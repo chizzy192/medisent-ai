@@ -124,7 +124,25 @@
     "welcomeIndependent": "Ọgwụ gị, otú gị.",
     "conditions": "Ọrịa",
     "medicines": "Ọgwụ gị",
-    "perDay": "{count, plural, one {# kwa ụbọchị} other {# kwa ụbọchị}}"
+    "perDay": "{count, plural, one {# kwa ụbọchị} other {# kwa ụbọchị}}",
+    "next": "Nke ọzọ",
+    "allDone": "Ọgwụ niile nke taa emechaala. Ọ dị mma.",
+    "savedNotice": "Echekwara. Edobere ncheta gị.",
+    "allMedicines": "Ọgwụ niile",
+    "tookIt": "Aṅụọla m ya",
+    "later": "Ma emechaa",
+    "missedIt": "Efuru m ya",
+    "daysLeft": "{count, plural, =0 {Na-agwụ taa} one {Ụbọchị # fọdụrụ} other {Ụbọchị # fọdụrụ}}",
+    "dose": {
+      "taken": "Aṅụọla",
+      "now": "Ugbu a",
+      "later": "Ma emechaa",
+      "late": "Egbuola oge",
+      "missed": "Efuola",
+      "snoozed": "Ehihiela"
+    },
+    "notSaved": "Echekwaghị ya. Biko nwaa ọzọ.",
+    "notSavedOffline": "Echekwaghị ya: enweghị njikọ. Hapụ ihuenyo a ma nwaa ọzọ mgbe ị nwere ịntanetị."
   },
   "placeholder": {
     "label": "Na-abịa n'oge na-adịghị anya",
@@ -153,7 +171,8 @@
     "me": "Mụ",
     "demo": "Nwaa ihe ngosi",
     "hospital": "Njikwa ụlọ ọgwụ",
-    "registry": "Ndepụta ndị ọrịa"
+    "registry": "Ndepụta ndị ọrịa",
+    "reminder": "Ncheta"
   },
   "setup": {
     "title": "Edobebeghị Supabase",
@@ -547,5 +566,273 @@
     "body": "Ọ bụ n'akụkụ anyị, ọ bụghị nke gị. Pịa Nwaa ọzọ. Ọ bụrụ na ọ na-eme ugboro ugboro, gwa ụlọ ọrụ ndekọ ma ọ bụ onye na-arụ ngwa a.",
     "retry": "Nwaa ọzọ",
     "home": "Laghachi na peeji mbido"
+  },
+  "voice": {
+    "listen": "Gee ntị",
+    "stop": "Kwụsị",
+    "browserVoice": "Na-akpọ ya n'olu ekwentị.",
+    "unavailable": "Enweghị olu {language} ugbu a. Gụọ okwu ndị dị n'ihuenyo."
+  },
+  "pill": {
+    "shape": "Ụdị",
+    "colour": "Agba",
+    "otherColour": "Agba ọzọ",
+    "shapes": {
+      "round": "Mkpụrụ okirikiri",
+      "capsule": "Kapsul",
+      "oval": "Mkpụrụ oval",
+      "inhaler": "Ihe iku ume",
+      "liquid": "Mmiri ọgwụ",
+      "injection": "Ịgba ogwu"
+    },
+    "colours": {
+      "white": "Ọcha",
+      "yellow": "Edo",
+      "red": "Uhie",
+      "orange": "Oroma",
+      "green": "Akwụkwọ ndụ",
+      "blue": "Anụnụ",
+      "pink": "Pink",
+      "brown": "Nchara"
+    }
+  },
+  "drugCheck": {
+    "chips": {
+      "none": "Enwebeghị nọmba",
+      "registered": "Edebanyere",
+      "not_found": "Ahụghị ya na ndepụta anyị",
+      "mismatch": "Nọmba adabaghị na ọgwụ a",
+      "unreadable": "Enweghị ike ịgụ nọmba"
+    },
+    "notes": {
+      "registered": "Nọmba NAFDAC a dabara na ndepụta ndebanye anyị.",
+      "not_found": "Anyị ahụghị nọmba a na ndepụta anyị. Lelee nọmba ahụ na mkpọ. Ọ bụrụ na o ziri ezi, gosi onye ọgwụ gị mkpọ a tupu ị ṅụọ ya.",
+      "mismatch": "Na ndepụta anyị nọmba a bụ maka ọgwụ ma ọ bụ ike dị iche. Lelee aha na ike na mkpọ. Ọ bụrụ na ha dabara na mkpọ, gosi onye ọgwụ gị ya tupu ị ṅụọ ya.",
+      "mismatchNamed": "Na ndepụta anyị nọmba a bụ maka {name}, ọ bụghị maka {typedName}. Lelee aha dị na mkpọ. Ọ bụrụ na mkpọ ahụ kwuru {typedName} n'ezie, gosi onye ọgwụ gị ya tupu ị ṅụọ ya.",
+      "unreadable": "Nke ahụ adịghị ka nọmba NAFDAC (ha na-adị ka A4-1234). Lelee mkpọ ma pịa ya ọzọ, ma ọ bụ jụọ onye ọgwụ gị.",
+      "registeredNamed": "Nọmba a dị na ndepụta maka {name} {strength}, nke {manufacturer} mere.",
+      "mismatchStrength": "Na ndepụta anyị nọmba a bụ maka {name} {listedStrength}. Mkpọ gị kwuru {strength}. Lelee ike dị na mkpọ, wee gosi onye ọgwụ gị ya tupu ị ṅụọ ya."
+    },
+    "reportLink": "nafdac.gov.ng (na-emepe webụsaịtị ha)",
+    "reportLead": "Ọ bụrụ na onye ọgwụ gị kwenyere, ị nwere ike ịgwa NAFDAC:"
+  },
+  "scan": {
+    "stepLabel": "Nyocha · Nzọụkwụ {step} nke {total}",
+    "pointTitle": "Tụọ n'akara ahụ",
+    "foundTitle": "Nke a bụ ihe anyị gụrụ",
+    "ready": "Njikere",
+    "reading": "Na-agụ akara… {pct}%",
+    "done": "Agụrụ · {pct}% n'aka",
+    "weak": "Ejighị n'aka · {pct}%",
+    "capture": "See foto",
+    "choosePhoto": "Họrọ foto kama",
+    "continue": "Ọ dị mma, gaa n'ihu",
+    "continueAnyway": "Gaa n'ihu ma dozie ya n'onwe m",
+    "retake": "Nwaa foto ọzọ",
+    "foundSoFar": "Ihe achọtara",
+    "turnPack": "Tụgharịa mkpọ",
+    "weakHint": "Anyị ejighị n'aka karịa {pct}%. Jide mkpọ ahụ n'ọkụ dị mma, ma ọ bụ dozie nkọwa n'ihuenyo ọzọ.",
+    "fields": {
+      "drug": "Ọgwụ",
+      "strength": "Ike",
+      "nafdac": "NAFDAC"
+    },
+    "check": {
+      "registered": "Edebanyere",
+      "not_found": "Ahụghị ya na ndepụta anyị",
+      "mismatch": "Nọmba bụ nke ọgwụ ọzọ",
+      "unreadable": "Enweghị ike ịgụ nọmba"
+    },
+    "camera": {
+      "denied": "Agbanyụrụ igwefoto maka ngwa a. Ị ka nwere ike ịhọrọ foto n'ekwentị gị.",
+      "unavailable": "Ahụghị igwefoto. Họrọ foto n'ekwentị gị kama.",
+      "unsupported": "Ihe nchọgharị a enweghị ike imepe igwefoto. Họrọ foto n'ekwentị gị kama."
+    },
+    "errors": {
+      "readerFailed": "Anyị enweghị ike ịgụ foto ahụ. Nwaa ọzọ jiri akara dị larịị n'ọkụ dị mma.",
+      "offline": "Ị nọghị n'ịntanetị. Nyocha chọrọ ịntanetị; ọgwụ gị echekwara ka na-arụ ọrụ.",
+      "tooBig": "Foto ahụ buru oke ibu. Nwaa ọzọ."
+    },
+    "cameraPreview": "Ihe igwefoto na-ahụ"
+  },
+  "confirm": {
+    "title": "Lelee ma kwenye",
+    "intro": "Dozie ihe ọ bụla na-ezighị ezi. Ọ dịghị ihe echekwara ruo mgbe ị pịrị Chekwaa.",
+    "sectionMedicine": "Ọgwụ",
+    "drugName": "Aha ọgwụ",
+    "strength": "Ike",
+    "strengthHint": "Dịka 500 mg",
+    "form": "Ụdị",
+    "sectionHow": "Otu esi aṅụ ya",
+    "dose": "Oge ọ bụla, ṅụọ",
+    "doseHint": "Dịka mkpụrụ 1 ma ọ bụ nkuume 2",
+    "frequency": "Ugboro ole",
+    "perDay": "{count, plural, =1 {Otu ugboro n'ụbọchị} =2 {Ugboro abụọ n'ụbọchị} other {Ugboro # n'ụbọchị}}",
+    "withFood": "Nri",
+    "food": {
+      "any": "Oge ọ bụla",
+      "before": "Tupu nri",
+      "after": "Mgbe nri gasịrị",
+      "with": "Na nri"
+    },
+    "duration": "Ruo ụbọchị ole",
+    "durationHint": "Hapụ ya efu ma ọ bụrụ kwa ụbọchị.",
+    "times": "Oge ncheta",
+    "timesHint": "Pịa oge iji gbanwee ya.",
+    "timeN": "Ncheta {n}",
+    "willSay": "Ngwa a ga-asị",
+    "sectionLooks": "Kedu ka ọgwụ gị dị?",
+    "looksIntro": "Ka i wee jikọta ihuenyo na mkpọ.",
+    "sectionSupply": "Ọgwụ fọdụrụ",
+    "quantity": "Ole ka i nwetara?",
+    "quantityHint": "Mkpụrụ, kapsul ma ọ bụ nkuume dị na mkpọ. Anyị na-echetara gị tupu ha agwụ.",
+    "sectionCheck": "Nyocha NAFDAC",
+    "nafdac": "Nọmba NAFDAC",
+    "nafdacHint": "E bipụtara ya na mkpọ n'akụkụ 'NAFDAC Reg. No.', dịka A4-1234.",
+    "warnings": "N'akara",
+    "save": "Chekwaa ma debe ncheta",
+    "saving": "Na-echekwa…",
+    "back": "Laghachi na foto",
+    "errors": {
+      "nameRequired": "Pịa aha ọgwụ.",
+      "doseRequired": "Pịa ole ị ga-aṅụ oge ọ bụla.",
+      "timesRequired": "Debe opekata mpe otu oge ncheta.",
+      "server": "Anyị enweghị ike ichekwa. Lelee netwọk gị ma nwaa ọzọ."
+    },
+    "checking": "Na-elele…",
+    "checkFailed": "Enweghị ike ịlele",
+    "checkFailedNote": "Anyị enweghị ike iru ndepụta ugbu a. Anyị ga-elele ọzọ mgbe ị chekwara; ị ka nwere ike ichekwa."
+  },
+  "reminder": {
+    "label": "Oge ọgwụ gị",
+    "listen": "Gee ntị",
+    "taken": "Aṅụọla m ya",
+    "snooze": "Chetara m na nkeji 30",
+    "missed": "Efuru m ya",
+    "backHome": "Laghachi na taa",
+    "logged": {
+      "taken": "Aṅụọla",
+      "late": "Aṅụrụ ya n'oge gafere",
+      "snoozed": "Ehihiela",
+      "missed": "Efuola"
+    },
+    "loggedBody": {
+      "taken": "Ọ dị mma. Anyị ga-echetara gị n'oge ọzọ.",
+      "late": "Echekwara dị ka aṅụrụ n'oge gafere. Gbalịa idebe oge echi.",
+      "snoozed": "Anyị ga-echetara gị ọzọ na nkeji 30.",
+      "missed": "Echekwara. Aṅụla ọgwụ abụọ iji mejuo; jụọ onye ọgwụ gị ma ọ bụrụ na ị na-efu ọgwụ ugboro ugboro."
+    },
+    "notSaved": "Echekwaghị ya. Biko nwaa ọzọ.",
+    "notSavedOffline": "Echekwaghị ya: enweghị njikọ. Hapụ ihuenyo a ma nwaa ọzọ mgbe ị nwere ịntanetị."
+  },
+  "meds": {
+    "label": "Ọgwụ m",
+    "title": "Ọgwụ gị",
+    "scanAnother": "Nyochaa ọgwụ",
+    "scanFirst": "Nyochaa ọgwụ mbụ gị",
+    "emptyTitle": "Enwebeghị ọgwụ",
+    "emptyBody": "Nyochaa mkpọ ma ọ bụ ndenye ọgwụ, anyị ga-edebe ncheta gị.",
+    "perDay": "{count, plural, one {# kwa ụbọchị} other {# kwa ụbọchị}}",
+    "daysLeft": "{count, plural, =0 {Na-agwụ taa} one {Ụbọchị # fọdụrụ} other {Ụbọchị # fọdụrụ}}",
+    "supply": "Ọgwụ fọdụrụ"
+  },
+  "refill": {
+    "label": "Nweta ọzọ n'oge na-adịghị anya",
+    "body": "Nweta ọzọ n'ụlọ ahịa ọgwụ gị tupu ọ gwụ.",
+    "daysLeft": "{count, plural, one {Ụbọchị # fọdụrụ} other {Ụbọchị # fọdụrụ}}",
+    "outToday": "Na-agwụ taa",
+    "gotRefill": "Enwetara m ọzọ",
+    "saving": "Na-echekwa…",
+    "howMany": "Ole ka i nwetara na mkpọ ọhụrụ?",
+    "save": "Chekwaa",
+    "notYet": "Ọ bụghị ugbu a",
+    "ranOut": "Agwụla. Jụọ ụlọ ahịa ọgwụ gị taa.",
+    "quantityRequired": "Pịa ole dị na mkpọ.",
+    "notSaved": "Echekwaghị ya. Biko nwaa ọzọ.",
+    "notSavedOffline": "Echekwaghị ya: enweghị njikọ. Nwaa ọzọ mgbe ị nwere ịntanetị.",
+    "count": "{count, plural, one {ọgwụ #} other {ọgwụ #}}"
+  },
+  "access": {
+    "title": "Nnweta",
+    "intro": "Mee ka ngwa a dị mfe ịhụ na ịnụ.",
+    "textSize": "Nha mkpụrụedemede",
+    "sizes": {
+      "normal": "Nkịtị",
+      "large": "Buru ibu",
+      "larger": "Kacha ibu"
+    },
+    "highContrast": "Ọdịiche dị elu",
+    "highContrastHint": "Mkpụrụedemede ojii, oke siri ike, enweghị ntụpọ n'azụ.",
+    "speechRate": "Ọsọ okwu",
+    "rates": {
+      "1": "Nkịtị",
+      "0_8": "Nwayọọ",
+      "1_2": "Ngwa ngwa"
+    },
+    "trySpeed": "Nụrụ ọsọ a",
+    "sample": "Ṅụọ otu mkpụrụ ọgwụ n'ụtụtụ ọ bụla mgbe i richara nri.",
+    "save": "Chekwaa ntọala",
+    "saving": "Na-echekwa…"
+  },
+  "patients": {
+    "title": "Ndị ọrịa",
+    "count": "{count, plural, one {onye ọrịa #} other {ndị ọrịa #}}",
+    "emptyTitle": "Enwebeghị ndị ọrịa",
+    "emptyBody": "Ndị ọrịa na-apụta ebe a ma ha debanye na ndepụta ụlọ ọgwụ.",
+    "risk": {
+      "low": "Dị ala",
+      "medium": "Etiti",
+      "high": "Dị elu"
+    },
+    "back": "Ndị ọrịa niile",
+    "weekAdherence": "{pct}% aṅụrụ n'izu a",
+    "medicines": "Ọgwụ",
+    "noMedicines": "Enweghị ọgwụ dị ire.",
+    "perDay": "{count, plural, one {# kwa ụbọchị} other {# kwa ụbọchị}}",
+    "confirmed": "Onye ọrịa kwenyere",
+    "unconfirmed": "Akwenyebeghị",
+    "source": {
+      "scan": "onye ọrịa nyochara",
+      "staff": "ndị ọrụ tinyere"
+    },
+    "addTitle": "Tinye ndenye ọgwụ",
+    "addBody": "Onye ọrịa na-ahụ ya n'ekwentị ha na ncheta ma nụ ya n'asụsụ ha."
+  },
+  "staffPrescription": {
+    "sectionMedicine": "Ọgwụ",
+    "drugName": "Aha ọgwụ",
+    "strength": "Ike",
+    "form": "Ụdị",
+    "dose": "Oge ọ bụla, ṅụọ",
+    "frequency": "Ugboro ole",
+    "perDay": "{count, plural, =1 {Otu ugboro n'ụbọchị} =2 {Ugboro abụọ n'ụbọchị} other {Ugboro # n'ụbọchị}}",
+    "withFood": "Nri",
+    "food": {
+      "any": "Oge ọ bụla",
+      "before": "Tupu nri",
+      "after": "Mgbe nri gasịrị",
+      "with": "Na nri"
+    },
+    "duration": "Ụbọchị",
+    "times": "Oge ncheta",
+    "timeN": "Ncheta {n}",
+    "sectionSupply": "Ọgwụ na ndebanye",
+    "quantity": "Ọnụọgụ enyere",
+    "quantityHint": "Mkpụrụ, kapsul ma ọ bụ nkuume enyere.",
+    "nafdac": "Nọmba NAFDAC",
+    "nafdacHint": "A na-enyocha ya na ndepụta ndebanye.",
+    "instructionsRaw": "Sig (dịka edere)",
+    "instructionsRawHint": "Nhọrọ, edebere maka ndekọ.",
+    "sectionLooks": "Otu ọgwụ ahụ dị",
+    "save": "Tinye ndenye ọgwụ",
+    "saving": "Na-echekwa…",
+    "saved": "Echekwara maka {name}. Ha ga-anụ:",
+    "errors": {
+      "nameRequired": "Pịa aha ọgwụ.",
+      "doseRequired": "Pịa ọnụọgụ.",
+      "frequencyRequired": "Họrọ ugboro ole.",
+      "notYourPatient": "Onye ọrịa a anọghị n'ụlọ ọgwụ gị.",
+      "server": "Anyị enweghị ike ichekwa. Nwaa ọzọ."
+    }
   }
 }

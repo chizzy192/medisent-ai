@@ -90,6 +90,15 @@ Drawn to `docs/mockups/medisent-landing.png`, nine sections (BUILD_PLAN Stage 0)
 - Success chip text `#12805C` on `#E3F4EC` measures 4.32:1 (AA needs 4.5:1 for 16px text); `#0F6E4F` would pass. Palette is fixed, so this is listed, not changed.
 - ink-3 `#5E6E84` on primary-tint `#E6EDFC` is 4.43:1: do not put ink-3 labels on primary-tint. On the dot-grid hero card use ink-2 for the 12px label.
 
+## Stage 2 components
+
+- **Scan viewfinder** (`src/components/scan/ScanFlow.tsx`): dark `#0B1220` frame, four cobalt corner brackets, a 2px cobalt line sweeping every 1.8 s while reading (`.animate-scan-sweep`, off under reduced motion), a status chip at the bottom ("Reading label… 82%"), then the "Found so far" card whose Drug / Strength / NAFDAC rows fade in one by one; missing fields show the warning chip "Turn the pack".
+- **Confirm screen** (`ConfirmForm.tsx`): every field editable in cards; reminder times as native time inputs in mono; the plain-language sentence in a primary-tint block with Listen; **PillPicker** (six shapes drawn as the real icon, eight colours plus a free picker); quantity; NAFDAC number with the live check chip and calm note; never the word "fake".
+- **Day timeline** (`DayTimeline` + `DoseCard`): node colours success / primary halo / border-grey / warning; the now card has a 2px primary border and the "I took it" primary button, which turns success with a check for 250 ms before the card settles.
+- **Reminder sheet** (`ReminderSheet.tsx`): 36px mono time, the medicine name and dose as the largest text, Listen in large size, three 56px choices Taken / Snooze / Missed (icon + word).
+- **Refill banner** (`RefillBanner.tsx`): warning tint and border, one row per medicine with the pill icon, a mono "X days left" chip and "I got a refill" (outline).
+- **Accessibility** (Me): text size normal / large / largest sets `data-text-size` on `<html>` (125% / 150% root font; spacing stays in px), high contrast sets `data-contrast="high"`, speech speed is the playback rate.
+
 ## Hard rules
 
 - Primary buttons with white text; one per card.

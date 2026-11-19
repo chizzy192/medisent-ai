@@ -3,7 +3,7 @@ import { CardRow } from "./CardRow";
 import { PillIcon, type PillShape } from "./PillIcon";
 import { StatusChip, type ChipTone } from "./StatusChip";
 
-export type DoseState = "taken" | "now" | "later" | "late";
+export type DoseState = "taken" | "now" | "later" | "late" | "missed" | "snoozed";
 
 /**
  * MedicineCard (section 3 v2 + signature element 3): pill icon in the medicine's real colour
@@ -37,20 +37,21 @@ export function MedicineCard({
   footer?: ReactNode;
 }) {
   const border =
-    state === "now" ? "border-2 border-primary" : state === "late" ? "border-2 border-warning-dot" : "border border-border";
+    state === "now" ? "border-2 border-primary" : state === "late" || state === "missed" ? "border-2 border-warning-dot" : "border border-border";
   return (
     <article className={`rounded-card bg-surface p-4 ${border}`}>
       <div className="flex flex-wrap items-start gap-3">
         <PillIcon shape={pill.shape} color={pill.color} />
-        <div className="min-w-0 flex-[1_1_12rem]">
+        <div className="min-w-0 flex-[1_1_8rem]">
           <CardRow
             main={
               <>
-                <h3 className="text-card-title font-semibold">
-                  {name} <span className="font-mono text-base font-medium text-ink-2">{strength}</span>
+                <h3 className="text-card-title font-semibold [text-wrap:pretty]">
+                  {name} <span className="font-mono text-base leading-none font-medium whitespace-nowrap text-ink-2">{strength}</span>
                 </h3>
-                <p className="font-mono text-sm text-ink-2">
-                  {time} · {dose}
+                {/* Time is the number an elderly patient must read: 22px mono, ink. Dose beside it. */}
+                <p className="font-mono text-time font-medium text-ink">
+                  {time} <span className="text-base whitespace-nowrap text-ink-2">· {dose}</span>
                 </p>
               </>
             }
@@ -58,7 +59,7 @@ export function MedicineCard({
           />
         </div>
       </div>
-      {actions && <div className="mt-4 flex flex-wrap gap-3 [&>*]:flex-[1_1_8rem]">{actions}</div>}
+      {actions && <div className="mt-4 flex flex-wrap gap-3 [&>*]:flex-[1_1_6rem]">{actions}</div>}
       {footer && <div className="mt-4 border-t border-surface-2 pt-3">{footer}</div>}
     </article>
   );

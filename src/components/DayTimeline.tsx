@@ -11,6 +11,8 @@ const nodeClass: Record<DoseState, string> = {
   now: "bg-primary ring-4 ring-primary-tint",
   later: "border-2 border-border bg-surface",
   late: "bg-warning-dot",
+  missed: "bg-warning-dot",
+  snoozed: "border-2 border-warning-dot bg-surface",
 };
 
 export function DayTimeline({ items }: { items: { key: string; state: DoseState; card: ReactNode }[] }) {

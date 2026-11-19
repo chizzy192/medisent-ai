@@ -124,7 +124,25 @@
     "welcomeIndependent": "Oògùn rẹ, ní ọ̀nà rẹ.",
     "conditions": "Àìsàn",
     "medicines": "Oògùn rẹ",
-    "perDay": "{count, plural, one {# lójúmọ́} other {# lójúmọ́}}"
+    "perDay": "{count, plural, one {# lójúmọ́} other {# lójúmọ́}}",
+    "next": "Tó kàn",
+    "allDone": "Gbogbo ìwọ̀n òní ti parí. Ó dára.",
+    "savedNotice": "A ti tọ́jú. Ìránnilétí rẹ ti ṣetán.",
+    "allMedicines": "Gbogbo oògùn",
+    "tookIt": "Mo ti lò ó",
+    "later": "Nígbà mìíràn",
+    "missedIt": "Mo pàdánù rẹ̀",
+    "daysLeft": "{count, plural, =0 {Ó tán lónìí} one {Ọjọ́ # kù} other {Ọjọ́ # kù}}",
+    "dose": {
+      "taken": "A lò",
+      "now": "Báyìí",
+      "later": "Nígbà mìíràn",
+      "late": "Ó pẹ́",
+      "missed": "A pàdánù",
+      "snoozed": "A sún síwájú"
+    },
+    "notSaved": "A kò tọ́jú rẹ̀. Jọ̀wọ́ tún gbìyànjú.",
+    "notSavedOffline": "A kò tọ́jú rẹ̀: kò sí ìsopọ̀. Fi ojú ìbòjú yìí sílẹ̀ kí o tún gbìyànjú nígbà tí o bá padà sórí ayélujára."
   },
   "placeholder": {
     "label": "Ó ń bọ̀ láìpẹ́",
@@ -153,7 +171,8 @@
     "me": "Èmi",
     "demo": "Dán àfihàn wò",
     "hospital": "Pátákó ilé ìwòsàn",
-    "registry": "Àkójọ aláìsàn"
+    "registry": "Àkójọ aláìsàn",
+    "reminder": "Ìránnilétí"
   },
   "setup": {
     "title": "A kò tíì ṣètò Supabase",
@@ -547,5 +566,273 @@
     "body": "Ó wà ní ìhà wa, kì í ṣe tìrẹ. Tẹ Tún gbìyànjú. Bí ó bá ń ṣẹlẹ̀ léraléra, sọ fún tábìlì àkọsílẹ̀ tàbí ẹni tó ń ṣe ohun èlò yìí.",
     "retry": "Tún gbìyànjú",
     "home": "Padà sí ojú-ìwé ìbẹ̀rẹ̀"
+  },
+  "voice": {
+    "listen": "Gbọ́",
+    "stop": "Dúró",
+    "browserVoice": "Ń lo ohùn fóònù fúnra rẹ̀.",
+    "unavailable": "Kò sí ohùn {language} báyìí. Ka ọ̀rọ̀ tó wà lójú ìbòjú."
+  },
+  "pill": {
+    "shape": "Ìrísí",
+    "colour": "Àwọ̀",
+    "otherColour": "Àwọ̀ mìíràn",
+    "shapes": {
+      "round": "Tábìlẹ́ẹ̀tì yíká",
+      "capsule": "Kápúsù",
+      "oval": "Tábìlẹ́ẹ̀tì ẹyin",
+      "inhaler": "Ohun ìfami",
+      "liquid": "Omi oògùn",
+      "injection": "Abẹ́rẹ́"
+    },
+    "colours": {
+      "white": "Funfun",
+      "yellow": "Àwọ̀ ewé pupa",
+      "red": "Pupa",
+      "orange": "Ọsàn",
+      "green": "Ewé",
+      "blue": "Búlúù",
+      "pink": "Píǹkì",
+      "brown": "Àwọ̀ ilẹ̀"
+    }
+  },
+  "drugCheck": {
+    "chips": {
+      "none": "Kò sí nọ́mbà síbẹ̀",
+      "registered": "Ó forúkọ sílẹ̀",
+      "not_found": "Kò sí nínú àkójọ wa",
+      "mismatch": "Nọ́mbà kò bá oògùn yìí mu",
+      "unreadable": "A kò lè ka nọ́mbà náà"
+    },
+    "notes": {
+      "registered": "Nọ́mbà NAFDAC yìí bá àkójọ ìforúkọsílẹ̀ wa mu.",
+      "not_found": "A kò rí nọ́mbà yìí nínú àkójọ wa. Ṣàyẹ̀wò nọ́mbà náà lórí àpótí. Bí ó bá tọ́, fi àpótí yìí han oníṣègùn oògùn rẹ kí o tó lò ó.",
+      "mismatch": "Nínú àkójọ wa nọ́mbà yìí jẹ́ fún oògùn tàbí agbára mìíràn. Ṣàyẹ̀wò orúkọ àti agbára lórí àpótí. Bí wọ́n bá bá àpótí mu, fi han oníṣègùn oògùn rẹ kí o tó lò ó.",
+      "mismatchNamed": "Nínú àkójọ wa nọ́mbà yìí jẹ́ fún {name}, kì í ṣe fún {typedName}. Ṣàyẹ̀wò orúkọ lórí àpótí. Bí àpótí bá sọ {typedName} ní tòótọ́, fi han oníṣègùn oògùn rẹ kí o tó lò ó.",
+      "unreadable": "Èyí kò dàbí nọ́mbà NAFDAC (wọ́n dàbí A4-1234). Ṣàyẹ̀wò àpótí kí o tún tẹ̀ ẹ́, tàbí bi oníṣègùn oògùn rẹ.",
+      "registeredNamed": "Nọ́mbà yìí wà lórí àkójọ fún {name} {strength}, tí {manufacturer} ṣe.",
+      "mismatchStrength": "Nínú àkójọ wa nọ́mbà yìí jẹ́ fún {name} {listedStrength}. Àpótí rẹ sọ {strength}. Ṣàyẹ̀wò agbára lórí àpótí, kí o sì fi han oníṣègùn oògùn rẹ kí o tó lò ó."
+    },
+    "reportLink": "nafdac.gov.ng (ó ṣí ojú-ìwé wọn)",
+    "reportLead": "Bí oníṣègùn oògùn rẹ bá gbà, o lè sọ fún NAFDAC:"
+  },
+  "scan": {
+    "stepLabel": "Yíyà · Ìgbésẹ̀ {step} nínú {total}",
+    "pointTitle": "Tọ́ka sí àmì náà",
+    "foundTitle": "Èyí ni ohun tí a kà",
+    "ready": "Ó ṣetán",
+    "reading": "Ń ka àmì… {pct}%",
+    "done": "A kà · {pct}% dájú",
+    "weak": "Kò dájú · {pct}%",
+    "capture": "Ya fọ́tò",
+    "choosePhoto": "Yan fọ́tò dípò",
+    "continue": "Ó tọ́, tẹ̀síwájú",
+    "continueAnyway": "Tẹ̀síwájú kí n ṣàtúnṣe fúnra mi",
+    "retake": "Gbìyànjú fọ́tò mìíràn",
+    "foundSoFar": "Ohun tí a rí",
+    "turnPack": "Yí àpótí padà",
+    "weakHint": "A kò dájú ju {pct}% lọ. Gbé àpótí náà tẹ́jú ní ibi tó mọ́lẹ̀, tàbí ṣàtúnṣe àlàyé lójú ìbòjú tó kàn.",
+    "fields": {
+      "drug": "Oògùn",
+      "strength": "Agbára",
+      "nafdac": "NAFDAC"
+    },
+    "check": {
+      "registered": "Ó forúkọ sílẹ̀",
+      "not_found": "Kò sí nínú àkójọ wa",
+      "mismatch": "Nọ́mbà jẹ́ ti oògùn mìíràn",
+      "unreadable": "A kò lè ka nọ́mbà"
+    },
+    "camera": {
+      "denied": "Kámẹ́rà ti wà ní pípa fún ohun èlò yìí. O ṣì lè yan fọ́tò láti inú fóònù rẹ.",
+      "unavailable": "A kò rí kámẹ́rà. Yan fọ́tò láti inú fóònù rẹ dípò.",
+      "unsupported": "Ẹ̀rọ awakiri yìí kò lè ṣí kámẹ́rà. Yan fọ́tò láti inú fóònù rẹ dípò."
+    },
+    "errors": {
+      "readerFailed": "A kò lè ka fọ́tò yẹn. Tún gbìyànjú pẹ̀lú àmì tó tẹ́jú ní ibi tó mọ́lẹ̀.",
+      "offline": "O kò sí lórí ayélujára. Yíyà nílò ayélujára; oògùn tí o ti tọ́jú ṣì ń ṣiṣẹ́.",
+      "tooBig": "Fọ́tò yẹn tóbi jù. Tún gbìyànjú."
+    },
+    "cameraPreview": "Àwòrán kámẹ́rà"
+  },
+  "confirm": {
+    "title": "Ṣàyẹ̀wò kí o sì jẹ́rìí",
+    "intro": "Ṣàtúnṣe ohunkóhun tó kò tọ́. A kò tọ́jú ohunkóhun títí o fi tẹ Tọ́jú.",
+    "sectionMedicine": "Oògùn",
+    "drugName": "Orúkọ oògùn",
+    "strength": "Agbára",
+    "strengthHint": "Bíi 500 mg",
+    "form": "Ìrísí",
+    "sectionHow": "Bí a ṣe ń lò ó",
+    "dose": "Nígbà kọ̀ọ̀kan, lo",
+    "doseHint": "Bíi tábìlẹ́ẹ̀tì 1 tàbí ìfami 2",
+    "frequency": "Ìgbà mélòó",
+    "perDay": "{count, plural, =1 {Lẹ́ẹ̀kan lójúmọ́} =2 {Lẹ́ẹ̀mejì lójúmọ́} other {Ìgbà # lójúmọ́}}",
+    "withFood": "Oúnjẹ",
+    "food": {
+      "any": "Nígbàkúgbà",
+      "before": "Kí o tó jẹun",
+      "after": "Lẹ́yìn oúnjẹ",
+      "with": "Pẹ̀lú oúnjẹ"
+    },
+    "duration": "Fún ọjọ́ mélòó",
+    "durationHint": "Fi sílẹ̀ ní òfo bí ó bá jẹ́ lójoojúmọ́.",
+    "times": "Àkókò ìránnilétí",
+    "timesHint": "Tẹ àkókò láti yí i padà.",
+    "timeN": "Ìránnilétí {n}",
+    "willSay": "Ohun èlò yóò sọ",
+    "sectionLooks": "Báwo ni oògùn rẹ ṣe rí?",
+    "looksIntro": "Kí o lè bá ojú ìbòjú mu pẹ̀lú àpótí.",
+    "sectionSupply": "Ìpèsè",
+    "quantity": "Mélòó ni o gbà?",
+    "quantityHint": "Tábìlẹ́ẹ̀tì, kápúsù tàbí ìfami nínú àpótí. A ń rán ọ létí kí wọ́n tó tán.",
+    "sectionCheck": "Àyẹ̀wò NAFDAC",
+    "nafdac": "Nọ́mbà NAFDAC",
+    "nafdacHint": "Ó wà lórí àpótí lẹ́yìn 'NAFDAC Reg. No.', bíi A4-1234.",
+    "warnings": "Lórí àmì",
+    "save": "Tọ́jú kí o ṣètò ìránnilétí",
+    "saving": "Ń tọ́jú…",
+    "back": "Padà sí fọ́tò",
+    "errors": {
+      "nameRequired": "Tẹ orúkọ oògùn.",
+      "doseRequired": "Tẹ iye tí o máa lò nígbà kọ̀ọ̀kan.",
+      "timesRequired": "Ṣètò ó kéré tán àkókò ìránnilétí kan.",
+      "server": "A kò lè tọ́jú. Ṣàyẹ̀wò nẹ́tíwọ̀kì rẹ kí o tún gbìyànjú."
+    },
+    "checking": "Ń ṣàyẹ̀wò…",
+    "checkFailed": "A kò lè ṣàyẹ̀wò",
+    "checkFailedNote": "A kò lè dé àkójọ náà báyìí. A ó tún ṣàyẹ̀wò nígbà tí o bá tọ́jú; o ṣì lè tọ́jú."
+  },
+  "reminder": {
+    "label": "Àkókò oògùn rẹ",
+    "listen": "Gbọ́",
+    "taken": "Mo ti lò ó",
+    "snooze": "Rán mi létí ní ìṣẹ́jú 30",
+    "missed": "Mo pàdánù rẹ̀",
+    "backHome": "Padà sí òní",
+    "logged": {
+      "taken": "A lò",
+      "late": "A lò pẹ́",
+      "snoozed": "A sún síwájú",
+      "missed": "A pàdánù"
+    },
+    "loggedBody": {
+      "taken": "Ó dára. A ó rán ọ létí ní àkókò tó kàn.",
+      "late": "A tọ́jú rẹ̀ gẹ́gẹ́ bí a lò pẹ́. Gbìyànjú láti tẹ̀lé àkókò lọ́la.",
+      "snoozed": "A ó tún rán ọ létí ní ìṣẹ́jú 30.",
+      "missed": "A tọ́jú. Má ṣe lo ìwọ̀n méjì láti bá a; bi oníṣègùn oògùn rẹ bí o bá ń pàdánù ìwọ̀n lọ́pọ̀ ìgbà."
+    },
+    "notSaved": "A kò tọ́jú rẹ̀. Jọ̀wọ́ tún gbìyànjú.",
+    "notSavedOffline": "A kò tọ́jú rẹ̀: kò sí ìsopọ̀. Fi ojú ìbòjú yìí sílẹ̀ kí o tún gbìyànjú nígbà tí o bá padà sórí ayélujára."
+  },
+  "meds": {
+    "label": "Oògùn mi",
+    "title": "Oògùn rẹ",
+    "scanAnother": "Ya oògùn",
+    "scanFirst": "Ya oògùn àkọ́kọ́ rẹ",
+    "emptyTitle": "Kò sí oògùn síbẹ̀",
+    "emptyBody": "Ya àpótí tàbí ìwé oògùn, a sì ṣètò ìránnilétí rẹ.",
+    "perDay": "{count, plural, one {# lójúmọ́} other {# lójúmọ́}}",
+    "daysLeft": "{count, plural, =0 {Ó tán lónìí} one {Ọjọ́ # kù} other {Ọjọ́ # kù}}",
+    "supply": "Ìpèsè tó kù"
+  },
+  "refill": {
+    "label": "Tún gbà láìpẹ́",
+    "body": "Gba síi ní ilé ìtajà oògùn rẹ kí ó tó tán.",
+    "daysLeft": "{count, plural, one {Ọjọ́ # kù} other {Ọjọ́ # kù}}",
+    "outToday": "Ó tán lónìí",
+    "gotRefill": "Mo ti gba síi",
+    "saving": "Ń tọ́jú…",
+    "howMany": "Mélòó ni o gbà nínú àpótí tuntun?",
+    "save": "Tọ́jú",
+    "notYet": "Kò tíì tó",
+    "ranOut": "Ó ti tán. Bi ilé ìtajà oògùn rẹ lónìí.",
+    "quantityRequired": "Tẹ iye tó wà nínú àpótí.",
+    "notSaved": "A kò tọ́jú rẹ̀. Jọ̀wọ́ tún gbìyànjú.",
+    "notSavedOffline": "A kò tọ́jú rẹ̀: kò sí ìsopọ̀. Tún gbìyànjú nígbà tí o bá padà sórí ayélujára.",
+    "count": "{count, plural, one {oògùn #} other {oògùn #}}"
+  },
+  "access": {
+    "title": "Ìràkò",
+    "intro": "Jẹ́ kí ohun èlò rọrùn láti rí àti gbọ́.",
+    "textSize": "Ìwọ̀n lẹ́tà",
+    "sizes": {
+      "normal": "Déédéé",
+      "large": "Ńlá",
+      "larger": "Títóbi jùlọ"
+    },
+    "highContrast": "Ìyàtọ̀ gíga",
+    "highContrastHint": "Lẹ́tà dúdú, ìlà tó lágbára, kò sí àmì lẹ́yìn.",
+    "speechRate": "Ìyára ọ̀rọ̀",
+    "rates": {
+      "1": "Déédéé",
+      "0_8": "Lọ́ra",
+      "1_2": "Yára"
+    },
+    "trySpeed": "Gbọ́ ìyára yìí",
+    "sample": "Lo tábìlẹ́ẹ̀tì kan ní àárọ̀ ọjọ́ kọ̀ọ̀kan lẹ́yìn oúnjẹ.",
+    "save": "Tọ́jú ìṣètò",
+    "saving": "Ń tọ́jú…"
+  },
+  "patients": {
+    "title": "Aláìsàn",
+    "count": "{count, plural, one {aláìsàn #} other {aláìsàn #}}",
+    "emptyTitle": "Kò sí aláìsàn síbẹ̀",
+    "emptyBody": "Aláìsàn ń hàn níbí nígbà tí wọ́n bá forúkọ sílẹ̀ pẹ̀lú àkójọ ilé ìwòsàn.",
+    "risk": {
+      "low": "Kéré",
+      "medium": "Àárín",
+      "high": "Gíga"
+    },
+    "back": "Gbogbo aláìsàn",
+    "weekAdherence": "{pct}% ni a lò ní ọ̀sẹ̀ yìí",
+    "medicines": "Oògùn",
+    "noMedicines": "Kò sí oògùn tó ń lọ.",
+    "perDay": "{count, plural, one {# lójúmọ́} other {# lójúmọ́}}",
+    "confirmed": "Aláìsàn ti jẹ́rìí",
+    "unconfirmed": "Kò tíì jẹ́rìí",
+    "source": {
+      "scan": "aláìsàn ló yà",
+      "staff": "òṣìṣẹ́ ló fi kún"
+    },
+    "addTitle": "Fi ìwé oògùn kún un",
+    "addBody": "Aláìsàn rí i lórí fóònù wọn pẹ̀lú ìránnilétí, wọ́n sì gbọ́ ọ ní èdè wọn."
+  },
+  "staffPrescription": {
+    "sectionMedicine": "Oògùn",
+    "drugName": "Orúkọ oògùn",
+    "strength": "Agbára",
+    "form": "Ìrísí",
+    "dose": "Nígbà kọ̀ọ̀kan, lo",
+    "frequency": "Ìgbà mélòó",
+    "perDay": "{count, plural, =1 {Lẹ́ẹ̀kan lójúmọ́} =2 {Lẹ́ẹ̀mejì lójúmọ́} other {Ìgbà # lójúmọ́}}",
+    "withFood": "Oúnjẹ",
+    "food": {
+      "any": "Nígbàkúgbà",
+      "before": "Kí o tó jẹun",
+      "after": "Lẹ́yìn oúnjẹ",
+      "with": "Pẹ̀lú oúnjẹ"
+    },
+    "duration": "Ọjọ́",
+    "times": "Àkókò ìránnilétí",
+    "timeN": "Ìránnilétí {n}",
+    "sectionSupply": "Ìpèsè àti ìforúkọsílẹ̀",
+    "quantity": "Iye tí a fún",
+    "quantityHint": "Tábìlẹ́ẹ̀tì, kápúsù tàbí ìfami tí a fún.",
+    "nafdac": "Nọ́mbà NAFDAC",
+    "nafdacHint": "A ń ṣàyẹ̀wò rẹ̀ lórí àkójọ ìforúkọsílẹ̀.",
+    "instructionsRaw": "Sig (bí a ṣe kọ ọ́)",
+    "instructionsRawHint": "Àṣàyàn, a tọ́jú rẹ̀ fún àkọsílẹ̀.",
+    "sectionLooks": "Bí oògùn náà ṣe rí",
+    "save": "Fi ìwé oògùn kún un",
+    "saving": "Ń tọ́jú…",
+    "saved": "A tọ́jú fún {name}. Wọn yóò gbọ́:",
+    "errors": {
+      "nameRequired": "Tẹ orúkọ oògùn.",
+      "doseRequired": "Tẹ ìwọ̀n.",
+      "frequencyRequired": "Yan ìgbà mélòó.",
+      "notYourPatient": "Aláìsàn yìí kò sí ní ilé ìwòsàn rẹ.",
+      "server": "A kò lè tọ́jú. Tún gbìyànjú."
+    }
   }
 }

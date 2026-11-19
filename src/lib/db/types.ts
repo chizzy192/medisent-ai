@@ -51,6 +51,7 @@ export type Profile = {
   failed_attempts: number;
   consent_at: string | null;
   text_size: "normal" | "large" | "larger";
+  high_contrast: boolean;
   speech_rate: number;
   created_at: string;
 };

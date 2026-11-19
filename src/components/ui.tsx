@@ -29,13 +29,19 @@ export function ButtonLink({
 export function Card({
   as: Tag = "div",
   className = "",
+  id,
   children,
 }: {
   as?: "div" | "article" | "section" | "li";
   className?: string;
+  id?: string;
   children: ReactNode;
 }) {
-  return <Tag className={`rounded-card border border-border bg-surface p-4 ${className}`}>{children}</Tag>;
+  return (
+    <Tag id={id} className={`rounded-card border border-border bg-surface p-4 ${className}`}>
+      {children}
+    </Tag>
+  );
 }
 
 /** Small mono uppercase section label (12px, 0.04em tracking, ink-3). */

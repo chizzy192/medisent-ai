@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Noto_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
+import { cookies } from "next/headers";
 import { getLocale, getTranslations } from "next-intl/server";
+import { CONTRAST_COOKIE, isTextSize, TEXT_SIZE_COOKIE } from "@/lib/accessibility";
 import { brand } from "@/config/brand";
 import { htmlLang, isLocale, defaultLocale } from "@/config/locales";
 import "./globals.css";
@@ -55,10 +57,15 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
   const lang = htmlLang[isLocale(locale) ? locale : defaultLocale];
+  const store = await cookies();
+  const textSize = store.get(TEXT_SIZE_COOKIE)?.value;
+  const contrast = store.get(CONTRAST_COOKIE)?.value === "high" ? "high" : undefined;
 
   return (
     <html
       lang={lang}
+      data-text-size={isTextSize(textSize) && textSize !== "normal" ? textSize : undefined}
+      data-contrast={contrast}
       className={`${plexSans.variable} ${plexMono.variable} ${notoSans.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">

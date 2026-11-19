@@ -1,20 +1,23 @@
 import { getTranslations } from "next-intl/server";
 import { signOut } from "@/lib/auth/actions";
+import { AccessibilityForm } from "@/components/AccessibilityForm";
 import { LanguageChoice } from "@/components/LanguageChoice";
 import { StatusChip } from "@/components/StatusChip";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Card, SectionLabel } from "@/components/ui";
 import { getSession, requireRole } from "@/lib/auth/dal";
+import { isTextSize } from "@/lib/accessibility";
 
 /**
- * "Me" (section 3): the account, hospital, language and sign-out. Stage 2 adds Accessibility
- * (text size, speech speed), Caregivers, Refills, Records and Privacy here.
+ * "Me" (section 3): the account, hospital, language, accessibility (text size, high contrast,
+ * speech speed) and sign-out. Later stages add Caregivers, Refills, Records and Privacy here.
  */
 export default async function MePage() {
   await requireRole(["patient", "doctor", "pharmacist", "nurse", "hospital_admin", "platform_admin"]);
   const session = (await getSession())!;
   const { profile, hospital } = session;
   const t = await getTranslations("me");
+  const tAccess = await getTranslations("access");
 
   const rows: { label: string; value: string | null }[] = [
     { label: t("role"), value: t(`roles.${profile.role}`) },
@@ -50,6 +53,19 @@ export default async function MePage() {
         <p className="mt-1 text-base text-ink-2">{t("languageBody")}</p>
         <div className="mt-3">
           <LanguageChoice label={t("language")} />
+        </div>
+      </Card>
+
+      <Card as="section" id="accessibility">
+        <h2 className="text-xl">{tAccess("title")}</h2>
+        <p className="mt-1 text-base text-ink-2">{tAccess("intro")}</p>
+        <div className="mt-4">
+          <AccessibilityForm
+            textSize={isTextSize(profile.text_size) ? profile.text_size : "normal"}
+            highContrast={Boolean(profile.high_contrast)}
+            speechRate={Number(profile.speech_rate) || 1}
+            sample={tAccess("sample")}
+          />
         </div>
       </Card>
 

@@ -124,7 +124,25 @@
     "welcomeIndependent": "Your medicines, your way.",
     "conditions": "Conditions",
     "medicines": "Your medicines",
-    "perDay": "{count, plural, one {# a day} other {# a day}}"
+    "perDay": "{count, plural, one {# a day} other {# a day}}",
+    "next": "Next",
+    "allDone": "All doses done for today. Well done.",
+    "savedNotice": "Saved. Your reminders are set.",
+    "allMedicines": "All medicines",
+    "tookIt": "I took it",
+    "later": "Later",
+    "missedIt": "I missed it",
+    "daysLeft": "{count, plural, =0 {Runs out today} one {# day left} other {# days left}}",
+    "dose": {
+      "taken": "Taken",
+      "now": "Now",
+      "later": "Later",
+      "late": "Late",
+      "missed": "Missed",
+      "snoozed": "Snoozed"
+    },
+    "notSaved": "Not saved. Please try again.",
+    "notSavedOffline": "Not saved: no connection. Keep this screen open and try again when you are back online."
   },
   "placeholder": {
     "label": "Coming soon",
@@ -153,7 +171,8 @@
     "me": "Me",
     "demo": "Try the demo",
     "hospital": "Hospital dashboard",
-    "registry": "Patient registry"
+    "registry": "Patient registry",
+    "reminder": "Reminder"
   },
   "setup": {
     "title": "Supabase is not set up yet",
@@ -547,5 +566,273 @@
     "body": "It was on our side, not yours. Press Try again. If it keeps happening, tell the records desk or the person who runs this app.",
     "retry": "Try again",
     "home": "Back to the start page"
+  },
+  "voice": {
+    "listen": "Listen",
+    "stop": "Stop",
+    "browserVoice": "Playing with the phone's own voice.",
+    "unavailable": "No {language} voice is available right now. Read the words on screen."
+  },
+  "pill": {
+    "shape": "Shape",
+    "colour": "Colour",
+    "otherColour": "Another colour",
+    "shapes": {
+      "round": "Round tablet",
+      "capsule": "Capsule",
+      "oval": "Oval tablet",
+      "inhaler": "Inhaler",
+      "liquid": "Liquid",
+      "injection": "Injection"
+    },
+    "colours": {
+      "white": "White",
+      "yellow": "Yellow",
+      "red": "Red",
+      "orange": "Orange",
+      "green": "Green",
+      "blue": "Blue",
+      "pink": "Pink",
+      "brown": "Brown"
+    }
+  },
+  "drugCheck": {
+    "chips": {
+      "none": "No number yet",
+      "registered": "Registered",
+      "not_found": "Not found in our list",
+      "mismatch": "Number doesn't match this medicine",
+      "unreadable": "Couldn't read the number"
+    },
+    "notes": {
+      "registered": "This NAFDAC number matches our registration list.",
+      "not_found": "We couldn't find this number in our list. Check the number against the pack. If it is right, show this pack to your pharmacist before taking it.",
+      "mismatch": "In our list this number is for a different medicine or strength. Check the name and strength against the pack. If they match the pack, show it to your pharmacist before taking it.",
+      "mismatchNamed": "In our list this number is for {name}, not for {typedName}. Check the name on the pack. If the pack really says {typedName}, show it to your pharmacist before taking it.",
+      "unreadable": "That does not look like a NAFDAC number (they look like A4-1234). Check the pack and type it again, or ask your pharmacist.",
+      "registeredNamed": "This number is on the list for {name} {strength}, made by {manufacturer}.",
+      "mismatchStrength": "In our list this number is for {name} {listedStrength}. Your pack says {strength}. Check the strength on the pack, then show it to your pharmacist before taking it."
+    },
+    "reportLink": "nafdac.gov.ng (opens their website)",
+    "reportLead": "If your pharmacist agrees, you can tell NAFDAC:"
+  },
+  "scan": {
+    "stepLabel": "Scan · Step {step} of {total}",
+    "pointTitle": "Point at the label",
+    "foundTitle": "Here is what we read",
+    "ready": "Ready",
+    "reading": "Reading label… {pct}%",
+    "done": "Read · {pct}% sure",
+    "weak": "Not sure · {pct}%",
+    "capture": "Take the photo",
+    "choosePhoto": "Choose a photo instead",
+    "continue": "Looks right, continue",
+    "continueAnyway": "Continue and fix it myself",
+    "retake": "Try another photo",
+    "foundSoFar": "Found so far",
+    "turnPack": "Turn the pack",
+    "weakHint": "We are less than {pct}% sure. Hold the pack flat in good light, or fix the details on the next screen.",
+    "fields": {
+      "drug": "Drug",
+      "strength": "Strength",
+      "nafdac": "NAFDAC"
+    },
+    "check": {
+      "registered": "Registered",
+      "not_found": "Not found in our list",
+      "mismatch": "Number belongs to another medicine",
+      "unreadable": "Number not readable"
+    },
+    "camera": {
+      "denied": "The camera is switched off for this app. You can still choose a photo from your phone.",
+      "unavailable": "No camera found. Choose a photo from your phone instead.",
+      "unsupported": "This browser cannot open the camera. Choose a photo from your phone instead."
+    },
+    "errors": {
+      "readerFailed": "We could not read that photo. Try again with the label flat and in good light.",
+      "offline": "You are offline. Scanning needs the internet; your saved medicines still work.",
+      "tooBig": "That photo is too large. Try again."
+    },
+    "cameraPreview": "Camera preview"
+  },
+  "confirm": {
+    "title": "Check and confirm",
+    "intro": "Fix anything that is wrong. Nothing is saved until you press Save.",
+    "sectionMedicine": "Medicine",
+    "drugName": "Medicine name",
+    "strength": "Strength",
+    "strengthHint": "For example 500 mg",
+    "form": "Form",
+    "sectionHow": "How to take it",
+    "dose": "Each time, take",
+    "doseHint": "For example 1 tablet or 2 puffs",
+    "frequency": "How often",
+    "perDay": "{count, plural, one {Once a day} =2 {Twice a day} other {# times a day}}",
+    "withFood": "Food",
+    "food": {
+      "any": "Any time",
+      "before": "Before food",
+      "after": "After food",
+      "with": "With food"
+    },
+    "duration": "For how many days",
+    "durationHint": "Leave empty if it is every day.",
+    "times": "Reminder times",
+    "timesHint": "Tap a time to change it.",
+    "timeN": "Reminder {n}",
+    "willSay": "The app will say",
+    "sectionLooks": "What does your medicine look like?",
+    "looksIntro": "So you can match the screen to the pack.",
+    "sectionSupply": "Supply",
+    "quantity": "How many did you get?",
+    "quantityHint": "Tablets, capsules or puffs in the pack. We remind you before they run out.",
+    "sectionCheck": "NAFDAC check",
+    "nafdac": "NAFDAC number",
+    "nafdacHint": "Printed on the pack after 'NAFDAC Reg. No.', for example A4-1234.",
+    "warnings": "On the label",
+    "save": "Save and set reminders",
+    "saving": "Saving…",
+    "back": "Back to the photo",
+    "errors": {
+      "nameRequired": "Type the medicine name.",
+      "doseRequired": "Type how much to take each time.",
+      "timesRequired": "Set at least one reminder time.",
+      "server": "We could not save. Check your network and try again."
+    },
+    "checking": "Checking…",
+    "checkFailed": "Couldn't check",
+    "checkFailedNote": "We could not reach the list just now. We check again when you save; you can still save."
+  },
+  "reminder": {
+    "label": "Time for your medicine",
+    "listen": "Listen",
+    "taken": "I took it",
+    "snooze": "Remind me in 30 minutes",
+    "missed": "I missed it",
+    "backHome": "Back to today",
+    "logged": {
+      "taken": "Taken",
+      "late": "Taken late",
+      "snoozed": "Snoozed",
+      "missed": "Missed"
+    },
+    "loggedBody": {
+      "taken": "Well done. We will remind you at the next time.",
+      "late": "Saved as taken late. Try to keep to the time tomorrow.",
+      "snoozed": "We will remind you again in 30 minutes.",
+      "missed": "Saved. Do not take two doses to catch up; ask your pharmacist if you miss doses often."
+    },
+    "notSaved": "Not saved. Please try again.",
+    "notSavedOffline": "Not saved: no connection. Keep this screen open and try again when you are back online."
+  },
+  "meds": {
+    "label": "My medicines",
+    "title": "Your medicines",
+    "scanAnother": "Scan a medicine",
+    "scanFirst": "Scan your first medicine",
+    "emptyTitle": "No medicines yet",
+    "emptyBody": "Scan the pack or the prescription and we set your reminders.",
+    "perDay": "{count, plural, one {# a day} other {# a day}}",
+    "daysLeft": "{count, plural, =0 {Runs out today} one {# day left} other {# days left}}",
+    "supply": "Supply left"
+  },
+  "refill": {
+    "label": "Refill soon",
+    "body": "Get a refill from your pharmacy before it runs out.",
+    "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+    "outToday": "Runs out today",
+    "gotRefill": "I got a refill",
+    "saving": "Saving…",
+    "howMany": "How many did you get in the new pack?",
+    "save": "Save",
+    "notYet": "Not yet",
+    "ranOut": "Ran out. Ask your pharmacy today.",
+    "quantityRequired": "Type how many came in the pack.",
+    "notSaved": "Not saved. Please try again.",
+    "notSavedOffline": "Not saved: no connection. Try again when you are back online.",
+    "count": "{count, plural, one {# medicine} other {# medicines}}"
+  },
+  "access": {
+    "title": "Accessibility",
+    "intro": "Make the app easier to see and hear.",
+    "textSize": "Text size",
+    "sizes": {
+      "normal": "Normal",
+      "large": "Large",
+      "larger": "Largest"
+    },
+    "highContrast": "High contrast",
+    "highContrastHint": "Black text, stronger borders, no background dots.",
+    "speechRate": "Speech speed",
+    "rates": {
+      "1": "Normal",
+      "0_8": "Slower",
+      "1_2": "Faster"
+    },
+    "trySpeed": "Hear this speed",
+    "sample": "Take one tablet every morning after food.",
+    "save": "Save settings",
+    "saving": "Saving…"
+  },
+  "patients": {
+    "title": "Patients",
+    "count": "{count, plural, one {# patient} other {# patients}}",
+    "emptyTitle": "No patients yet",
+    "emptyBody": "Patients appear here once they sign up with the hospital registry.",
+    "risk": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "back": "All patients",
+    "weekAdherence": "{pct}% taken this week",
+    "medicines": "Medicines",
+    "noMedicines": "No active medicines.",
+    "perDay": "{count, plural, one {# a day} other {# a day}}",
+    "confirmed": "Confirmed by patient",
+    "unconfirmed": "Not confirmed yet",
+    "source": {
+      "scan": "scanned by patient",
+      "staff": "added by staff"
+    },
+    "addTitle": "Add a prescription",
+    "addBody": "The patient sees it on their phone with reminders and hears it in their language."
+  },
+  "staffPrescription": {
+    "sectionMedicine": "Medicine",
+    "drugName": "Medicine name",
+    "strength": "Strength",
+    "form": "Form",
+    "dose": "Each time, take",
+    "frequency": "How often",
+    "perDay": "{count, plural, one {Once a day} =2 {Twice a day} other {# times a day}}",
+    "withFood": "Food",
+    "food": {
+      "any": "Any time",
+      "before": "Before food",
+      "after": "After food",
+      "with": "With food"
+    },
+    "duration": "Days",
+    "times": "Reminder times",
+    "timeN": "Reminder {n}",
+    "sectionSupply": "Supply and registration",
+    "quantity": "Quantity dispensed",
+    "quantityHint": "Tablets, capsules or puffs given.",
+    "nafdac": "NAFDAC number",
+    "nafdacHint": "Checked against the registration list.",
+    "instructionsRaw": "Sig (as written)",
+    "instructionsRawHint": "Optional, kept for the record.",
+    "sectionLooks": "What the medicine looks like",
+    "save": "Add prescription",
+    "saving": "Saving…",
+    "saved": "Saved for {name}. They will hear:",
+    "errors": {
+      "nameRequired": "Type the medicine name.",
+      "doseRequired": "Type the dose.",
+      "frequencyRequired": "Choose how often.",
+      "notYourPatient": "This patient is not in your hospital.",
+      "server": "We could not save. Try again."
+    }
   }
 }

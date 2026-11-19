@@ -124,7 +124,25 @@
     "welcomeIndependent": "Maganinka, yadda kake so.",
     "conditions": "Cututtuka",
     "medicines": "Magungunanka",
-    "perDay": "{count, plural, one {# a rana} other {# a rana}}"
+    "perDay": "{count, plural, one {# a rana} other {# a rana}}",
+    "next": "Na gaba",
+    "allDone": "An gama duk adadin yau. Madalla.",
+    "savedNotice": "An ajiye. Tunatarwarka ta shirya.",
+    "allMedicines": "Duk magunguna",
+    "tookIt": "Na sha",
+    "later": "Daga baya",
+    "missedIt": "Na rasa shi",
+    "daysLeft": "{count, plural, =0 {Yana ƙarewa yau} one {Kwana # ya rage} other {Kwanaki # sun rage}}",
+    "dose": {
+      "taken": "An sha",
+      "now": "Yanzu",
+      "later": "Daga baya",
+      "late": "An makara",
+      "missed": "An rasa",
+      "snoozed": "An jinkirta"
+    },
+    "notSaved": "Ba a ajiye ba. Da fatan za a sake gwadawa.",
+    "notSavedOffline": "Ba a ajiye ba: babu haɗi. Bar wannan fuska a buɗe ka sake gwadawa idan ka dawo kan intanet."
   },
   "placeholder": {
     "label": "Nan ba da jimawa ba",
@@ -153,7 +171,8 @@
     "me": "Ni",
     "demo": "Gwada nunin",
     "hospital": "Allon asibiti",
-    "registry": "Jerin marasa lafiya"
+    "registry": "Jerin marasa lafiya",
+    "reminder": "Tunatarwa"
   },
   "setup": {
     "title": "Ba a saita Supabase ba tukuna",
@@ -547,5 +566,273 @@
     "body": "A ɓangarenmu ne, ba naka ba. Danna Sake gwadawa. Idan ya ci gaba, gaya wa teburin bayanai ko wanda ke gudanar da wannan manhaja.",
     "retry": "Sake gwadawa",
     "home": "Koma shafin farko"
+  },
+  "voice": {
+    "listen": "Saurara",
+    "stop": "Tsaya",
+    "browserVoice": "Ana kunnawa da muryar wayar kanta.",
+    "unavailable": "Babu muryar {language} a yanzu. Karanta kalmomin da ke allon."
+  },
+  "pill": {
+    "shape": "Siffa",
+    "colour": "Launi",
+    "otherColour": "Wani launi",
+    "shapes": {
+      "round": "Ƙwaya zagaye",
+      "capsule": "Kafsul",
+      "oval": "Ƙwaya mai tsawo",
+      "inhaler": "Na shaƙa",
+      "liquid": "Ruwa",
+      "injection": "Allura"
+    },
+    "colours": {
+      "white": "Fari",
+      "yellow": "Rawaya",
+      "red": "Ja",
+      "orange": "Lemu",
+      "green": "Kore",
+      "blue": "Shuɗi",
+      "pink": "Ruwan hoda",
+      "brown": "Ruwan ƙasa"
+    }
+  },
+  "drugCheck": {
+    "chips": {
+      "none": "Babu lamba tukuna",
+      "registered": "An yi rajista",
+      "not_found": "Ba a samu a jerinmu ba",
+      "mismatch": "Lambar ba ta dace da wannan magani ba",
+      "unreadable": "Ba a iya karanta lambar ba"
+    },
+    "notes": {
+      "registered": "Wannan lambar NAFDAC ta dace da jerin rajistarmu.",
+      "not_found": "Ba mu sami wannan lambar a jerinmu ba. Duba lambar a kan fakitin. Idan ta yi daidai, nuna wa likitan maganinka wannan fakitin kafin ka sha.",
+      "mismatch": "A jerinmu wannan lambar ta wani magani ko ƙarfi daban ce. Duba suna da ƙarfi a kan fakitin. Idan sun dace da fakitin, nuna wa likitan maganinka kafin ka sha.",
+      "mismatchNamed": "A jerinmu wannan lambar ta {name} ce, ba ta {typedName} ba. Duba sunan a kan fakitin. Idan fakitin da gaske ya ce {typedName}, nuna wa likitan maganinka kafin ka sha.",
+      "unreadable": "Wannan bai yi kama da lambar NAFDAC ba (suna kama da A4-1234). Duba fakitin ka sake rubutawa, ko tambayi likitan maganinka.",
+      "registeredNamed": "Wannan lambar tana jerin don {name} {strength}, wanda {manufacturer} ya yi.",
+      "mismatchStrength": "A jerinmu wannan lambar ta {name} {listedStrength} ce. Fakitinka ya ce {strength}. Duba ƙarfin a kan fakitin, sannan ka nuna wa likitan maganinka kafin ka sha."
+    },
+    "reportLink": "nafdac.gov.ng (yana buɗe shafinsu)",
+    "reportLead": "Idan likitan maganinka ya yarda, za ka iya gaya wa NAFDAC:"
+  },
+  "scan": {
+    "stepLabel": "Ɗauki hoto · Mataki {step} na {total}",
+    "pointTitle": "Nuna wa lambar",
+    "foundTitle": "Ga abin da muka karanta",
+    "ready": "A shirye",
+    "reading": "Ana karanta lamba… {pct}%",
+    "done": "An karanta · {pct}% tabbas",
+    "weak": "Ba tabbas ba · {pct}%",
+    "capture": "Ɗauki hoton",
+    "choosePhoto": "Zaɓi hoto a maimakon haka",
+    "continue": "Ya yi daidai, ci gaba",
+    "continueAnyway": "Ci gaba in gyara da kaina",
+    "retake": "Gwada wani hoto",
+    "foundSoFar": "Abin da aka samu",
+    "turnPack": "Juya fakitin",
+    "weakHint": "Ba mu da tabbas fiye da {pct}%. Riƙe fakitin a kwance a haske mai kyau, ko gyara bayanan a fuska ta gaba.",
+    "fields": {
+      "drug": "Magani",
+      "strength": "Ƙarfi",
+      "nafdac": "NAFDAC"
+    },
+    "check": {
+      "registered": "An yi rajista",
+      "not_found": "Ba a samu a jerinmu ba",
+      "mismatch": "Lambar ta wani magani ce",
+      "unreadable": "Ba a iya karanta lambar ba"
+    },
+    "camera": {
+      "denied": "An kashe kyamara don wannan manhaja. Har yanzu za ka iya zaɓar hoto daga wayarka.",
+      "unavailable": "Ba a sami kyamara ba. Zaɓi hoto daga wayarka a maimakon haka.",
+      "unsupported": "Wannan burauza ba ta iya buɗe kyamara. Zaɓi hoto daga wayarka a maimakon haka."
+    },
+    "errors": {
+      "readerFailed": "Ba mu iya karanta wannan hoton ba. Sake gwadawa da lambar a kwance a haske mai kyau.",
+      "offline": "Ba ka da intanet. Ɗaukar hoto yana buƙatar intanet; magungunanka da aka ajiye suna aiki.",
+      "tooBig": "Hoton ya yi girma sosai. Sake gwadawa."
+    },
+    "cameraPreview": "Hoton kyamara"
+  },
+  "confirm": {
+    "title": "Duba ka tabbatar",
+    "intro": "Gyara duk abin da bai yi daidai ba. Ba a ajiye komai ba har sai ka danna Ajiye.",
+    "sectionMedicine": "Magani",
+    "drugName": "Sunan magani",
+    "strength": "Ƙarfi",
+    "strengthHint": "Misali 500 mg",
+    "form": "Siffa",
+    "sectionHow": "Yadda ake sha",
+    "dose": "Kowane lokaci, sha",
+    "doseHint": "Misali ƙwaya 1 ko shaƙa 2",
+    "frequency": "Sau nawa",
+    "perDay": "{count, plural, one {Sau ɗaya a rana} =2 {Sau biyu a rana} other {Sau # a rana}}",
+    "withFood": "Abinci",
+    "food": {
+      "any": "Kowane lokaci",
+      "before": "Kafin abinci",
+      "after": "Bayan abinci",
+      "with": "Tare da abinci"
+    },
+    "duration": "Na kwanaki nawa",
+    "durationHint": "Bar shi fanko idan kullum ne.",
+    "times": "Lokutan tunatarwa",
+    "timesHint": "Danna lokaci don canza shi.",
+    "timeN": "Tunatarwa {n}",
+    "willSay": "Manhajar za ta ce",
+    "sectionLooks": "Yaya maganinka yake?",
+    "looksIntro": "Don ka iya daidaita allon da fakitin.",
+    "sectionSupply": "Kaya",
+    "quantity": "Nawa ka samu?",
+    "quantityHint": "Ƙwayoyi, kafsul ko shaƙa a cikin fakitin. Muna tunatar da kai kafin su ƙare.",
+    "sectionCheck": "Duban NAFDAC",
+    "nafdac": "Lambar NAFDAC",
+    "nafdacHint": "An buga a kan fakitin bayan 'NAFDAC Reg. No.', misali A4-1234.",
+    "warnings": "A kan lambar",
+    "save": "Ajiye ka saita tunatarwa",
+    "saving": "Ana ajiyewa…",
+    "back": "Koma zuwa hoto",
+    "errors": {
+      "nameRequired": "Rubuta sunan magani.",
+      "doseRequired": "Rubuta nawa za ka sha kowane lokaci.",
+      "timesRequired": "Saita aƙalla lokacin tunatarwa ɗaya.",
+      "server": "Ba mu iya ajiyewa ba. Duba hanyar sadarwarka ka sake gwadawa."
+    },
+    "checking": "Ana dubawa…",
+    "checkFailed": "Ba a iya dubawa ba",
+    "checkFailedNote": "Ba mu iya kai ga jerin ba a yanzu. Za mu sake dubawa idan ka ajiye; har yanzu za ka iya ajiyewa."
+  },
+  "reminder": {
+    "label": "Lokacin maganinka",
+    "listen": "Saurara",
+    "taken": "Na sha",
+    "snooze": "Tunatar da ni cikin minti 30",
+    "missed": "Na rasa shi",
+    "backHome": "Koma zuwa yau",
+    "logged": {
+      "taken": "An sha",
+      "late": "An sha a makare",
+      "snoozed": "An jinkirta",
+      "missed": "An rasa"
+    },
+    "loggedBody": {
+      "taken": "Madalla. Za mu tunatar da kai a lokaci na gaba.",
+      "late": "An ajiye a matsayin an sha a makare. Yi ƙoƙarin kiyaye lokaci gobe.",
+      "snoozed": "Za mu sake tunatar da kai cikin minti 30.",
+      "missed": "An ajiye. Kada ka sha adadi biyu don rama; tambayi likitan maganinka idan kana rasa adadi sau da yawa."
+    },
+    "notSaved": "Ba a ajiye ba. Da fatan za a sake gwadawa.",
+    "notSavedOffline": "Ba a ajiye ba: babu haɗi. Bar wannan fuska a buɗe ka sake gwadawa idan ka dawo kan intanet."
+  },
+  "meds": {
+    "label": "Magungunana",
+    "title": "Magungunanka",
+    "scanAnother": "Ɗauki hoton magani",
+    "scanFirst": "Ɗauki hoton maganinka na farko",
+    "emptyTitle": "Babu magunguna tukuna",
+    "emptyBody": "Ɗauki hoton fakitin ko takardar magani, mu saita tunatarwarka.",
+    "perDay": "{count, plural, one {# a rana} other {# a rana}}",
+    "daysLeft": "{count, plural, =0 {Yana ƙarewa yau} one {Kwana # ya rage} other {Kwanaki # sun rage}}",
+    "supply": "Kayan da ya rage"
+  },
+  "refill": {
+    "label": "Sake siya nan ba da jimawa ba",
+    "body": "Sake siya daga kantin maganinka kafin ya ƙare.",
+    "daysLeft": "{count, plural, one {Kwana # ya rage} other {Kwanaki # sun rage}}",
+    "outToday": "Yana ƙarewa yau",
+    "gotRefill": "Na sake siya",
+    "saving": "Ana ajiyewa…",
+    "howMany": "Nawa ka samu a sabon fakitin?",
+    "save": "Ajiye",
+    "notYet": "Ba tukuna ba",
+    "ranOut": "Ya ƙare. Tambayi kantin maganinka yau.",
+    "quantityRequired": "Rubuta nawa suke cikin fakitin.",
+    "notSaved": "Ba a ajiye ba. Da fatan za a sake gwadawa.",
+    "notSavedOffline": "Ba a ajiye ba: babu haɗi. Sake gwadawa idan ka dawo kan intanet.",
+    "count": "{count, plural, one {magani #} other {magunguna #}}"
+  },
+  "access": {
+    "title": "Samun dama",
+    "intro": "Sauƙaƙa manhajar don gani da ji.",
+    "textSize": "Girman rubutu",
+    "sizes": {
+      "normal": "Na yau da kullum",
+      "large": "Babba",
+      "larger": "Mafi girma"
+    },
+    "highContrast": "Bambanci mai ƙarfi",
+    "highContrastHint": "Rubutu baƙi, layuka masu ƙarfi, babu ɗigo a baya.",
+    "speechRate": "Saurin magana",
+    "rates": {
+      "1": "Na yau da kullum",
+      "0_8": "A hankali",
+      "1_2": "Da sauri"
+    },
+    "trySpeed": "Ji wannan saurin",
+    "sample": "Sha ƙwaya ɗaya kowace safiya bayan abinci.",
+    "save": "Ajiye saituna",
+    "saving": "Ana ajiyewa…"
+  },
+  "patients": {
+    "title": "Marasa lafiya",
+    "count": "{count, plural, one {mara lafiya #} other {marasa lafiya #}}",
+    "emptyTitle": "Babu marasa lafiya tukuna",
+    "emptyBody": "Marasa lafiya suna bayyana a nan da zarar sun yi rajista da jerin asibiti.",
+    "risk": {
+      "low": "Ƙasa",
+      "medium": "Matsakaici",
+      "high": "Sama"
+    },
+    "back": "Duk marasa lafiya",
+    "weekAdherence": "An sha {pct}% a wannan mako",
+    "medicines": "Magunguna",
+    "noMedicines": "Babu magunguna masu aiki.",
+    "perDay": "{count, plural, one {# a rana} other {# a rana}}",
+    "confirmed": "Mara lafiya ya tabbatar",
+    "unconfirmed": "Ba a tabbatar ba tukuna",
+    "source": {
+      "scan": "mara lafiya ya ɗauki hoto",
+      "staff": "ma'aikata sun ƙara"
+    },
+    "addTitle": "Ƙara takardar magani",
+    "addBody": "Mara lafiya yana ganinta a wayarsa da tunatarwa kuma yana jin ta a harshensa."
+  },
+  "staffPrescription": {
+    "sectionMedicine": "Magani",
+    "drugName": "Sunan magani",
+    "strength": "Ƙarfi",
+    "form": "Siffa",
+    "dose": "Kowane lokaci, sha",
+    "frequency": "Sau nawa",
+    "perDay": "{count, plural, one {Sau ɗaya a rana} =2 {Sau biyu a rana} other {Sau # a rana}}",
+    "withFood": "Abinci",
+    "food": {
+      "any": "Kowane lokaci",
+      "before": "Kafin abinci",
+      "after": "Bayan abinci",
+      "with": "Tare da abinci"
+    },
+    "duration": "Kwanaki",
+    "times": "Lokutan tunatarwa",
+    "timeN": "Tunatarwa {n}",
+    "sectionSupply": "Kaya da rajista",
+    "quantity": "Adadin da aka bayar",
+    "quantityHint": "Ƙwayoyi, kafsul ko shaƙa da aka bayar.",
+    "nafdac": "Lambar NAFDAC",
+    "nafdacHint": "Ana duba ta a jerin rajista.",
+    "instructionsRaw": "Sig (yadda aka rubuta)",
+    "instructionsRawHint": "Na zaɓi, ana ajiyewa don rikodi.",
+    "sectionLooks": "Yadda maganin yake",
+    "save": "Ƙara takardar magani",
+    "saving": "Ana ajiyewa…",
+    "saved": "An ajiye wa {name}. Za su ji:",
+    "errors": {
+      "nameRequired": "Rubuta sunan magani.",
+      "doseRequired": "Rubuta adadi.",
+      "frequencyRequired": "Zaɓi sau nawa.",
+      "notYourPatient": "Wannan mara lafiya ba ya a asibitinka.",
+      "server": "Ba mu iya ajiyewa ba. Sake gwadawa."
+    }
   }
 }

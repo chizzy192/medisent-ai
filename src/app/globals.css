@@ -150,6 +150,14 @@
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
+  /* Large-text mode (Me → Accessibility, section 3): everything in rem grows 125% / 150%;
+   * spacing and touch targets are in px, so layouts reflow instead of inflating. */
+  html[data-text-size="large"] {
+    font-size: 125%;
+  }
+  html[data-text-size="larger"] {
+    font-size: 150%;
+  }
 
   /* App background: bg colour with the dot grid (1px dots, 16px spacing). Cards, header,
    * bottom bar, sidebar, inputs and tables sit on top as solid surface. */
@@ -204,6 +212,15 @@
     stroke-dashoffset: var(--ring-circumference);
   }
 }
+/* Scan line sweeps the viewfinder every 1.8 s while reading (signature element 4). */
+@keyframes scan-sweep {
+  0% {
+    top: 8%;
+  }
+  100% {
+    top: 92%;
+  }
+}
 @keyframes wave {
   0%,
   100% {
@@ -221,10 +238,17 @@
   transform-origin: center;
   animation: wave 900ms ease-in-out infinite;
 }
+.animate-scan-sweep {
+  animation: scan-sweep 1.8s ease-in-out infinite alternate;
+}
 @media (prefers-reduced-motion: reduce) {
   .animate-ring-fill,
-  .animate-wave {
+  .animate-wave,
+  .animate-scan-sweep {
     animation: none;
+  }
+  .animate-scan-sweep {
+    top: 50%;
   }
 }
 
