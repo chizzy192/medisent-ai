@@ -75,8 +75,9 @@ function Badge({ tab, counts }: { tab: NavTab; counts: NavCounts }) {
 
 /**
  * Mobile-app style bottom bar (section 3). Every tab is icon + always-visible label (13px),
- * 48×48 minimum, active = primary with a primary-tint pill and aria-current. Fixed to the
- * bottom with safe-area padding; never hides on scroll, only while the keyboard is open.
+ * 48×48 minimum, active = primary with a primary-tint pill and aria-current; the Scan tab follows
+ * the same rule (owner decision, 2026-11-19: no always-raised square). Fixed to the bottom with
+ * safe-area padding; never hides on scroll, only while the keyboard is open.
  * Staff and admins switch to the Sidebar on desktop (>= 1024px); patients keep the bar,
  * centred at 480px.
  */
@@ -123,22 +124,11 @@ export function BottomNav({ role, counts = {} }: { role: NavRole; counts?: NavCo
                   active ? "font-semibold text-primary" : "text-ink-3 hover:text-ink"
                 }`}
               >
-                {tab.raised ? (
-                  <span
-                    className={`-mt-5 flex size-12 items-center justify-center rounded-[14px] bg-primary text-on-primary ring-4 ring-surface ${
-                      active ? "outline-2 outline-offset-2 outline-primary" : ""
-                    }`}
-                  >
-                    <Icon size={24} />
-                  </span>
-                ) : (
-                  <span
-                    className={`relative flex h-8 w-14 items-center justify-center rounded-full ${active ? "bg-primary-tint" : ""}`}
-                  >
-                    <Icon size={24} />
-                    <Badge tab={tab} counts={counts} />
-                  </span>
-                )}
+                {/* Every tab, Scan included: ink-3 when inactive; primary icon on a primary-tint pill when current (owner rule). */}
+                <span className={`relative flex h-8 w-14 items-center justify-center rounded-full ${active ? "bg-primary-tint" : ""}`}>
+                  <Icon size={24} />
+                  <Badge tab={tab} counts={counts} />
+                </span>
                 {/* The label scales with the text from 13px up to 16px; tabs size to their label so words stay whole. */}
                 <span className="max-w-full text-center leading-tight [overflow-wrap:break-word]">{t(tab.labelKey)}</span>
               </Link>

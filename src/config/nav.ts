@@ -1,6 +1,6 @@
 /**
  * Bottom navigation tab sets (BUILD_PLAN section 3, "Bottom navigation bar").
- * Labels come from messages under `nav.<labelKey>`. Patient Scan is the raised main action.
+ * Labels come from messages under `nav.<labelKey>`.
  * Stage 0: /forum and /me live in the (patient) group, so they show the patient shell for
  * every role; Stage 1 makes the shell follow the signed-in profile's role.
  */
@@ -12,8 +12,6 @@ export type NavTab = {
   href: string;
   labelKey: "home" | "scan" | "ask" | "forum" | "me" | "dashboard" | "patients" | "alerts" | "staff";
   icon: NavIconName;
-  /** Patient Scan: the raised primary rounded square in the centre. */
-  raised?: boolean;
   /** Which live count this tab shows (red-flag alerts, waiting questions, overdue dose). */
   badge?: NavBadge;
 };
@@ -21,7 +19,7 @@ export type NavTab = {
 export const navTabs: Record<NavRole, NavTab[]> = {
   patient: [
     { href: "/home", labelKey: "home", icon: "home", badge: "overdue" },
-    { href: "/scan", labelKey: "scan", icon: "scan", raised: true },
+    { href: "/scan", labelKey: "scan", icon: "scan" },
     { href: "/assistant", labelKey: "ask", icon: "ask" },
     { href: "/forum", labelKey: "forum", icon: "forum" },
     { href: "/me", labelKey: "me", icon: "me" },

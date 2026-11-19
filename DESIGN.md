@@ -75,7 +75,7 @@ White (surface). Logo left with the hospital name under it; language picker righ
 
 ## Bottom navigation
 
-Phones and tablets (< 1024px): fixed bottom bar, surface background, 1px border-colour top border, 64px + safe-area inset. Icon (24px outline) + always-visible translated label (13px min; on phones the label holds at 13px so words stay whole at 200% text, on wider screens it scales with the text). Active: primary icon and label, primary-tint pill, `aria-current="page"`; inactive ink-3. Patient Scan tab is a raised cobalt rounded square. Never hides on scroll. Desktop (≥ 1024px): staff and admins get a left sidebar (see the staff mockup); patients keep the bottom bar centred at max 480px.
+Phones and tablets (< 1024px): fixed bottom bar, surface background, 1px border-colour top border, 64px + safe-area inset. Icon (24px outline) + always-visible translated label (13px min; on phones the label holds at 13px so words stay whole at 200% text, on wider screens it scales with the text). Active: primary icon and label, primary-tint pill, `aria-current="page"`; inactive ink-3. Every tab, Scan included, uses the same inactive/active treatment (owner decision 2026-11-19: no always-raised Scan square). Never hides on scroll. Desktop (≥ 1024px): staff and admins get a left sidebar (see the staff mockup); patients keep the bottom bar centred at max 480px.
 
 ## Components
 
