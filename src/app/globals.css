@@ -33,6 +33,10 @@
   /* Solid red-flag banner and the text on it. Same in every theme. */
   --color-danger-solid: #c81e1e;
   --color-on-danger: #ffffff;
+  /* Default hospital bar when a hospital has no brand_color. */
+  --color-hospital-bar: #1d4e89;
+  /* Dot-grid texture (signature element 1): hero cards only. */
+  --color-dot-grid: #d3dbe6;
 
   /* IBM Plex covers ẹ ọ ị ụ ṅ; Noto Sans catches stacked tone marks (ẹ̀). */
   --font-sans: var(--font-plex-sans), var(--font-noto-sans), system-ui, sans-serif;
@@ -63,6 +67,10 @@
   --text-3xl--line-height: 1.2;
   --text-4xl: 2.75rem;
   --text-4xl--line-height: 1.1;
+  /* Landing hero headline (BUILD_PLAN Stage 0: 64px / 600). */
+  --text-display: 4rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.025em;
 
   /* Spacing on a 4px base (section 3 v2). In px, not rem, so large-text mode grows the
    * text without also inflating gutters, padding and touch targets (reflow at 150% / 200%). */
@@ -74,7 +82,9 @@
 }
 
 /* Dark mode values from section 3 v2. Follows the OS unless data-theme is set.
- * Status colours for dark mode are not in section 3; these are derived (listed for the owner). */
+ * `.theme-dark` scopes the same values to one region (the landing CTA band).
+ * Status colours and the dot grid for dark mode are not in section 3; they are derived
+ * (listed for the owner). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --color-bg: #0b1220;
@@ -93,10 +103,12 @@
     --color-warning-tint: #33240f;
     --color-danger: #ff8a8a;
     --color-danger-tint: #3a1618;
+    --color-dot-grid: #1f2b40;
     color-scheme: dark;
   }
 }
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+.theme-dark {
   --color-bg: #0b1220;
   --color-surface: #111a2b;
   --color-surface-2: #1a2538;
@@ -113,6 +125,7 @@
   --color-warning-tint: #33240f;
   --color-danger: #ff8a8a;
   --color-danger-tint: #3a1618;
+  --color-dot-grid: #1f2b40;
   color-scheme: dark;
 }
 
@@ -169,19 +182,44 @@
     text-underline-offset: 0.2em;
   }
 
+  /* Reduced motion: replace movement with instant changes. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
+      animation: none !important;
       transition-duration: 0.01ms !important;
     }
   }
 }
 
+/* Motion (section 3 v2). Every animation is removed under prefers-reduced-motion below. */
+@keyframes ring-fill {
+  from {
+    stroke-dashoffset: var(--ring-circumference);
+  }
+}
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.45);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
 @layer components {
+  /* Dot-grid hero texture: 1px dots, 14px spacing (the only decorative texture). */
+  .dot-grid {
+    background-image: radial-gradient(var(--color-dot-grid) 1px, transparent 1px);
+    background-size: 14px 14px;
+  }
+
   /* Primary button: cobalt with white text, 48px minimum, wraps for long translations. */
   .btn-primary,
-  .btn-secondary {
+  .btn-secondary,
+  .btn-outline {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -205,11 +243,13 @@
     background-color: color-mix(in srgb, var(--color-primary) 86%, black);
   }
   /* Secondary: outlined cobalt. */
-  .btn-secondary {
+  .btn-secondary,
+  .btn-outline {
     background-color: var(--color-surface);
     color: var(--color-primary);
   }
-  .btn-secondary:hover {
+  .btn-secondary:hover,
+  .btn-outline:hover {
     background-color: var(--color-primary-tint);
   }
 

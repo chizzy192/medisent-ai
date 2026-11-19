@@ -1,11 +1,6 @@
-import { HospitalHeader } from "@/components/HospitalHeader";
+import { AppShell } from "@/components/AppShell";
 
-// TODO (Stage 1): load the signed-in user's hospital for the header and add BottomNav.
+// Staff shell: header, Staff navigation and page. TODO (Stage 1): role from the signed-in profile.
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <HospitalHeader />
-      {children}
-    </>
-  );
+  return <AppShell role="staff">{children}</AppShell>;
 }

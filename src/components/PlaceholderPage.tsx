@@ -1,19 +1,34 @@
-import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type en from "../../messages/en.json";
+import { EmptyState } from "./EmptyState";
+import { HospitalHeader } from "./HospitalHeader";
+import { ButtonLink } from "./ui";
 
 type PageKey = keyof (typeof en)["pages"];
 
-/** Stand-in for screens built in later stages. All text comes from messages/. */
-export async function PlaceholderPage({ titleKey }: { titleKey: PageKey }) {
+/**
+ * Stand-in for screens built in later stages: a finished-looking empty state inside the
+ * real shell. All text comes from messages/. `shell="public"` adds the public header (app
+ * groups get the header and navigation from their layout).
+ */
+export async function PlaceholderPage({ titleKey, shell }: { titleKey: PageKey; shell?: "public" }) {
   const t = await getTranslations();
   return (
-    <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6">
-      <h1 className="text-2xl">{t(`pages.${titleKey}`)}</h1>
-      <p className="mt-4 text-lg">{t("placeholder.comingSoon")}</p>
-      <Link href="/" className="mt-6 inline-flex min-h-12 items-center font-semibold text-primary underline underline-offset-4">
-        {t("placeholder.backHome")}
-      </Link>
-    </main>
+    <>
+      {shell === "public" && <HospitalHeader />}
+      <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:px-6 sm:py-10">
+        <EmptyState
+          label={t("placeholder.label")}
+          title={t(`pages.${titleKey}`)}
+          action={
+            <ButtonLink href="/" variant="outline">
+              {t("placeholder.backHome")}
+            </ButtonLink>
+          }
+        >
+          <p>{t("placeholder.comingSoon")}</p>
+        </EmptyState>
+      </main>
+    </>
   );
 }

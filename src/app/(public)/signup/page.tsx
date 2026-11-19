@@ -1,5 +1,5 @@
 import { PlaceholderPage } from "@/components/PlaceholderPage";
 
 export default function Page() {
-  return <PlaceholderPage titleKey="signup" />;
+  return <PlaceholderPage titleKey="signup" shell="public" />;
 }
