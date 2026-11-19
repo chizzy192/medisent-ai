@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Third-party tooling installed into the repo (Impeccable skill files).
+    ".claude/**",
+    ".agents/**",
+    ".codex/**",
+    ".impeccable/**",
   ]),
 ]);
 

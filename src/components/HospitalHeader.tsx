@@ -39,7 +39,7 @@ export async function HospitalHeader({ hospital }: { hospital?: HeaderHospital |
             </span>
           )}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 max-sm:w-full">
           <LanguageSwitcher />
           <ReadAloudButton />
         </div>

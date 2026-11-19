@@ -59,6 +59,9 @@
   /* Radii: cards 14px, buttons 12px. */
   --radius-button: 12px;
   --radius-card: 14px;
+
+  /* Soft, offset depth tinted from chocolate. */
+  --shadow-card: 0 1px 2px rgb(74 47 29 / 0.06), 0 6px 16px -4px rgb(74 47 29 / 0.1);
 }
 
 /* Dark mode values from section 3. Follows the OS unless data-theme is set. */
@@ -125,6 +128,20 @@
   :focus-visible {
     outline: 3px solid var(--color-denim);
     outline-offset: 3px;
+  }
+
+  /* Browser surfaces carry the palette too. */
+  :root {
+    accent-color: var(--color-denim);
+    caret-color: var(--color-denim);
+    scrollbar-color: var(--color-tan) var(--color-cream-light);
+  }
+  ::selection {
+    background-color: var(--color-denim-tint);
+    color: var(--color-espresso);
+  }
+  a {
+    text-underline-offset: 0.2em;
   }
 
   @media (prefers-reduced-motion: reduce) {

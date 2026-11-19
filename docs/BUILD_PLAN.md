@@ -137,31 +137,53 @@ AFRICASTALKING_SENDER_ID=
 
 ---
 
-## 3. Design system (Option B: cream + blue-led)
+## 3. Design system — "Clinical precision" (v2, replaces the brown palette)
+
+Direction: technical, precise and calm, like a well-made medical instrument. Cool neutrals, one cobalt accent, monospaced numbers for times, doses and IDs. Works for every age: plain labels, big targets, high contrast, nothing decorative.
+
+Visual target: `docs/mockups/medisent-patient-screens.png` and `docs/mockups/medisent-staff-screens.png`.
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| cream-light | `#FBF6EE` | Main background, header background |
-| white | `#FFFFFF` | Cards, inputs, modals |
-| cream | `#F5EDE0` | Section bands, side panels |
-| sand | `#EAD9C2` | Card borders, reminder pill fill, selected rows |
-| tan | `#CDB497` | Dividers, input borders |
-| cocoa | `#6F4A2E` | Logo, page titles, brand marks (NOT buttons) |
-| chocolate | `#4A2F1D` | Headings, header text |
-| espresso | `#2A1B12` | Body text |
-| mocha | `#7A6352` | Labels, timestamps, hints |
-| caramel | `#A9743F` | Small icons and progress bars only, never text |
-| denim | `#2F5D8A` | Primary buttons (white text), links, header accent bar, forum tags |
-| denim-tint | `#DCE8F3` | Verified post cards, info panels, selected tab |
-| ochre | `#C8901A` | Overdue reminder fill only (espresso text) |
-| green | `#3D7A4F` | Taken, verified badge |
-| alert | `#C62828` | Red-flag banner only |
+| bg | `#F6F8FA` | App background |
+| surface | `#FFFFFF` | Cards, header, bottom bar, inputs |
+| surface-2 | `#EEF2F6` | Meter tracks, neutral chips, table row dividers |
+| border | `#D9E0E8` | Card and input borders (1px) |
+| ink | `#0E1726` | Main text |
+| ink-2 | `#44546A` | Secondary text |
+| ink-3 | `#5E6E84` | Labels, hints, inactive nav |
+| primary | `#1F4FD8` | Buttons (white text), links, active nav, charts, logo mark |
+| primary-tint | `#E6EDFC` | Active nav pill, info panels, citation blocks, AI badge |
+| success | `#12805C` on `#E3F4EC` | Taken, registered, verified, low risk |
+| warning | `#9A4B05` text, `#D97706` dot/bar, `#FDF1DC` fill | Late, overdue, refill soon, medium risk, drug not found |
+| danger | `#C81E1E` on `#FDECEC`; solid `#C81E1E` banner | Red flags and high risk only |
+| hospital bar | hospital `brand_color` (default `#1D4E89`) | 3px line under the header only |
 
-Dark mode: background `#1C130D`, surface `#2A1B12`, text `#F5EDE0`, primary `#B98A5E`, blue `#7FA7CF`.
+Dark mode: bg `#0B1220`, surface `#111A2B`, surface-2 `#1A2538`, border `#26344A`, ink `#E6EBF2`, ink-2 `#AEB9C8`, ink-3 `#8A97AA`, primary `#6E95FF` (text on it `#0B1220`), primary-tint `#1B2A4D`.
 
-Fonts: **Young Serif** (headings), **Atkinson Hyperlegible** (body), Noto Sans fallback. Load with `next/font/google`. Must render ẹ ọ ṣ ị ụ ṅ.
+Fonts:
+- **IBM Plex Sans** (UI text, 400 / 500 / 600) with Noto Sans fallback for ẹ ọ ị ụ ṅ and tone marks.
+- **IBM Plex Mono** (500) for times (`08:00`), doses, counts, percentages, IDs (`AH-0002`, NAFDAC numbers) and small uppercase section labels. Use `font-variant-numeric: tabular-nums` only on columns of numbers, not inside single times.
+- Load with `next/font/google`.
 
-Header: cream-light background, cocoa "Medisent AI" logo (Young Serif), chocolate hospital name, 3px bottom bar in the hospital's `brand_color` (denim if none).
+Type scale: page title 22–26px / 600; card title (medicine name) 19px / 600; body 16–18px; time on medicine card 22px mono; section label 12px mono uppercase, letter-spacing 0.04em; never below 12px.
+
+Shape and spacing: 4px base (8 / 12 / 16 / 24 / 32); cards 12px radius, 14–16px padding, 1px border, no shadows; buttons 10px radius, 48px min height; chips fully rounded with a coloured dot.
+
+Logo: cobalt rounded square with a white plus, then "Medisent" in Plex Sans 600, then a small mono "AI" badge on primary-tint. Never a red cross.
+
+Status chips: dot + word, always (● Taken, ● 20 min late, ● Upcoming, ● High 78). Colour is never the only signal.
+
+Header: white, logo left, language picker right (`IG ▾`), hospital name under the logo, 3px hospital-colour bar at the bottom.
+
+Rules:
+- One primary (cobalt) button per card; secondary actions are outlined cobalt.
+- Red only for red-flag alerts and high risk.
+- Numbers, times and IDs always in Plex Mono.
+- Charts: cobalt line, dashed grey target line, mono axis labels, text summary for screen readers.
+- Large-text mode (Me → Accessibility) scales everything 125% / 150% without breaking layouts.
+- High-contrast mode: ink `#000`, borders `#5E6E84`, primary `#1A3FB0`.
+- No gradients, no glassmorphism, no purple, no emoji in UI, no centred-hero-plus-three-cards layout.
 
 ### Translation (whole app)
 - Every piece of UI text comes from `messages/<locale>.json` through next-intl. No hard-coded strings in components.
@@ -171,27 +193,27 @@ Header: cream-light background, cocoa "Medisent AI" logo (Young Serif), chocolat
 - Dates, times and numbers formatted with `Intl` for the locale.
 - Text expands in other languages: no fixed-width buttons; allow wrapping.
 
-Rules: buttons are denim with white text; red only on the red-flag banner; high-contrast toggle (near-black background, cream text, ochre accents); three text sizes; adjustable speech speed.
+Also: three text sizes; adjustable speech speed.
 
 ### Bottom navigation bar (mobile app style)
 - On phones and tablets (< 1024px) every signed-in screen has a **bottom navigation bar**, like a native mobile app. On desktop (≥ 1024px) staff and admins get a left sidebar instead; patients keep the bottom bar centred at max 480px wide.
 - **Patient tabs (5):** Home · Scan · Ask · Forum · Me
-    - Scan is the centre tab, shown as a raised denim circle with a camera icon (the main action).
+    - Scan is the centre tab, shown as a raised cobalt rounded square with a scan icon (the main action).
     - "Me" holds My progress, Caregivers, Refills, Records, Language, Accessibility, Privacy.
 - **Pharmacist / doctor / nurse tabs (5):** Dashboard · Patients · Alerts · Forum · Me
 - **Hospital admin tabs (4):** Dashboard · Staff · Patients · Me (transfers and verifications inside Dashboard)
 - Spec:
-    - Fixed to the bottom, white background, 1px sand top border, height 64px plus `env(safe-area-inset-bottom)` for phones with gesture bars.
+    - Fixed to the bottom, white (surface) background, 1px border-colour top border, height 64px plus `env(safe-area-inset-bottom)` for phones with gesture bars.
     - Every tab = icon (24px, outline) + text label (13px minimum, always visible, translated). Never icon-only.
-    - Active tab: denim icon and label, denim-tint pill behind the icon, `aria-current="page"`. Inactive: mocha.
+    - Active tab: primary icon and label, primary-tint pill behind the icon, `aria-current="page"`. Inactive: ink-3.
     - Each tab is at least 48×48px touch area.
-    - Badges: red dot with count only for open red-flag alerts; denim count for waiting questions; ochre dot on Home when a dose is overdue.
+    - Badges: danger count only for open red-flag alerts; primary count for waiting questions; warning dot on Home when a dose is overdue.
     - Does not hide on scroll (elderly users lose it). Hides only while the on-screen keyboard is open.
     - Page content gets bottom padding equal to the bar height so nothing is covered.
     - Works offline (no data needed to render it) and is part of the cached app shell.
     - Implemented once as `BottomNav` in the role layouts (`(patient)/layout.tsx`, `(staff)/layout.tsx`, `(admin)/layout.tsx`), tabs defined in `src/config/nav.ts`.
 
-Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time, play button), ReminderSheet (big Taken / Snooze / Missed), MicButton (hold to talk + transcript), AlertBanner (full width, call button), ForumPostCard (denim tag, green verified badge, listen button), VerificationPill (pending / verified / rejected / blocked), OfflineBanner ("Offline — last synced 10:42").
+Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time, play button), ReminderSheet (big Taken / Snooze / Missed), MicButton (hold to talk + transcript), AlertBanner (full width, call button), ForumPostCard (primary tag, green verified badge, listen button), VerificationPill (pending / verified / rejected / blocked), OfflineBanner ("Offline — last synced 10:42").
 
 ---
 
@@ -314,7 +336,7 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - `src/config/brand.ts` with the app name "Medisent AI" and the tagline per locale (section 1).
 - next-intl set up with locales en, ig, yo, ha, pcm; `messages/en.json` holding every landing-page string; the other four files drafted by `scripts/translate-messages.ts`.
 - Language switcher in the header; brand name stays "Medisent AI", tagline and text change with the language.
-- Landing page `/`: HospitalHeader (no hospital yet → denim bar), logo, tagline, buttons "Register your hospital" and "Sign in", and a test line "ẹ ọ ṣ ị ụ ṅ".
+- Landing page `/`: HospitalHeader (no hospital yet → primary bar), logo, tagline, buttons "Register your hospital" and "Sign in", and a test line "ẹ ọ ṣ ị ụ ṅ".
 - **Impeccable (Stage 0):** after I install Impeccable (section 10, step 1), write `DESIGN.md` from section 3 and `PRODUCT.md` from section 1 using the templates in section 10.3, then run `/impeccable init` to confirm and complete PRODUCT.md. Build the landing page with `/impeccable shape landing page` first, then build it, then `/impeccable critique landing page` and `/impeccable audit landing page`; fix all P0 and P1 findings.
 - **Done when:** `npm run dev` and `npm run build` pass; landing page shows the right fonts and colours; switching to Igbo keeps "Medisent AI" in the header and shows the Igbo tagline and landing text.
 
@@ -344,7 +366,7 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - **Refills:** when a prescription is saved, store quantity dispensed (from the scan or asked: "How many tablets did you get?"), compute `runs_out_on`, show "X days left" on the MedicineCard; a daily job alerts the patient (app + SMS) and their pharmacist 3 days before; "I got a refill" button resets the count.
 - **Drug registration check:**
     - Scanner also extracts `nafdac_no` (format like `A4-1234`) and manufacturer if visible; patient can also type the number.
-    - Look up in the `drugs` table. Results: **Registered** (green: name, strength and manufacturer match) · **Not found** (ochre: "We couldn't find this NAFDAC number in our list. Show this pack to your pharmacist before taking it.") · **Mismatch** (ochre: number belongs to a different drug) · **Unreadable** (ask for another photo or typing).
+    - Look up in the `drugs` table. Results: **Registered** (green: name, strength and manufacturer match) · **Not found** (warning: "We couldn't find this NAFDAC number in our list. Show this pack to your pharmacist before taking it.") · **Mismatch** (warning: number belongs to a different drug) · **Unreadable** (ask for another photo or typing).
     - Never say a drug is "fake". Wording is always "not found in our list — check with your pharmacist". Log every check in `drug_checks`; "not found" and "mismatch" create a pharmacist alert.
     - Add a link "Report to NAFDAC" pointing to NAFDAC's official site (no data sent automatically).
 - Accessibility settings: three text sizes, high contrast, speech speed.
@@ -391,8 +413,8 @@ Finish each stage's **Done when** test before the next. After each stage: list f
     - Patient "My progress" screen: last 7 days as a simple row of day circles (✓ all taken / ½ some / ✗ missed) plus "You took 18 of 21 doses this week". Big, plain, no complex chart.
     - Staff patient detail: 30-day line chart of daily % doses taken, with markers for side-effect reports and red flags; per-medicine breakdown.
     - Dashboard: hospital-wide 30-day adherence line and "doses taken today" stat.
-    - Use a light chart library (Recharts) with section 3 colours: denim line, green for taken, ochre for missed, never red except red-flag markers. Every chart has a text summary for screen readers.
-- **Impeccable (Stage 5):** `/impeccable shape pharmacist dashboard` first (use docs/mockups/staff-screens.png if present as the visual target). After building: `/impeccable layout pharmacist dashboard` (scan order: alerts → high risk → table), `/impeccable critique pharmacist dashboard`, `/impeccable audit hospital admin dashboard`, `/impeccable harden offline banner and sync` (stale data, sync conflict, failed SMS), `/impeccable optimize patient home` (fast on low-end phones and 3G), `/impeccable critique my progress screen`, `/impeccable typeset adherence chart` (labels readable at 18px), `/impeccable audit adherence chart` (contrast, screen-reader summary).
+    - Use a light chart library (Recharts) with section 3 colours: primary line, green for taken, warning for missed, never red except red-flag markers. Every chart has a text summary for screen readers.
+- **Impeccable (Stage 5):** `/impeccable shape pharmacist dashboard` first (use docs/mockups/medisent-staff-screens.png if present as the visual target). After building: `/impeccable layout pharmacist dashboard` (scan order: alerts → high risk → table), `/impeccable critique pharmacist dashboard`, `/impeccable audit hospital admin dashboard`, `/impeccable harden offline banner and sync` (stale data, sync conflict, failed SMS), `/impeccable optimize patient home` (fast on low-end phones and 3G), `/impeccable critique my progress screen`, `/impeccable typeset adherence chart` (labels readable at 18px), `/impeccable audit adherence chart` (contrast, screen-reader summary).
 - **Done when:** charts show 30 days of seeded data for all patients; in airplane mode a reminder fires and "Taken" logs, then syncs on reconnect; an SMS reply updates the dashboard.
 
 ### Stage 6 — Polish
@@ -572,12 +594,12 @@ It gives the agent a shared design vocabulary of 24 commands, a reviewer (critiq
 ### 10.3 Project context files (agent writes these in Stage 0)
 
 **DESIGN.md** — write it from section 3, not from `/impeccable document` (there is no UI code yet). Must contain:
-- Direction: warm, calm, clinical-but-human; cream backgrounds, white cards, denim actions, browns for brand and text. Built for elderly, low-literacy and low-vision users on low-end Android phones.
+- Direction: "Clinical precision" — technical, precise and calm; cool neutrals, white cards, one cobalt accent, monospaced numbers. Built for every age, including elderly, low-literacy and low-vision users on low-end Android phones.
 - The full token table from section 3, dark-mode values, fonts, header rule, button rule.
 - Type scale: body 18px minimum; medicine name and dose are the largest text on patient screens; line-height 1.5 for body.
-- Spacing: 4px base, 8 / 12 / 16 / 24 / 32 steps; cards 16px padding, 14px radius; buttons 12px radius, 48px minimum height.
+- Spacing: 4px base, 8 / 12 / 16 / 24 / 32 steps; cards 14–16px padding, 12px radius; buttons 10px radius, 48px minimum height.
 - Components list from section 3.
-- Hard rules: denim buttons with white text; red only for red-flag alerts; never colour alone (icon + word); no gradients, no glassmorphism, no purple; every screen has a read-aloud button; text must not be clipped when translated.
+- Hard rules: primary buttons with white text; red only for red-flag alerts; never colour alone (icon + word); no gradients, no glassmorphism, no purple; every screen has a read-aloud button; text must not be clipped when translated.
 - Anti-goals: generic SaaS landing (centered hero + three feature cards), purple-pink gradients, tiny grey text, icon-only buttons on patient screens.
 
 **PRODUCT.md** — write a draft from section 1, then run `/impeccable init` to check and complete it. Must contain:
@@ -631,7 +653,7 @@ Every command takes a target. Keep targets narrow: one screen or one component a
 - Machine-readable: `npx impeccable detect --json .`
 - List rules: `npx impeccable detect --list-rules`
 - Exit code 2 = findings, 1 = could not scan.
-- If a rule conflicts with section 3 on purpose (e.g. a font rule flags Young Serif), allow it with a reason instead of changing the design:
+- If a rule conflicts with section 3 on purpose (e.g. a font rule flags IBM Plex Sans), allow it with a reason instead of changing the design:
   `npx impeccable ignores add-value <rule> <value> --reason "Fixed brand choice, see BUILD_PLAN section 3"`
 - Hook control: `impeccable hooks status | on | off`.
 

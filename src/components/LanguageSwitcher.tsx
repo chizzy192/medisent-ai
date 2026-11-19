@@ -28,7 +28,7 @@ export function LanguageSwitcher() {
             router.refresh();
           });
         }}
-        className="min-h-12 cursor-pointer appearance-none bg-transparent py-2 text-base font-bold outline-none disabled:opacity-60"
+        className="min-h-12 cursor-pointer appearance-none bg-transparent py-2 text-base font-bold outline-none [field-sizing:content] disabled:opacity-60"
       >
         {locales.map((code) => (
           <option key={code} value={code} lang={code}>
