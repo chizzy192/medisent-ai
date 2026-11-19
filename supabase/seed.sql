@@ -1,0 +1,2 @@
+-- Medisent AI demo seed data (BUILD_PLAN section 7). Built in Stage 1.
+-- All data is fictional and labelled "Demo". No real patient data.
