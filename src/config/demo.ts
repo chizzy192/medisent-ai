@@ -5,7 +5,7 @@ import type { PillShape } from "@/components/PillIcon";
  * Fictional demo data (BUILD_PLAN section 7). Every name is labelled "Demo".
  * Used by app-shell placeholders until Stage 1 loads the signed-in user's hospital.
  */
-export const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE !== "false";
+export const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 export const demoHospital: HeaderHospital = {
   name: "Adaeze Specialist Hospital (Demo)",

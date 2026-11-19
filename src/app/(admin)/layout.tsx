@@ -1,6 +1,8 @@
 import { AppShell } from "@/components/AppShell";
+import { adminRoles, requireRole } from "@/lib/auth/dal";
 
-// Hospital admin shell: header, Hospital admin navigation and page. TODO (Stage 1): role from the signed-in profile.
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <AppShell role="admin">{children}</AppShell>;
+/** Hospital admin group. */
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await requireRole(adminRoles);
+  return <AppShell>{children}</AppShell>;
 }

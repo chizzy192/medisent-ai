@@ -27,7 +27,15 @@ export async function HospitalHeader({ hospital }: { hospital?: HeaderHospital |
           <Link href="/" aria-label={t("homeLink")} className="flex min-h-12 items-center">
             <Logo />
           </Link>
-          {hospital && <p className="-mt-1 text-sm text-ink-2">{hospital.name}</p>}
+          {hospital && (
+            <p className="-mt-1 flex items-center gap-1.5 text-sm text-ink-2">
+              {hospital.logoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element -- hospital logos come from Supabase Storage at any size
+                <img src={hospital.logoUrl} alt="" className="size-5 rounded-sm object-contain" />
+              )}
+              <span className="[overflow-wrap:anywhere]">{hospital.name}</span>
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-2 max-sm:contents">
           <LanguageSwitcher />

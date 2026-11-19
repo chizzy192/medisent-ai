@@ -1,6 +1,8 @@
 import { AppShell } from "@/components/AppShell";
+import { requireRole, staffRoles } from "@/lib/auth/dal";
 
-// Staff shell: header, Staff navigation and page. TODO (Stage 1): role from the signed-in profile.
-export default function StaffLayout({ children }: { children: React.ReactNode }) {
-  return <AppShell role="staff">{children}</AppShell>;
+/** Staff group: verified doctors, pharmacists, nurses and hospital admins. */
+export default async function StaffLayout({ children }: { children: React.ReactNode }) {
+  await requireRole(staffRoles);
+  return <AppShell>{children}</AppShell>;
 }

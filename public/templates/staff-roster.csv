@@ -1,0 +1,5 @@
+staff_id,full_name,role,licence_body,licence_no,phone,email
+AH-AD-001,Ngozi Eze,hospital_admin,,,+2348000000101,admin@adaeze.demo
+AH-DR-001,Dr Obinna Ugwu,doctor,MDCN,DEMO-MDCN-1001,+2348000000102,obinna@adaeze.demo
+AH-PH-001,Chidinma Okafor,pharmacist,PCN,DEMO-PCN-2001,+2348000000104,chidinma@adaeze.demo
+AH-NU-001,Blessing Okoro,nurse,NMCN,DEMO-NMCN-3001,+2348000000106,blessing@adaeze.demo

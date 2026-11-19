@@ -39,7 +39,7 @@ A voice-first, offline-ready medication companion for Nigerian hospitals.
 - AI builds reminders, answers medication questions by voice, runs daily check-ins, catches red flags, checks interactions, and scores adherence risk.
 - Verified professionals post on a forum about medication, diet and mental health.
 - Records move between hospitals with patient consent.
-- Works offline, with SMS / voice-call fallback for basic phones.
+- Works offline, and works with no data at all on basic phones via SMS, voice calls and USSD.
 - Caregiver mode: a family member is alerted when a dose is missed.
 - Refill alerts before medicine runs out.
 - Adherence progress charts for patients and staff.
@@ -239,7 +239,7 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 | hospitals | id, name, slug, logo_url, brand_color, address, city, state, cac_no, licence_url, status (pending / approved / rejected) |
 | staff_roster | id, hospital_id, staff_id, full_name, role, phone, email, licence_body, licence_no |
 | patient_registry | id, hospital_id, hospital_number, full_name, phone, age, sex, language |
-| profiles | id (= auth user), role (platform_admin / hospital_admin / doctor / pharmacist / nurse / patient), hospital_id (nullable for independent patients), full_name, phone, language (ig / yo / ha / pcm / en), licence_no, licence_body (MDCN / PCN / NMCN), verified_status (pending / verified / rejected / blocked), failed_attempts |
+| profiles | id (= auth user), device_type (smartphone / basic), preferred_channel (app / sms / voice), role (platform_admin / hospital_admin / doctor / pharmacist / nurse / patient), hospital_id (nullable for independent patients), full_name, phone, language (ig / yo / ha / pcm / en), licence_no, licence_body (MDCN / PCN / NMCN), verified_status (pending / verified / rejected / blocked), failed_attempts |
 | prescriptions | id, patient_id, hospital_id, quantity_dispensed, drug_id, pill_shape (round / capsule / oval / inhaler / liquid / injection), pill_color (hex), drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, source (scan / staff), image_url, confirmed_by_patient, created_by, active |
 | reminders | id, prescription_id, patient_id, time_of_day, days, channel (app / sms / voice), active |
 | dose_logs | id, reminder_id, patient_id, scheduled_at, status (taken / missed / snoozed / late), logged_at, synced |
@@ -251,6 +251,8 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 | forum_posts | id, author_id, hospital_id, category (medication / diet / mental_health), title, body, audio_url, drug_tags (text[]), language, status (published / hidden), is_demo |
 | transfers | id, patient_id, from_hospital_id, to_hospital_id, scope (jsonb), consent_at, status (requested / accepted / completed / declined), summary |
 | audit_log | id, actor_id, action, target_table, target_id, created_at |
+| ussd_sessions | id, session_id, phone, patient_id, menu_path, created_at |
+| voice_calls | id, patient_id, reminder_id, call_id, language, status (queued / answered / no_answer / failed), dtmf (pressed key), recording_url, created_at |
 | clinics | id, name, address, lat, lng, phone, hours, is_demo |
 | drugs | id, name, generic_name, strength, form, manufacturer, nafdac_no, nafdac_listed (bool), is_demo |
 | caregivers | id, patient_id, full_name, relationship, phone, language, channel (sms / whatsapp / app), notify_after_missed (int, default 1), consent_at, active |
@@ -436,6 +438,25 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - Sync queue: write to IndexedDB first, push on reconnect, last-write-wins by timestamp; OfflineBanner with last-synced time.
 - Local notifications for reminders while offline.
 - Africa's Talking: SMS reminders; replies 1 = taken, 2 = missed; inbound webhook updates `dose_logs`; voice-call reminder playing cached audio.
+- **No-data mode (basic phones, no internet, no reading needed):**
+    - **Staff-assisted signup:** pharmacist/nurse registers a patient from the dashboard with "Basic phone" ticked (`device_type = basic`); the pharmacist scans the label at the counter. Patient gets SMS: "Medisent AI: You're registered with [Hospital]. Reply YES to start reminders."
+    - **SMS reminders** in the patient's language: "08:00 Take Lisinopril 10mg (1 tablet). Reply 1 if taken, 2 if not." Replies update `dose_logs`.
+    - **Voice-call reminders** (`/api/voice`, Africa's Talking Voice): plays the cached Spitch/9jaLingo audio of the instruction, then "Press 1 if taken, 2 if not, 9 to leave a question." DTMF result logged in `voice_calls` and `dose_logs`. Default channel for patients who can't read.
+    - **Escalation:** no reply after 60 min → second reminder → caregiver alert.
+    - **USSD menu** (`/api/ussd`, sandbox code e.g. `*384*123#`), screens ≤ 160 characters, in the patient's language:
+      ```
+      Medisent AI – [Hospital]
+      1. My medicines today
+      2. I took my medicine
+      3. I have a side effect
+      4. EMERGENCY – I need help
+      5. Change language
+      ```
+      1 lists today's doses with times; 2 lists due doses to confirm; 3 offers Dizzy / Rash / Stomach pain / Other → logged as side effect + alert; 4 creates a red-flag alert (pharmacist + caregiver) and shows the hospital phone number; 5 switches language.
+    - **SMS questions:** any other text is treated as a question → assistant with the same safety rules → SMS reply (≤ 2 SMS) or escalation to pharmacist.
+    - **Voice questions:** "Press 9" records a question → Spitch STT → pharmacist alert with transcript.
+    - **Costs:** hospital pays SMS and calls; USSD may charge users unless zero-rated — note in admin settings; sandbox is free.
+    - **Demo:** use the Africa's Talking sandbox simulator for SMS, USSD and voice on screen; use a real keypad phone if available.
 - Pharmacist / doctor dashboard: stat cards (open alerts, high-risk patients, doses taken today, questions waiting), patients by risk table, alerts panel, weekly AI insight card.
 - Hospital admin dashboard: staff, patients, verifications, transfers, usage stats.
 - Signature element 6: streak card and weekly bars on the patient Progress screen.
@@ -445,7 +466,7 @@ Finish each stage's **Done when** test before the next. After each stage: list f
     - Dashboard: hospital-wide 30-day adherence line and "doses taken today" stat.
     - Use a light chart library (Recharts) with section 3 colours: primary line, green for taken, warning for missed, never red except red-flag markers. Every chart has a text summary for screen readers.
 - **Impeccable (Stage 5):** `/impeccable shape pharmacist dashboard` first (use docs/mockups/medisent-staff-screens.png if present as the visual target). After building: `/impeccable layout pharmacist dashboard` (scan order: alerts → high risk → table), `/impeccable critique pharmacist dashboard`, `/impeccable audit hospital admin dashboard`, `/impeccable harden offline banner and sync` (stale data, sync conflict, failed SMS), `/impeccable optimize patient home` (fast on low-end phones and 3G), `/impeccable critique my progress screen`, `/impeccable typeset adherence chart` (labels readable at 18px), `/impeccable audit adherence chart` (contrast, screen-reader summary).
-- **Done when:** charts show 30 days of seeded data for all patients; in airplane mode a reminder fires and "Taken" logs, then syncs on reconnect; an SMS reply updates the dashboard.
+- **Done when:** a basic-phone patient completes the USSD flow (confirm a dose, report a side effect, trigger emergency) and answers a voice-call reminder with 1 in the sandbox; charts show 30 days of seeded data for all patients; in airplane mode a reminder fires and "Taken" logs, then syncs on reconnect; an SMS reply updates the dashboard.
 
 ### Stage 6 — Polish
 - **Guided demo mode:**
@@ -585,7 +606,7 @@ Both demo hospitals plus 3 invented "Demo clinic" entries in Nsukka and Enugu wi
 4. Ask by voice in Yoruba: "Can I take this after food?" → spoken answer with linked forum post.
 5. "I dey feel dizzy" logs side effect; "chest pain" opens red-flag alert with nearest clinic.
 6. Airplane mode: reminder fires, "Taken" logs, syncs on reconnect.
-7. Basic phone gets SMS reminder and replies 1.
+7. Basic phone: SMS reminder → reply 1; voice-call reminder in Igbo → press 1; USSD `*384*123#` → option 4 EMERGENCY → pharmacist alert.
 7b. Nkechi misses a dose → her caregiver's (test) phone gets an SMS; refill alert shows "2 days left".
 8. Pharmacist dashboard (with 30-day adherence charts): risk scores, missed doses, dizziness report, red-flag alert, interaction warning.
 9. Emeka transfers to Hospital B; meds, reminders and AI summary arrive.

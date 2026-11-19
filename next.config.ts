@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
   cacheComponents: false,
   // The dev badge covers page content in design-review screenshots.
   devIndicators: false,
+  // Roster/registry CSVs (5 MB) and licence uploads (10 MB) go through server actions.
+  experimental: { serverActions: { bodySizeLimit: "12mb" } },
   turbopack: {
     rules: {
       "*.css": {

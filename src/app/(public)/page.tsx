@@ -66,7 +66,7 @@ export default async function LandingPage() {
       <TopBar />
       <main id="main" className="flex-1">
         {/* 2 · Hero on the dot grid, then 3 · the live preview console. */}
-        <section className="dot-grid border-b border-border">
+        <section className="border-b border-border">
           <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-12 sm:px-6 sm:pt-14 lg:pt-16 lg:pb-16">
             <p className="inline-flex min-h-8 items-center gap-2 rounded-full bg-primary-tint px-3 py-1.5 font-mono text-label tracking-[0.04em] text-primary uppercase">
               <span aria-hidden="true" className="size-2 rounded-full bg-primary" />

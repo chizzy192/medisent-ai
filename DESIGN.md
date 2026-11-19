@@ -26,6 +26,10 @@ Technical, precise and calm, like a well-made medical instrument. Cool neutrals,
 
 In code these are Tailwind utilities from `src/app/globals.css`: `bg-bg`, `bg-surface`, `bg-surface-2`, `border-border`, `text-ink`, `text-ink-2`, `text-ink-3`, `bg-primary`, `text-on-primary`, `bg-primary-tint`, `text-success` / `bg-success-tint`, `text-warning` / `bg-warning-dot` / `bg-warning-tint`, `text-danger` / `bg-danger-tint`, `bg-danger-solid` / `text-on-danger`.
 
+## App background (owner rule, 2026-11-19)
+
+Every page carries the dot grid: bg `#F6F8FA` with `radial-gradient(#D3DBE6 1px, transparent 1px)` at 16px spacing, set once on `body` in the root layout. Cards, header, bottom bar, sidebar, inputs and tables stay solid white (`bg-surface`). Dark mode: `#0B1220` with `#1A2538` dots. High-contrast mode (`data-contrast="high"`) and `prefers-contrast: more`: no dots. Hero cards no longer carry their own texture.
+
 ## Dark mode
 
 bg `#0B1220`, surface `#111A2B`, surface-2 `#1A2538`, border `#26344A`, ink `#E6EBF2`, ink-2 `#AEB9C8`, ink-3 `#8A97AA`, primary `#6E95FF` (text on it `#0B1220`), primary-tint `#1B2A4D`. Follows the OS; `data-theme="light|dark"` on `<html>` overrides it.
