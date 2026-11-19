@@ -12,7 +12,7 @@ import { HospitalHeader } from "./HospitalHeader";
  */
 export function AppShell({ role, counts, children }: { role: NavRole; counts?: NavCounts; children: ReactNode }) {
   const hospital = demoMode ? demoHospital : null;
-  const padForBar = "pb-[calc(64px+env(safe-area-inset-bottom)+24px)]";
+  const padForBar = "pb-[calc(var(--bottom-nav-h,calc(64px+env(safe-area-inset-bottom)))+24px)]";
   return (
     <>
       <HospitalHeader hospital={hospital} />

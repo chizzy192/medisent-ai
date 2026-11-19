@@ -23,9 +23,10 @@ export function TodayRing({
   const fraction = total > 0 ? Math.min(1, taken / total) : 0;
   const offset = c * (1 - fraction);
 
+  // Sized in rem so the ring grows with large-text mode and the mono count never overflows it.
   return (
-    <div role="img" aria-label={label} className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90" aria-hidden="true">
+    <div role="img" aria-label={label} className="relative shrink-0" style={{ width: `${size / 16}rem`, height: `${size / 16}rem` }}>
+      <svg width="100%" height="100%" viewBox={`0 0 ${size} ${size}`} className="-rotate-90" aria-hidden="true">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--color-surface-2)" strokeWidth={stroke} />
         <circle
           cx={size / 2}
@@ -37,12 +38,13 @@ export function TodayRing({
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={offset}
-          style={{ ["--ring-circumference" as string]: `${c}`, animation: "ring-fill 600ms cubic-bezier(0.16, 1, 0.3, 1) both" }}
+          className="animate-ring-fill"
+          style={{ ["--ring-circumference" as string]: `${c}` }}
         />
       </svg>
       <div aria-hidden="true" className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="font-mono text-xl leading-none font-medium">
-          {taken}/{total}
+          {total > 0 ? `${taken}/${total}` : "—"}
         </span>
         <span className="label-mono mt-1">{caption}</span>
       </div>

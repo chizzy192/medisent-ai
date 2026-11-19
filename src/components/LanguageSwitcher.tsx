@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
   const [pending, startTransition] = useTransition();
 
   return (
-    <div className="relative flex min-h-12 min-w-12 items-center gap-1 rounded-button border border-border bg-surface px-3 text-ink-2 focus-within:outline-3 focus-within:outline-offset-3 focus-within:outline-primary">
+    <div className="relative flex h-12 min-w-12 items-center gap-1 rounded-button border border-border bg-surface px-3 text-ink-2 focus-within:outline-3 focus-within:outline-offset-3 focus-within:outline-primary">
       <span aria-hidden="true" className="font-mono text-sm">
         {localeCodes[locale]}
       </span>
@@ -29,7 +29,7 @@ export function LanguageSwitcher() {
         aria-label={t("language")}
         title={t("languageHint")}
         value={locale}
-        disabled={pending}
+        aria-busy={pending}
         onChange={(event) => {
           const next = event.target.value;
           startTransition(async () => {
@@ -37,7 +37,7 @@ export function LanguageSwitcher() {
             router.refresh();
           });
         }}
-        className="absolute inset-0 cursor-pointer appearance-none opacity-0 disabled:cursor-wait"
+        className="absolute -inset-px cursor-pointer appearance-none opacity-0 aria-busy:cursor-wait"
       >
         {locales.map((code) => (
           <option key={code} value={code} lang={code}>

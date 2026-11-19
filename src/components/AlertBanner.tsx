@@ -33,4 +33,4 @@ export function AlertBanner({
 
 /** White full-width call block on the red banner (red 600 text). */
 export const alertActionClass =
-  "flex min-h-12 w-full items-center justify-center gap-2 rounded-button bg-white px-4 text-center text-base font-semibold text-[#C81E1E]";
+  "flex min-h-12 w-full items-center justify-center gap-2 rounded-button bg-white px-4 text-center text-base font-semibold text-danger-solid";

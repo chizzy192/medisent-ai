@@ -1,6 +1,6 @@
 # Medisent AI — Design
 
-Source of truth: `docs/BUILD_PLAN.md` section 3 v2, **"Clinical precision"**. Visual target: `docs/mockups/medisent-patient-screens.png` and `docs/mockups/medisent-staff-screens.png`. The palette, fonts, header rule, logo and button rules are FIXED. Design tools work inside them; suggested changes are listed for the product owner, not applied.
+Source of truth: `docs/BUILD_PLAN.md` section 3 v2, **"Clinical precision"**. Visual targets: `docs/mockups/medisent-landing.png` (landing), `docs/mockups/medisent-patient-screens-v3.png` (patient, replaces the older patient image wherever they differ) and `docs/mockups/medisent-staff-screens.png` (staff). The palette, fonts, header rule, logo and button rules are FIXED. Design tools work inside them; suggested changes are listed for the product owner, not applied.
 
 ## Direction
 
@@ -71,11 +71,20 @@ White (surface). Logo left with the hospital name under it; language picker righ
 
 ## Bottom navigation
 
-Phones and tablets (< 1024px): fixed bottom bar, surface background, 1px border-colour top border, 64px + safe-area inset. Icon (24px outline) + always-visible translated label (13px min). Active: primary icon and label, primary-tint pill, `aria-current="page"`; inactive ink-3. Patient Scan tab is a raised cobalt rounded square. Never hides on scroll. Desktop (≥ 1024px): staff and admins get a left sidebar (see the staff mockup); patients keep the bottom bar centred at max 480px.
+Phones and tablets (< 1024px): fixed bottom bar, surface background, 1px border-colour top border, 64px + safe-area inset. Icon (24px outline) + always-visible translated label (13px min; on phones the label holds at 13px so words stay whole at 200% text, on wider screens it scales with the text). Active: primary icon and label, primary-tint pill, `aria-current="page"`; inactive ink-3. Patient Scan tab is a raised cobalt rounded square. Never hides on scroll. Desktop (≥ 1024px): staff and admins get a left sidebar (see the staff mockup); patients keep the bottom bar centred at max 480px.
 
 ## Components
 
-BottomNav, HospitalHeader, Logo, StatusChip, MedicineCard (drug, dose, mono time, status chip, "I took it" primary + "Later" outlined), ReminderSheet (big Taken / Snooze / Missed), MicButton (hold to talk + transcript), AlertBanner (solid red, full width, white call button), ForumPostCard (verified chip with licence body, listen button), VerificationPill (pending / verified / rejected / blocked), OfflineBanner ("● Offline · synced 10:42").
+Button (primary, outline: `.btn-primary`, `.btn-outline`), Card, SectionLabel (`.label-mono`), Meter, EmptyState, TodayRing (sized in rem so it grows with large text), DayTimeline, PillIcon, MedicineCard, AlertBanner, BottomNav + Sidebar, HospitalHeader, Logo, StatusChip, MedicineCard (drug, dose, mono time, status chip, "I took it" primary + "Later" outlined), ReminderSheet (big Taken / Snooze / Missed), MicButton (hold to talk + transcript), AlertBanner (solid red, full width, white call button), ForumPostCard (verified chip with licence body, listen button), VerificationPill (pending / verified / rejected / blocked), OfflineBanner ("● Offline · synced 10:42").
+
+## Landing page (`/`)
+
+Drawn to `docs/mockups/medisent-landing.png`, nine sections (BUILD_PLAN Stage 0): top bar with section links, hero on the dot grid with the mono kicker chip and a 64px headline whose "your language" is primary, the live preview console (`src/components/landing/PreviewConsole.tsx`: language tabs swap the spoken sentence; audio from `public/audio/landing/<code>.mp3` with a browser-voice fallback), four numbered steps on a line, the three-views spec table (three cards below 768px), the drawn feature phone (`FeaturePhone.tsx`; its body and green LCD colours are an illustration, like pill colours, not tokens), four safety cards, the dark CTA band (`.theme-dark` remaps the tokens to the dark values inside it) and the footer with the language codes in mono. The brand name appears in the top bar and footer only.
+
+## Known contrast gaps (owner decisions)
+
+- Success chip text `#12805C` on `#E3F4EC` measures 4.32:1 (AA needs 4.5:1 for 16px text); `#0F6E4F` would pass. Palette is fixed, so this is listed, not changed.
+- ink-3 `#5E6E84` on primary-tint `#E6EDFC` is 4.43:1: do not put ink-3 labels on primary-tint. On the dot-grid hero card use ink-2 for the 12px label.
 
 ## Hard rules
 
@@ -83,7 +92,7 @@ BottomNav, HospitalHeader, Logo, StatusChip, MedicineCard (drug, dose, mono time
 - Red only for red-flag alerts and high risk.
 - Never colour alone: dot or icon + word.
 - No gradients, no glassmorphism, no purple, no emoji in UI, no shadows on cards.
-- Every screen has a read-aloud button.
+- Every screen has a read-aloud button. Owner exception (2026-11-19): the public landing page hides it below 768px so the sticky top bar stays short; app screens keep it at every size.
 - Text must not be clipped when translated.
 
 ## Anti-goals

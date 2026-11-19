@@ -1,181 +1,300 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import { brand, tagline } from "@/config/brand";
-import { defaultLocale, isLocale, localeNames } from "@/config/locales";
-import { CardRow } from "@/components/CardRow";
-import { MessageIcon, PhoneIcon } from "@/components/icons";
-import { LanguageChoice } from "@/components/LanguageChoice";
-import { PillIcon } from "@/components/PillIcon";
-import { SpeakTextButton } from "@/components/SpeakTextButton";
+import { FeaturePhone } from "@/components/landing/FeaturePhone";
+import { PreviewConsole } from "@/components/landing/PreviewConsole";
+import { TopBar } from "@/components/landing/TopBar";
+import { AlertIcon, ArrowRightIcon, LockIcon, ShieldIcon, VerifiedListIcon } from "@/components/icons";
+import { Logo } from "@/components/Logo";
 import { StatusChip } from "@/components/StatusChip";
+import { previewLabel } from "@/config/landingPreview";
+import { defaultLocale, isLocale, localeCodes, locales } from "@/config/locales";
 
 /** A wall-clock time in Lagos, formatted for the visitor's locale as 24-hour (`08:00`). */
 function lagosTime(hour: number) {
   return new Date(Date.UTC(2026, 0, 15, hour - 1, 0));
 }
 
-/** Timeline node colours (signature element 2): primary + halo = now, warning = late, grey = other. */
-type Node = "now" | "late" | "plain";
-
+/**
+ * Landing page: the nine sections of BUILD_PLAN Stage 0, drawn to docs/mockups/medisent-landing.png.
+ * The brand name appears in the top bar only. The top bar carries the read-aloud button.
+ */
 export default async function LandingPage() {
   const t = await getTranslations("landing");
   const format = await getFormatter();
   const rawLocale = await getLocale();
   const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
+  const reminderTime = format.dateTime(lagosTime(previewLabel.reminderHour), {
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+    timeZone: "Africa/Lagos",
+  });
 
-  const time = (hour: number) =>
-    format.dateTime(lagosTime(hour), {
-      hour: "2-digit",
-      minute: "2-digit",
-      hourCycle: "h23",
-      timeZone: "Africa/Lagos",
-    });
+  const steps = [
+    { n: "01", title: t("step1Title"), body: t("step1Body") },
+    { n: "02", title: t("step2Title"), body: t("step2Body") },
+    { n: "03", title: t("step3Title"), body: t("step3Body") },
+    { n: "04", title: t("step4Title"), body: t("step4Body") },
+  ];
 
-  const actions = (id?: string) => (
-    <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-      <Link id={id} href="/login" className="btn-primary sm:min-w-44">
-        {t("signIn")}
-      </Link>
-      <Link href="/register-hospital" className="btn-primary sm:min-w-44">
-        {t("registerHospital")}
-      </Link>
-    </div>
-  );
+  const columns = [
+    {
+      who: t("viewsPatients"),
+      sees: t("viewsPatientsSees"),
+      does: t("viewsPatientsDoes"),
+      verified: t("viewsPatientsVerified"),
+    },
+    { who: t("viewsStaff"), sees: t("viewsStaffSees"), does: t("viewsStaffDoes"), verified: t("viewsStaffVerified") },
+    {
+      who: t("viewsHospitals"),
+      sees: t("viewsHospitalsSees"),
+      does: t("viewsHospitalsDoes"),
+      verified: t("viewsHospitalsVerified"),
+    },
+  ];
+
+  const safety = [
+    { icon: <ShieldIcon size={22} />, title: t("safe1Title"), body: t("safe1Body") },
+    { icon: <AlertIcon size={22} />, title: t("safe2Title"), body: t("safe2Body") },
+    { icon: <LockIcon size={22} />, title: t("safe3Title"), body: t("safe3Body") },
+    { icon: <VerifiedListIcon size={22} />, title: t("safe4Title"), body: t("safe4Body") },
+  ];
 
   return (
     <>
+      <TopBar />
       <main id="main" className="flex-1">
-        {/* Offer and actions in one column. The header carries the logo. */}
-        <section className="mx-auto w-full max-w-6xl px-4 pt-7 pb-8 sm:px-6 sm:pt-10 sm:pb-10 lg:pt-14 lg:pb-12">
-          <h1 className="max-w-[24ch] text-3xl tracking-[-0.01em] sm:text-4xl">
-            <span lang="mul" className="block">
-              {brand.signature}
-            </span>
-            {tagline[locale]}
-          </h1>
-          <p className="mt-4 max-w-[52ch] text-lg text-ink-2 sm:mt-5">{t("intro")}</p>
-          <div className="mt-6">{actions("primary-action")}</div>
-          <p className="mt-4 flex max-w-[60ch] items-start gap-2 text-sm text-ink-2">
-            <span aria-hidden="true" className="mt-2 size-2 shrink-0 rounded-full bg-success" />
-            {t("verifiedNote")}
-          </p>
+        {/* 2 · Hero on the dot grid, then 3 · the live preview console. */}
+        <section className="dot-grid border-b border-border">
+          <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-12 sm:px-6 sm:pt-14 lg:pt-16 lg:pb-16">
+            <p className="inline-flex min-h-8 items-center gap-2 rounded-full bg-primary-tint px-3 py-1.5 font-mono text-label tracking-[0.04em] text-primary uppercase">
+              <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
+              {t("kicker")}
+            </p>
+            <h1 className="mt-5 max-w-[30ch] text-3xl tracking-[-0.02em] sm:text-4xl lg:text-display">
+              {t("headlineBefore")}
+              <span className="text-primary">{t("headlineAccent")}</span>
+              {t("headlineAfter")}
+            </h1>
+            <p className="mt-5 max-w-[56ch] text-lg text-ink-2">{t("lead")}</p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link href="/demo" className="btn-primary">
+                {t("tryDemo")}
+                <ArrowRightIcon size={20} />
+              </Link>
+              <Link href="/register-hospital" className="btn-outline">
+                {t("registerHospital")}
+              </Link>
+            </div>
+            <div className="mt-10 lg:mt-12">
+              {/* English visitors see the Igbo sentence with its gloss first, as in the comp. */}
+              <PreviewConsole initial={locale === "en" ? "ig" : locale} time={reminderTime} />
+            </div>
+          </div>
         </section>
 
-        {/* The day: each hour proves one claim, drawn in the app's own components. */}
-        <section aria-labelledby="day-title" className="border-t border-border">
-          <div className="mx-auto w-full max-w-6xl px-4 pt-8 pb-14 sm:px-6 sm:pt-10 lg:pt-12 lg:pb-20">
-            <h2 id="day-title" className="text-2xl">
-              {t("dayTitle")}
-            </h2>
-            <p className="mt-1 text-sm text-ink-2">{t("dayIntro")}</p>
-
-            <ol className="relative mt-8 space-y-12 before:absolute before:top-3 before:bottom-3 before:left-[7px] before:w-px before:bg-border lg:space-y-16">
-              <Stop
-                time={time(8)}
-                node="now"
-                claim={t("morningTitle")}
-                note={
-                  <>
-                    <p>{t("morningNote")}</p>
-                    <div className="mt-3">
-                      <LanguageChoice label={t("chooseLanguage")} />
-                    </div>
-                  </>
-                }
-              >
-                <article className="rounded-card border-2 border-primary bg-surface p-4">
-                  {/* The icon moves above the name when large text leaves no room beside it. */}
-                  <div className="flex flex-wrap items-start gap-3">
-                    <PillIcon shape="round" color="#E05A5A" />
-                    <div className="min-w-0 flex-[1_1_12rem]">
-                      <CardRow
-                        main={
-                          <>
-                            <p className="text-card-title font-semibold">
-                              {t("morningDrug")}{" "}
-                              <span className="font-mono text-base font-medium text-ink-2">{t("morningStrength")}</span>
-                            </p>
-                            <p className="font-mono text-sm text-ink-2">
-                              {time(8)} · {t("morningDose")}
-                            </p>
-                          </>
-                        }
-                        value={<StatusChip tone="primary">{t("statusDueNow")}</StatusChip>}
-                      />
-                    </div>
+        {/* 4 · How it works: four numbered steps on a connecting line. */}
+        <section id="how-it-works" aria-labelledby="how-title" className="scroll-mt-32 lg:scroll-mt-20">
+          <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+            <SectionHead id="how-title" title={t("howTitle")} intro={t("howIntro")} />
+            <ol className="relative mt-10 grid gap-8 before:absolute before:bg-border max-lg:before:top-3 max-lg:before:bottom-3 max-lg:before:left-5 max-lg:before:w-px lg:grid-cols-4 lg:gap-6 lg:before:top-5 lg:before:right-0 lg:before:left-0 lg:before:h-px">
+              {steps.map((step) => (
+                <li key={step.n} className="relative flex gap-4 max-lg:pl-0 lg:block">
+                  <span
+                    aria-hidden="true"
+                    className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-button border border-primary bg-surface font-mono text-sm font-medium text-primary"
+                  >
+                    {step.n}
+                  </span>
+                  <div className="lg:mt-5">
+                    <h3 className="text-lg">
+                      <span className="sr-only">{step.n} </span>
+                      {step.title}
+                    </h3>
+                    <p className="mt-1 max-w-[36ch] text-base text-ink-2">{step.body}</p>
                   </div>
-                  <div className="mt-4 border-t border-surface-2 pt-3">
-                    <SpeakTextButton
-                      text={`${t("morningDrug")} ${t("morningStrength")}. ${t("morningDose")}.`}
-                      label={t("listenIn", { language: localeNames[locale] })}
-                      stopLabel={t("stop")}
-                    />
-                  </div>
-                </article>
-              </Stop>
-
-              <Stop time={time(14)} node="plain" claim={t("afternoonTitle")} note={<p>{t("afternoonNote")}</p>}>
-                <SmsCard heading={brand.name} status={<StatusChip tone="neutral">{t("statusSent")}</StatusChip>}>
-                  {t("afternoonSms")}
-                </SmsCard>
-              </Stop>
-
-              <Stop time={time(20)} node="late" claim={t("eveningTitle")} note={<p>{t("eveningNote")}</p>}>
-                <SmsCard heading={t("eveningTo")} status={<StatusChip tone="warning">{t("statusMissed")}</StatusChip>}>
-                  {t("eveningSms", { time: time(20) })}
-                </SmsCard>
-              </Stop>
-
-              <Stop time={t("anyTime")} node="plain" claim={t("urgentTitle")} note={<p>{t("urgentNote")}</p>}>
-                {/* The real red-flag alert (section 3 v2): the only red on the page. */}
-                <div className="rounded-card bg-danger-solid p-4 text-on-danger">
-                  <p className="font-mono text-label tracking-[0.04em] uppercase">
-                    {t("alertLabel")} · {t("exampleLabel")}
-                  </p>
-                  <p className="mt-1 text-xl font-semibold">{t("urgentHeading")}</p>
-                  <p className="mt-1 text-base">{t("urgentBody")}</p>
-                  {/* Drawn as the app's call block; part of the labelled example, not a control. */}
-                  <div className="mt-4 flex min-h-12 cursor-default items-center justify-center gap-2 rounded-button bg-white px-4 text-center text-base font-semibold text-[#C81E1E]">
-                    <PhoneIcon size={20} className="shrink-0" />
-                    {t("urgentCall")}
-                  </div>
-                </div>
-              </Stop>
+                </li>
+              ))}
             </ol>
           </div>
         </section>
 
-        {/* Close: how you join, and the actions again. */}
-        <section aria-labelledby="join-title" className="border-t border-border bg-surface">
-          <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.2fr_1fr] lg:gap-16 lg:py-16">
-            <div>
-              <h2 id="join-title" className="text-2xl">
-                {t("joinTitle")}
-              </h2>
-              <ol className="mt-6 space-y-5">
-                {(["step1", "step2", "step3"] as const).map((key, index) => (
-                  <li key={key} className="flex gap-4">
-                    <span
-                      aria-hidden="true"
-                      className="flex size-9 shrink-0 items-center justify-center rounded-button border border-border bg-bg font-mono text-sm text-primary"
-                    >
-                      {index + 1}
-                    </span>
-                    <p className="max-w-[52ch] pt-1 text-base">{t(key)}</p>
-                  </li>
-                ))}
-              </ol>
+        {/* 5 · One platform, three views: spec-sheet table; three cards on phones. */}
+        <section id="for-hospitals" aria-labelledby="views-title" className="scroll-mt-32 lg:scroll-mt-20 border-t border-border">
+          <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+            <SectionHead id="views-title" title={t("viewsTitle")} intro={t("viewsIntro")} />
+            <div className="mt-8 overflow-hidden rounded-card border border-border bg-surface max-md:hidden">
+              <table className="w-full border-collapse text-left text-base">
+                <thead>
+                  <tr className="border-b border-border bg-bg">
+                    <th scope="col" className="label-mono w-32 px-4 py-3 font-medium">
+                      {t("viewsWho")}
+                    </th>
+                    {columns.map((column) => (
+                      <th key={column.who} scope="col" className="px-4 py-3 font-semibold text-ink">
+                        {column.who}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-surface-2 align-top">
+                    <th scope="row" className="label-mono px-4 py-4 font-medium">
+                      {t("viewsSees")}
+                    </th>
+                    {columns.map((column) => (
+                      <td key={column.who} className="px-4 py-4 text-ink-2">
+                        {column.sees}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr className="border-b border-surface-2 align-top">
+                    <th scope="row" className="label-mono px-4 py-4 font-medium">
+                      {t("viewsDoes")}
+                    </th>
+                    {columns.map((column) => (
+                      <td key={column.who} className="px-4 py-4 text-ink-2">
+                        {column.does}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr className="align-top">
+                    <th scope="row" className="label-mono px-4 py-4 font-medium">
+                      {t("viewsVerifiedBy")}
+                    </th>
+                    {columns.map((column) => (
+                      <td key={column.who} className="px-4 py-4 font-mono text-sm text-ink">
+                        {column.verified}
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div className="lg:pt-12">
-              {actions()}
-              <p className="mt-6 max-w-[46ch] text-sm text-ink-2">{t("safety")}</p>
+            <ul className="mt-8 grid gap-4 md:hidden">
+              {columns.map((column) => (
+                <li key={column.who} className="rounded-card border border-border bg-surface p-4">
+                  <h3 className="text-lg">{column.who}</h3>
+                  <dl className="mt-3 space-y-3">
+                    <div>
+                      <dt className="label-mono">{t("viewsSees")}</dt>
+                      <dd className="mt-0.5 text-base text-ink-2">{column.sees}</dd>
+                    </div>
+                    <div>
+                      <dt className="label-mono">{t("viewsDoes")}</dt>
+                      <dd className="mt-0.5 text-base text-ink-2">{column.does}</dd>
+                    </div>
+                    <div>
+                      <dt className="label-mono">{t("viewsVerifiedBy")}</dt>
+                      <dd className="mt-0.5 font-mono text-sm">{column.verified}</dd>
+                    </div>
+                  </dl>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* 6 · Works on any phone. */}
+        <section aria-labelledby="phone-title" className="border-t border-border">
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)] gap-4 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:py-20">
+            <div className="min-w-0 rounded-card border border-border bg-surface p-5 sm:p-6">
+              <p className="label-mono">{t("phoneLabel")}</p>
+              <h2 id="phone-title" className="mt-2 max-w-[20ch] text-2xl">
+                {t("phoneTitle")}
+              </h2>
+              <p className="mt-3 max-w-[48ch] text-base text-ink-2">{t("phoneBody")}</p>
+              <ul className="mt-5 flex flex-wrap gap-2">
+                <li>
+                  <StatusChip tone="neutral">{t("phoneChipOffline")}</StatusChip>
+                </li>
+                <li>
+                  <StatusChip tone="neutral">{t("phoneChipSms")}</StatusChip>
+                </li>
+                <li>
+                  <StatusChip tone="neutral">{t("phoneChipVoice")}</StatusChip>
+                </li>
+              </ul>
+            </div>
+            <div className="flex min-w-0 items-center justify-center rounded-card border border-border bg-surface p-6 sm:p-8">
+              <FeaturePhone sms={t("phoneSms")} reply={t("phoneReply")} figureLabel={t("phoneFigure")} />
+            </div>
+          </div>
+        </section>
+
+        {/* 7 · Safe by design. */}
+        <section id="safety" aria-labelledby="safe-title" className="scroll-mt-32 lg:scroll-mt-20 border-t border-border">
+          <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
+            <SectionHead id="safe-title" title={t("safeTitle")} intro={t("safeIntro")} />
+            <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {safety.map((item) => (
+                <li key={item.title} className="rounded-card border border-border bg-surface p-5">
+                  <span
+                    aria-hidden="true"
+                    className="flex size-10 items-center justify-center rounded-button bg-primary-tint text-primary"
+                  >
+                    {item.icon}
+                  </span>
+                  <h3 className="mt-4 text-lg">{item.title}</h3>
+                  <p className="mt-1 text-base text-ink-2">{item.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* 8 · Final CTA band on the dark palette (tokens remapped by .theme-dark). */}
+        <section aria-labelledby="cta-title" className="px-4 pb-14 sm:px-6 lg:pb-20">
+          <div className="theme-dark mx-auto w-full max-w-6xl rounded-card border border-border bg-surface px-5 py-8 text-ink sm:px-8 sm:py-10 lg:px-10">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="label-mono">{t("ctaLabel")}</p>
+                <h2 id="cta-title" className="mt-2 text-2xl sm:text-3xl">
+                  {t("ctaTitle")}
+                </h2>
+                <p className="mt-2 text-base text-ink-2">{t("ctaBody")}</p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap lg:shrink-0">
+                <Link href="/demo" className="btn-primary">
+                  {t("tryDemo")}
+                  <ArrowRightIcon size={20} />
+                </Link>
+                <Link href="/register-hospital" className="btn-outline bg-transparent text-ink">
+                  {t("registerHospital")}
+                </Link>
+              </div>
             </div>
           </div>
         </section>
       </main>
-      {process.env.NODE_ENV !== "production" && <DevLetterCheck label={t("letterCheck")} />}
+
+      {/* 9 · Footer. */}
+      <footer className="border-t border-border bg-surface">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-5 sm:px-6">
+          <p className="flex items-center">
+            <Logo />
+          </p>
+          <p className="font-mono text-sm text-ink-2">
+            <span className="sr-only">{t("footerLanguages")}: </span>
+            {locales.map((code) => localeCodes[code]).join(" · ")}
+          </p>
+        </div>
+        {process.env.NODE_ENV !== "production" && <DevLetterCheck label={t("letterCheck")} />}
+      </footer>
     </>
+  );
+}
+
+/** Section heading with its one-line intro beside it on desktop (as in the mockup). */
+function SectionHead({ id, title, intro }: { id: string; title: string; intro: ReactNode }) {
+  return (
+    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-end lg:gap-10">
+      <h2 id={id} className="max-w-[24ch] text-2xl sm:text-3xl">
+        {title}
+      </h2>
+      <p className="max-w-[48ch] text-base text-ink-2">{intro}</p>
+    </div>
   );
 }
 
@@ -185,63 +304,10 @@ export default async function LandingPage() {
  */
 function DevLetterCheck({ label }: { label: string }) {
   return (
-    <footer className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-4 sm:px-6">
       <p className="text-sm text-ink-3">
         {label}: <span lang="yo">ẹ ọ ṣ ị ụ ṅ</span> · <span lang="yo" className="font-mono">ẹ ọ ṣ ị ụ ṅ</span>
       </p>
-    </footer>
-  );
-}
-
-/**
- * One stop on the day-rail. Phones: time, claim, proof, note. Desktop: time | proof | claim + note.
- * The claim is the stop's heading, so it is the strongest text in the stop.
- */
-function Stop({
-  time,
-  node,
-  claim,
-  note,
-  children,
-}: {
-  time: string;
-  node: Node;
-  claim: string;
-  note: ReactNode;
-  children: ReactNode;
-}) {
-  const nodeClass = {
-    now: "bg-primary ring-4 ring-primary-tint",
-    late: "bg-warning-dot",
-    plain: "bg-bg border-2 border-border",
-  }[node];
-  return (
-    <li className="relative pl-8 lg:grid lg:grid-cols-[7rem_minmax(0,30rem)_minmax(0,1fr)] lg:gap-x-10">
-      <span aria-hidden="true" className={`absolute top-1.5 left-0 size-[15px] rounded-full ${nodeClass}`} />
-      <p className="font-mono text-base text-ink-2 lg:col-start-1 lg:row-span-2 lg:row-start-1">{time}</p>
-      <h3 className="mt-1 text-xl lg:col-start-3 lg:row-start-1 lg:mt-0">{claim}</h3>
-      <div className="mt-4 min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0">{children}</div>
-      <div className="mt-4 max-w-[44ch] text-base text-ink-2 lg:col-start-3 lg:row-start-2 lg:mt-2">{note}</div>
-    </li>
-  );
-}
-
-/** An SMS as received on a basic phone: plain bordered card, sender + status, fills the column. */
-function SmsCard({ heading, status, children }: { heading: string; status: ReactNode; children: ReactNode }) {
-  return (
-    <div className="rounded-card border border-border bg-surface p-4">
-      <div className="border-b border-surface-2 pb-2">
-        <CardRow
-          main={
-            <p className="flex items-center gap-2 text-sm font-medium text-ink-2">
-              <MessageIcon size={18} className="shrink-0 text-ink-3" />
-              {heading}
-            </p>
-          }
-          value={status}
-        />
-      </div>
-      <p className="mt-2 text-base">{children}</p>
     </div>
   );
 }

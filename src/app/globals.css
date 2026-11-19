@@ -22,6 +22,8 @@
   --color-primary: #1f4fd8;
   --color-on-primary: #ffffff;
   --color-primary-tint: #e6edfc;
+  /* Hover on primary buttons: the same cobalt, 14% darker. */
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 86%, black);
 
   --color-success: #12805c;
   --color-success-tint: #e3f4ec;
@@ -182,18 +184,11 @@
     text-underline-offset: 0.2em;
   }
 
-  /* Reduced motion: replace movement with instant changes. */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation: none !important;
-      transition-duration: 0.01ms !important;
-    }
-  }
 }
 
-/* Motion (section 3 v2). Every animation is removed under prefers-reduced-motion below. */
+/* Motion (section 3 v2). Each animation has a class; prefers-reduced-motion turns the movement
+ * off per class and keeps the state change (colour, icon, count) visible. Short colour
+ * transitions stay. */
 @keyframes ring-fill {
   from {
     stroke-dashoffset: var(--ring-circumference);
@@ -206,6 +201,20 @@
   }
   50% {
     transform: scaleY(1);
+  }
+}
+
+.animate-ring-fill {
+  animation: ring-fill 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-wave {
+  transform-origin: center;
+  animation: wave 900ms ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-ring-fill,
+  .animate-wave {
+    animation: none;
   }
 }
 
@@ -240,7 +249,7 @@
     color: var(--color-on-primary);
   }
   .btn-primary:hover {
-    background-color: color-mix(in srgb, var(--color-primary) 86%, black);
+    background-color: var(--color-primary-hover);
   }
   /* Secondary: outlined cobalt. */
   .btn-secondary,

@@ -18,7 +18,8 @@ export default async function HomePage() {
       <section className="dot-grid flex flex-wrap items-center gap-4 rounded-card border border-border bg-surface p-4">
         <TodayRing taken={0} total={0} caption={t("ringCaption")} label={t("ringLabel")} />
         <div className="min-w-0 flex-[1_1_10rem]">
-          <SectionLabel>{today}</SectionLabel>
+          {/* ink-2 on the dot grid: ink-3 falls under 4.5:1 through the dots. */}
+          <SectionLabel className="text-ink-2">{today}</SectionLabel>
           <p className="mt-0.5 text-xl font-semibold">{t("greeting")}</p>
           <p className="text-base text-ink-2">{t("noDoses")}</p>
         </div>

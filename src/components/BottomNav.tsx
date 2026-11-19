@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { navTabs, type NavCounts, type NavIconName, type NavRole, type NavTab } from "@/config/nav";
 import {
@@ -33,13 +33,17 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/** Hide only while the on-screen keyboard is open (the visual viewport shrinks a lot). */
+/**
+ * Hide only while the on-screen keyboard is open: the visual viewport loses a lot of height at
+ * scale 1. Pinch-zoom also shrinks it, so the height is unscaled first (low-vision users
+ * pinch-zoom constantly and must keep the bar).
+ */
 function useKeyboardOpen() {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-    const update = () => setOpen(window.innerHeight - vv.height > 150);
+    const update = () => setOpen(window.innerHeight - vv.height * vv.scale > 150);
     vv.addEventListener("resize", update);
     return () => vv.removeEventListener("resize", update);
   }, []);
@@ -81,9 +85,25 @@ export function BottomNav({ role, counts = {} }: { role: NavRole; counts?: NavCo
   const pathname = usePathname();
   const keyboardOpen = useKeyboardOpen();
   const tabs = navTabs[role];
+  const navRef = useRef<HTMLElement>(null);
+
+  // The bar grows with large text and long translations; the page padding follows its real height
+  // through --bottom-nav-h (AppShell reads it).
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const root = document.documentElement;
+    const observer = new ResizeObserver(() => root.style.setProperty("--bottom-nav-h", `${nav.offsetHeight}px`));
+    observer.observe(nav);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--bottom-nav-h");
+    };
+  }, []);
 
   return (
     <nav
+      ref={navRef}
       aria-label={t("main")}
       hidden={keyboardOpen}
       className={`fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] ${
@@ -95,11 +115,11 @@ export function BottomNav({ role, counts = {} }: { role: NavRole; counts?: NavCo
           const Icon = icons[tab.icon];
           const active = isActive(pathname, tab.href);
           return (
-            <li key={tab.href} className="flex min-w-0 flex-1">
+            <li key={tab.href} className="flex min-w-0 flex-[1_1_auto]">
               <Link
                 href={tab.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center gap-0.5 px-0.5 text-xs ${
+                className={`flex min-h-12 min-w-12 flex-1 flex-col items-center justify-center gap-0.5 px-0.5 text-[clamp(13px,0.8125rem,1rem)] leading-[1.3] ${
                   active ? "font-semibold text-primary" : "text-ink-3 hover:text-ink"
                 }`}
               >
@@ -119,6 +139,7 @@ export function BottomNav({ role, counts = {} }: { role: NavRole; counts?: NavCo
                     <Badge tab={tab} counts={counts} />
                   </span>
                 )}
+                {/* The label scales with the text from 13px up to 16px; tabs size to their label so words stay whole. */}
                 <span className="max-w-full text-center leading-tight [overflow-wrap:break-word]">{t(tab.labelKey)}</span>
               </Link>
             </li>
@@ -134,7 +155,7 @@ export function Sidebar({ role, counts = {} }: { role: Exclude<NavRole, "patient
   const t = useTranslations("nav");
   const pathname = usePathname();
   return (
-    <nav aria-label={t("main")} className="hidden w-60 shrink-0 border-r border-border bg-surface p-3 lg:block">
+    <nav aria-label={t("main")} className="sticky top-0 hidden max-h-screen w-64 shrink-0 self-start overflow-y-auto border-r border-border bg-surface p-3 lg:block">
       <ul className="space-y-1">
         {navTabs[role].map((tab) => {
           const Icon = icons[tab.icon];
@@ -150,7 +171,7 @@ export function Sidebar({ role, counts = {} }: { role: Exclude<NavRole, "patient
                 }`}
               >
                 <Icon size={22} />
-                <span className="min-w-0 flex-1">{t(tab.labelKey)}</span>
+                <span className="min-w-0 flex-1 [overflow-wrap:break-word]">{t(tab.labelKey)}</span>
                 {count > 0 && (
                   <span
                     className={`rounded-full px-2 font-mono text-sm ${
