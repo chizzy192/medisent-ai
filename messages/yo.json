@@ -10,7 +10,7 @@
     "readAloud": "Kà á sókè",
     "stopReading": "Dúró kíkà",
     "readAloudUnavailable": "Kíkà sókè kò tíì ṣiṣẹ́ lórí ẹ̀rọ aṣàwákiri yìí.",
-    "voiceMissing": "Ẹ̀rọ yìí kò tíì ní ohùn {language}."
+    "voiceMissing": "Ẹ̀rọ yìí kò tíì ní ohùn {language}. Ka káàdì náà, tàbí béèrè lọ́wọ́ oníṣègùn-oògùn rẹ."
   },
   "landing": {
     "intro": "Ṣe àyẹ̀wò oògùn rẹ. Gbọ́ bí o ṣe máa lò ó, ní èdè rẹ. Gba ìránnilétí nígbà tí àkókò bá tó.",
@@ -20,12 +20,10 @@
     "dayTitle": "Ọjọ́ kan aláìsàn",
     "dayIntro": "Àpẹẹrẹ ọjọ́ kan fún aláìsàn. Orúkọ wọ̀nyí kì í ṣe ti ènìyàn gidi.",
     "anyTime": "Ìgbàkígbà",
-    "statusSms": "SMS",
     "statusMissed": "Ó pàdánù",
-    "statusUrgent": "Kíákíá",
-    "morningDrug": "Amlodipine 5 mg",
+    "morningDrug": "Amlodipine",
     "stop": "Dúró",
-    "morningNote": "A ń kà á sókè ní èdè aláìsàn fúnra rẹ̀:",
+    "morningNote": "A ń kà á sókè ní èdè aláìsàn fúnra rẹ̀. Yan ọ̀kan:",
     "afternoonTitle": "Lórí fóònù lásán",
     "afternoonSms": "Àkókò Metformin 500 mg tó. Lo kóró kan lẹ́yìn oúnjẹ. Fèsì 1 tí o bá ti lò ó, 2 tí o kò bá lò ó.",
     "afternoonNote": "Kò sí fóònù smart tàbí dátà? Ìránnilétí máa dé nípasẹ̀ SMS tàbí ìpè.",
@@ -49,7 +47,10 @@
     "alertLabel": "Ìkìlọ̀",
     "urgentHeading": "Gba ìrànlọ́wọ́ báyìí",
     "urgentBody": "O sọ pé “àyà ń dùn mí”. A ti sọ fún oníṣègùn-oògùn rẹ àti olùtọ́jú rẹ.",
-    "exampleLabel": "Àpẹẹrẹ"
+    "exampleLabel": "Àpẹẹrẹ",
+    "statusSent": "Ti fi ránṣẹ́",
+    "chooseLanguage": "Yan èdè rẹ",
+    "morningStrength": "5 mg"
   },
   "placeholder": {
     "comingSoon": "Ojú-ìwé yìí ń bọ̀ láìpẹ́.",

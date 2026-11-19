@@ -141,7 +141,7 @@ AFRICASTALKING_SENDER_ID=
 
 Direction: technical, precise and calm, like a well-made medical instrument. Cool neutrals, one cobalt accent, monospaced numbers for times, doses and IDs. Works for every age: plain labels, big targets, high contrast, nothing decorative.
 
-Visual target: `docs/mockups/medisent-patient-screens.png` and `docs/mockups/medisent-staff-screens.png`.
+Visual target: `docs/mockups/medisent-patient-screens-v3.png` (patient, latest), `docs/mockups/medisent-staff-screens.png` (staff). The v3 patient image replaces the older patient image wherever they differ.
 
 | Token | Hex | Use |
 | --- | --- | --- |
@@ -195,6 +195,21 @@ Rules:
 
 Also: three text sizes; adjustable speech speed.
 
+### Signature UI elements (what makes it interesting)
+1. **Today ring (Home):** a progress ring showing doses taken today (`1/3 TAKEN` in mono), next to the greeting in the patient's language ("Ndewo, Emeka") and the next dose. The card has a faint dot-grid background (`radial-gradient` 1px dots, 14px spacing, `#D3DBE6`) — the only decorative texture in the app, used on hero cards only.
+2. **Day timeline (Home):** today's doses as a vertical timeline. Node colours: success = taken, primary with a soft halo = now, border-grey = later, warning = late. The "now" card has a 2px primary border and the big "✓ I took it" button.
+3. **Pill icons in the medicine's real colour and shape:** each medicine gets a small icon (round tablet, capsule, inhaler, liquid, injection) in the colour the patient sees in real life. Chosen on the confirm-scan screen ("What does your tablet look like?") or suggested by the scanner. Stored as `prescriptions.pill_shape` and `prescriptions.pill_color`. Helps elderly and low-literacy patients match the screen to the pack. Medicine name + strength (strength in mono, ink-2) stay on one line; time and dose on the line below.
+4. **Live scan viewfinder:** dark viewfinder with four rounded primary corner brackets, a sweeping scan line, and a live status chip ("Reading label… 82%"). Below it, a "Found so far" card fills in field by field (Drug, Strength, NAFDAC) as the scanner reads them; missing fields show a warning chip ("Turn the pack").
+5. **Voice waveform:** while listening, animated bars (primary) react to the microphone level; the live transcript appears under it in quotes; "Try asking" suggestion chips below; the mic button has two soft halo rings while recording ("Release to send").
+6. **Streak + weekly bars (Progress):** a streak card ("2 days in a row — every dose on time since Wednesday") and a 7-day bar chart of doses taken per day (success = all, warning = some, danger never used here). Supply bars per medicine with days left.
+
+Motion (all respect `prefers-reduced-motion`: replace with instant changes):
+- Ring fills from 0 on first load (600 ms ease-out).
+- "I took it": button turns success with a check, card collapses into the timeline node (250 ms), ring advances.
+- Scan line sweeps every 1.8 s while reading; fields fade in as found.
+- Waveform bars follow mic input level (Web Audio `AnalyserNode`).
+- Nothing loops when idle; no confetti; no bouncing.
+
 ### Bottom navigation bar (mobile app style)
 - On phones and tablets (< 1024px) every signed-in screen has a **bottom navigation bar**, like a native mobile app. On desktop (≥ 1024px) staff and admins get a left sidebar instead; patients keep the bottom bar centred at max 480px wide.
 - **Patient tabs (5):** Home · Scan · Ask · Forum · Me
@@ -225,7 +240,7 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 | staff_roster | id, hospital_id, staff_id, full_name, role, phone, email, licence_body, licence_no |
 | patient_registry | id, hospital_id, hospital_number, full_name, phone, age, sex, language |
 | profiles | id (= auth user), role (platform_admin / hospital_admin / doctor / pharmacist / nurse / patient), hospital_id (nullable for independent patients), full_name, phone, language (ig / yo / ha / pcm / en), licence_no, licence_body (MDCN / PCN / NMCN), verified_status (pending / verified / rejected / blocked), failed_attempts |
-| prescriptions | id, patient_id, hospital_id, quantity_dispensed, drug_id, drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, source (scan / staff), image_url, confirmed_by_patient, created_by, active |
+| prescriptions | id, patient_id, hospital_id, quantity_dispensed, drug_id, pill_shape (round / capsule / oval / inhaler / liquid / injection), pill_color (hex), drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, source (scan / staff), image_url, confirmed_by_patient, created_by, active |
 | reminders | id, prescription_id, patient_id, time_of_day, days, channel (app / sms / voice), active |
 | dose_logs | id, reminder_id, patient_id, scheduled_at, status (taken / missed / snoozed / late), logged_at, synced |
 | conditions | id, patient_id, hospital_id, name, noted_by, started_on |
@@ -336,7 +351,19 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - `src/config/brand.ts` with the app name "Medisent AI" and the tagline per locale (section 1).
 - next-intl set up with locales en, ig, yo, ha, pcm; `messages/en.json` holding every landing-page string; the other four files drafted by `scripts/translate-messages.ts`.
 - Language switcher in the header; brand name stays "Medisent AI", tagline and text change with the language.
-- Landing page `/`: HospitalHeader (no hospital yet → primary bar), logo, tagline, buttons "Register your hospital" and "Sign in", and a test line "ẹ ọ ṣ ị ụ ṅ".
+- Landing page `/` — follow `docs/mockups/medisent-landing.png` (replaces the plain version). Sections, top to bottom:
+    1. **Top bar:** logo, links (How it works · For hospitals · Safety · Languages), language picker, "Sign in" (outline), "Try the demo" (primary).
+    2. **Hero on dot-grid background:** mono kicker chip ("Medication companion · 5 Nigerian languages"); headline "Your medicine, explained in *your language*, on time, every time." (64px, 600, "your language" in primary); one-line lead; buttons "Try the demo →" and "Register your hospital".
+    3. **Live preview console** (the interesting part): a wide card with language tabs EN · IG · YO · HA · PCM. Three cells: (1) scanned label in mono with "Registered" and "Confidence" chips; (2) the instruction spoken in the selected language with a play button and waveform, English gloss under it; (3) a today ring + reminder time + refill chip. Switching tabs swaps the spoken sentence and plays its audio (pre-generated files in `public/audio/landing/`). Works without JS (shows English).
+    4. **How it works:** 4 numbered steps on a connecting line — 01 Scan · 02 Hear · 03 Remember · 04 Get help.
+    5. **One platform, three views:** a spec-sheet table (rows Sees / Does / Verified by; columns Patients / Pharmacists & doctors / Hospitals), verification methods in mono.
+    6. **Works on any phone:** text panel + a drawn basic feature phone (keypad, green LCD) showing the SMS reminder "Reply 1 if taken". Must look like a basic phone, not a smartphone.
+    7. **Safe by design:** 4 cards — Never diagnoses · Red flags first · NDPA 2023 · Verified voices.
+    8. **Final CTA band** (dark ink background): "See it work in under a minute." + "Try the demo →" + "Register your hospital", with "Demo mode · fictional data" label.
+    9. **Footer:** logo, "Built for AIESEC Hackathon 2026", language list in mono.
+    - Mobile: sections stack; console cells stack vertically; steps become a vertical timeline; spec table becomes three cards.
+    - The brand name appears in the top bar only (not repeated as a page heading).
+    - Dev-only letter-check line ("ẹ ọ ṣ ị ụ ṅ") in a small footer row, hidden in production.
 - **Impeccable (Stage 0):** after I install Impeccable (section 10, step 1), write `DESIGN.md` from section 3 and `PRODUCT.md` from section 1 using the templates in section 10.3, then run `/impeccable init` to confirm and complete PRODUCT.md. Build the landing page with `/impeccable shape landing page` first, then build it, then `/impeccable critique landing page` and `/impeccable audit landing page`; fix all P0 and P1 findings.
 - **Done when:** `npm run dev` and `npm run build` pass; landing page shows the right fonts and colours; switching to Igbo keeps "Medisent AI" in the header and shows the Igbo tagline and landing text.
 
@@ -357,7 +384,8 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 ### Stage 2 — Scan, speak, remind
 - Camera capture (getUserMedia) with file-picker fallback.
 - `/api/scan` with Gemini + schema above; low-confidence retry; NAFDAC name match; unknown-drug flag.
-- Confirm screen before saving.
+- Confirm screen before saving, including "What does your medicine look like?" (shape + colour picker, scanner suggests a default).
+- Signature elements 1–4 from section 3: Today ring, day timeline, pill icons, live scan viewfinder with "Found so far".
 - Plain-language instruction builder ("Take 1 tablet 3 times a day after food, for 5 days").
 - `/api/speak`: Spitch (ig, yo, ha, en), 9jaLingo (pcm); cache audio in Storage + IndexedDB; English Web Speech fallback if keys are missing.
 - Reminder generator (3× daily → 08:00, 14:00, 20:00; editable).
@@ -378,6 +406,7 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - `/api/assistant` with the rules in section 5; reply as text + audio; saved to `assistant_messages`.
 - Red-flag layer before the model; escalation alerts.
 - Daily check-in voice flow; parser extracts mood, side effects, red flag.
+- Signature element 5: live voice waveform, transcript, "Try asking" chips, recording halo.
 - Red-flag screen: AlertBanner, call button, nearest seeded clinics on a Leaflet map; staff alert.
 - Interaction check on each new prescription vs current meds + allergies → pharmacist alert.
 - Risk score recalculated after every dose log; high → alert.
@@ -409,6 +438,7 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - Africa's Talking: SMS reminders; replies 1 = taken, 2 = missed; inbound webhook updates `dose_logs`; voice-call reminder playing cached audio.
 - Pharmacist / doctor dashboard: stat cards (open alerts, high-risk patients, doses taken today, questions waiting), patients by risk table, alerts panel, weekly AI insight card.
 - Hospital admin dashboard: staff, patients, verifications, transfers, usage stats.
+- Signature element 6: streak card and weekly bars on the patient Progress screen.
 - **Adherence progress charts:**
     - Patient "My progress" screen: last 7 days as a simple row of day circles (✓ all taken / ½ some / ✗ missed) plus "You took 18 of 21 doses this week". Big, plain, no complex chart.
     - Staff patient detail: 30-day line chart of daily % doses taken, with markers for side-effect reports and red flags; per-medicine breakdown.

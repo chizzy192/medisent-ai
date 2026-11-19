@@ -15,12 +15,12 @@ export function SpeakTextButton({ text, label, stopLabel }: { text: string; labe
       <button
         type="button"
         onClick={() => (speaking ? stop() : speak(text))}
-        className="group inline-flex min-h-12 items-center gap-3 rounded-button pr-3 text-left text-base text-ink-2 hover:text-ink"
+        className="group inline-flex min-h-12 max-w-full items-center gap-3 rounded-button pr-3 text-left text-base text-ink-2 hover:text-ink"
       >
         <span className="flex size-12 shrink-0 items-center justify-center rounded-button bg-primary-tint text-primary group-hover:bg-primary group-hover:text-on-primary">
           {speaking ? <StopIcon size={22} /> : <PlayIcon size={22} />}
         </span>
-        {speaking ? stopLabel : label}
+        <span className="min-w-0 [overflow-wrap:break-word]">{speaking ? stopLabel : label}</span>
       </button>
       <p role="status" className="mt-2 text-sm text-ink-2 empty:hidden">
         {message}

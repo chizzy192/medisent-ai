@@ -64,6 +64,10 @@
   --text-4xl: 2.75rem;
   --text-4xl--line-height: 1.1;
 
+  /* Spacing on a 4px base (section 3 v2). In px, not rem, so large-text mode grows the
+   * text without also inflating gutters, padding and touch targets (reflow at 150% / 200%). */
+  --spacing: 4px;
+
   /* Shape: cards 12px, buttons 10px, chips fully rounded. No shadows. */
   --radius-card: 12px;
   --radius-button: 10px;

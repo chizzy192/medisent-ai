@@ -10,7 +10,7 @@
     "readAloud": "Read am out",
     "stopReading": "Stop to read",
     "readAloudUnavailable": "Reading out no dey work for this browser yet.",
-    "voiceMissing": "This phone no get {language} voice yet."
+    "voiceMissing": "This phone no get {language} voice yet. Read the card, or ask your pharmacist."
   },
   "landing": {
     "intro": "Scan your medicine. Hear how to take am, for your own language. Get reminder when time reach.",
@@ -20,12 +20,10 @@
     "dayTitle": "One patient day",
     "dayIntro": "Example of one day for patient. The names no be real people.",
     "anyTime": "Any time",
-    "statusSms": "SMS",
     "statusMissed": "E miss",
-    "statusUrgent": "Urgent",
-    "morningDrug": "Amlodipine 5 mg",
+    "morningDrug": "Amlodipine",
     "stop": "Stop",
-    "morningNote": "We go read am out for the patient own language:",
+    "morningNote": "We go read am out for the patient own language. Choose one:",
     "afternoonTitle": "For small phone",
     "afternoonSms": "Time for Metformin 500 mg. Take 1 tablet after you chop. Reply 1 if you don take am, 2 if you miss am.",
     "afternoonNote": "No smartphone, or no data? The reminder go come by SMS or voice call.",
@@ -49,7 +47,10 @@
     "alertLabel": "Alert",
     "urgentHeading": "Get help now now",
     "urgentBody": "You talk say “chest pain”. We don tell your pharmacist and the person wey dey take care of you.",
-    "exampleLabel": "Example"
+    "exampleLabel": "Example",
+    "statusSent": "E don go",
+    "chooseLanguage": "Choose your language",
+    "morningStrength": "5 mg"
   },
   "placeholder": {
     "comingSoon": "This screen dey come soon.",

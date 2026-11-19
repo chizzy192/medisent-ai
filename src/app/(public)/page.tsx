@@ -2,15 +2,21 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { brand, tagline } from "@/config/brand";
-import { defaultLocale, isLocale, localeNames, locales } from "@/config/locales";
+import { defaultLocale, isLocale, localeNames } from "@/config/locales";
+import { CardRow } from "@/components/CardRow";
 import { MessageIcon, PhoneIcon } from "@/components/icons";
+import { LanguageChoice } from "@/components/LanguageChoice";
+import { PillIcon } from "@/components/PillIcon";
 import { SpeakTextButton } from "@/components/SpeakTextButton";
-import { StatusChip, type ChipTone } from "@/components/StatusChip";
+import { StatusChip } from "@/components/StatusChip";
 
 /** A wall-clock time in Lagos, formatted for the visitor's locale as 24-hour (`08:00`). */
 function lagosTime(hour: number) {
   return new Date(Date.UTC(2026, 0, 15, hour - 1, 0));
 }
+
+/** Timeline node colours (signature element 2): primary + halo = now, warning = late, grey = other. */
+type Node = "now" | "late" | "plain";
 
 export default async function LandingPage() {
   const t = await getTranslations("landing");
@@ -25,9 +31,6 @@ export default async function LandingPage() {
       hourCycle: "h23",
       timeZone: "Africa/Lagos",
     });
-
-  // The visitor's own language first, then the rest.
-  const languageList = [locale, ...locales.filter((code) => code !== locale)];
 
   const actions = (id?: string) => (
     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -46,7 +49,10 @@ export default async function LandingPage() {
         {/* Offer and actions in one column. The header carries the logo. */}
         <section className="mx-auto w-full max-w-6xl px-4 pt-7 pb-8 sm:px-6 sm:pt-10 sm:pb-10 lg:pt-14 lg:pb-12">
           <h1 className="max-w-[24ch] text-3xl tracking-[-0.01em] sm:text-4xl">
-            <span lang="mul">{brand.signature}</span> {tagline[locale]}
+            <span lang="mul" className="block">
+              {brand.signature}
+            </span>
+            {tagline[locale]}
           </h1>
           <p className="mt-4 max-w-[52ch] text-lg text-ink-2 sm:mt-5">{t("intro")}</p>
           <div className="mt-6">{actions("primary-action")}</div>
@@ -64,36 +70,44 @@ export default async function LandingPage() {
             </h2>
             <p className="mt-1 text-sm text-ink-2">{t("dayIntro")}</p>
 
-            <ol className="relative mt-8 space-y-10 before:absolute before:top-3 before:bottom-3 before:left-[7px] before:w-px before:bg-border lg:space-y-14">
+            <ol className="relative mt-8 space-y-12 before:absolute before:top-3 before:bottom-3 before:left-[7px] before:w-px before:bg-border lg:space-y-16">
               <Stop
                 time={time(8)}
-                status={{ tone: "primary", label: t("statusDueNow") }}
-                caption={t("morningTitle")}
+                node="now"
+                claim={t("morningTitle")}
                 note={
                   <>
-                    {t("morningNote")}{" "}
-                    <span className="font-medium text-ink">
-                      {languageList.map((code, i) => (
-                        <span key={code} lang={code}>
-                          {localeNames[code]}
-                          {i < languageList.length - 1 && " ·"}{" "}
-                        </span>
-                      ))}
-                    </span>
+                    <p>{t("morningNote")}</p>
+                    <div className="mt-3">
+                      <LanguageChoice label={t("chooseLanguage")} />
+                    </div>
                   </>
                 }
               >
-                <article className="rounded-card border border-border bg-surface p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <p className="text-card-title font-semibold [overflow-wrap:anywhere]">{t("morningDrug")}</p>
-                      <p className="text-base text-ink-2">{t("morningDose")}</p>
+                <article className="rounded-card border-2 border-primary bg-surface p-4">
+                  {/* The icon moves above the name when large text leaves no room beside it. */}
+                  <div className="flex flex-wrap items-start gap-3">
+                    <PillIcon shape="round" color="#E05A5A" />
+                    <div className="min-w-0 flex-[1_1_12rem]">
+                      <CardRow
+                        main={
+                          <>
+                            <p className="text-card-title font-semibold">
+                              {t("morningDrug")}{" "}
+                              <span className="font-mono text-base font-medium text-ink-2">{t("morningStrength")}</span>
+                            </p>
+                            <p className="font-mono text-sm text-ink-2">
+                              {time(8)} · {t("morningDose")}
+                            </p>
+                          </>
+                        }
+                        value={<StatusChip tone="primary">{t("statusDueNow")}</StatusChip>}
+                      />
                     </div>
-                    <p className="font-mono text-time">{time(8)}</p>
                   </div>
                   <div className="mt-4 border-t border-surface-2 pt-3">
                     <SpeakTextButton
-                      text={`${t("morningDrug")}. ${t("morningDose")}. ${time(8)}.`}
+                      text={`${t("morningDrug")} ${t("morningStrength")}. ${t("morningDose")}.`}
                       label={t("listenIn", { language: localeNames[locale] })}
                       stopLabel={t("stop")}
                     />
@@ -101,46 +115,31 @@ export default async function LandingPage() {
                 </article>
               </Stop>
 
-              <Stop
-                time={time(14)}
-                status={{ tone: "neutral", label: t("statusSms") }}
-                caption={t("afternoonTitle")}
-                note={t("afternoonNote")}
-              >
-                <SmsCard heading={brand.name}>
+              <Stop time={time(14)} node="plain" claim={t("afternoonTitle")} note={<p>{t("afternoonNote")}</p>}>
+                <SmsCard heading={brand.name} status={<StatusChip tone="neutral">{t("statusSent")}</StatusChip>}>
                   {t("afternoonSms")}
                 </SmsCard>
               </Stop>
 
-              <Stop
-                time={time(20)}
-                status={{ tone: "warning", label: t("statusMissed") }}
-                caption={t("eveningTitle")}
-                note={t("eveningNote")}
-              >
-                <SmsCard heading={t("eveningTo")}>
+              <Stop time={time(20)} node="late" claim={t("eveningTitle")} note={<p>{t("eveningNote")}</p>}>
+                <SmsCard heading={t("eveningTo")} status={<StatusChip tone="warning">{t("statusMissed")}</StatusChip>}>
                   {t("eveningSms", { time: time(20) })}
                 </SmsCard>
               </Stop>
 
-              <Stop
-                time={t("anyTime")}
-                wordTime
-                status={{ tone: "danger", label: t("statusUrgent") }}
-                caption={t("urgentTitle")}
-                note={t("urgentNote")}
-              >
-                {/* The real red-flag alert treatment (section 3 v2: red only for red flags). */}
+              <Stop time={t("anyTime")} node="plain" claim={t("urgentTitle")} note={<p>{t("urgentNote")}</p>}>
+                {/* The real red-flag alert (section 3 v2): the only red on the page. */}
                 <div className="rounded-card bg-danger-solid p-4 text-on-danger">
                   <p className="font-mono text-label tracking-[0.04em] uppercase">
                     {t("alertLabel")} · {t("exampleLabel")}
                   </p>
                   <p className="mt-1 text-xl font-semibold">{t("urgentHeading")}</p>
                   <p className="mt-1 text-base">{t("urgentBody")}</p>
-                  <p className="mt-3 flex items-center gap-2 text-base font-semibold">
-                    <PhoneIcon size={20} />
+                  {/* Drawn as the app's call block; part of the labelled example, not a control. */}
+                  <div className="mt-4 flex min-h-12 cursor-default items-center justify-center gap-2 rounded-button bg-white px-4 text-center text-base font-semibold text-[#C81E1E]">
+                    <PhoneIcon size={20} className="shrink-0" />
                     {t("urgentCall")}
-                  </p>
+                  </div>
                 </div>
               </Stop>
             </ol>
@@ -194,49 +193,54 @@ function DevLetterCheck({ label }: { label: string }) {
   );
 }
 
-/** One hour on the day-rail: dot, mono time, status chip; then caption, proof and note. */
+/**
+ * One stop on the day-rail. Phones: time, claim, proof, note. Desktop: time | proof | claim + note.
+ * The claim is the stop's heading, so it is the strongest text in the stop.
+ */
 function Stop({
   time,
-  wordTime = false,
-  status,
-  caption,
+  node,
+  claim,
   note,
   children,
 }: {
   time: string;
-  wordTime?: boolean;
-  status: { tone: ChipTone; label: string };
-  caption: string;
+  node: Node;
+  claim: string;
   note: ReactNode;
   children: ReactNode;
 }) {
+  const nodeClass = {
+    now: "bg-primary ring-4 ring-primary-tint",
+    late: "bg-warning-dot",
+    plain: "bg-bg border-2 border-border",
+  }[node];
   return (
-    <li className="relative pl-8 lg:grid lg:grid-cols-[11rem_minmax(0,30rem)_minmax(0,1fr)] lg:gap-x-10">
-      <span
-        aria-hidden="true"
-        className="absolute top-2 left-0 size-[15px] rounded-full border-[3px] border-bg bg-primary"
-      />
-      <h3 className="flex flex-wrap items-center gap-x-3 gap-y-2 lg:flex-col lg:items-start">
-        <span className={wordTime ? "text-xl font-semibold" : "font-mono text-3xl font-medium"}>{time}</span>
-        <StatusChip tone={status.tone}>{status.label}</StatusChip>
-      </h3>
-      <figure className="mt-4 min-w-0 lg:mt-1">
-        <figcaption className="label-mono mb-2">{caption}</figcaption>
-        {children}
-      </figure>
-      <p className="mt-4 max-w-[42ch] text-base text-ink-2 lg:mt-7">{note}</p>
+    <li className="relative pl-8 lg:grid lg:grid-cols-[7rem_minmax(0,30rem)_minmax(0,1fr)] lg:gap-x-10">
+      <span aria-hidden="true" className={`absolute top-1.5 left-0 size-[15px] rounded-full ${nodeClass}`} />
+      <p className="font-mono text-base text-ink-2 lg:col-start-1 lg:row-span-2 lg:row-start-1">{time}</p>
+      <h3 className="mt-1 text-xl lg:col-start-3 lg:row-start-1 lg:mt-0">{claim}</h3>
+      <div className="mt-4 min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0">{children}</div>
+      <div className="mt-4 max-w-[44ch] text-base text-ink-2 lg:col-start-3 lg:row-start-2 lg:mt-2">{note}</div>
     </li>
   );
 }
 
-/** An SMS as received on a basic phone: plain bordered card, mono header line. */
-function SmsCard({ heading, children }: { heading: string; children: ReactNode }) {
+/** An SMS as received on a basic phone: plain bordered card, sender + status, fills the column. */
+function SmsCard({ heading, status, children }: { heading: string; status: ReactNode; children: ReactNode }) {
   return (
-    <div className="max-w-[24rem] rounded-card border border-border bg-surface p-4">
-      <p className="flex min-w-0 items-center gap-2 border-b border-surface-2 pb-2 text-sm font-medium text-ink-2">
-        <MessageIcon size={18} className="shrink-0 text-ink-3" />
-        {heading}
-      </p>
+    <div className="rounded-card border border-border bg-surface p-4">
+      <div className="border-b border-surface-2 pb-2">
+        <CardRow
+          main={
+            <p className="flex items-center gap-2 text-sm font-medium text-ink-2">
+              <MessageIcon size={18} className="shrink-0 text-ink-3" />
+              {heading}
+            </p>
+          }
+          value={status}
+        />
+      </div>
       <p className="mt-2 text-base">{children}</p>
     </div>
   );

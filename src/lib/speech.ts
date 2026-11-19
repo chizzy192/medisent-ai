@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { htmlLang, isLocale, localeNames, type Locale } from "@/config/locales";
+import { isLocale, localeNames, type Locale } from "@/config/locales";
 
 /**
  * Browser speech for Stage 0. Stage 2 replaces this with /api/speak (Spitch / 9jaLingo).
- * Never reads Igbo, Yoruba or Hausa with a voice from another language: if the device
- * has no matching voice, it says so instead. Pidgin may fall back to an English voice.
+ * Never reads Igbo, Yoruba or Hausa with a voice from another language: without a matching
+ * voice it says so instead. Pidgin may fall back to an English voice.
  */
 const voicePrefixes: Record<Locale, string[]> = {
   en: ["en"],
@@ -16,6 +16,21 @@ const voicePrefixes: Record<Locale, string[]> = {
   ha: ["ha"],
   pcm: ["pcm", "en"],
 };
+
+/** Chrome fills the voice list asynchronously; wait briefly for it before deciding. */
+function loadVoices(synth: SpeechSynthesis, timeoutMs = 1000): Promise<SpeechSynthesisVoice[]> {
+  const now = synth.getVoices();
+  if (now.length > 0) return Promise.resolve(now);
+  return new Promise((resolve) => {
+    const done = () => {
+      synth.removeEventListener("voiceschanged", done);
+      clearTimeout(timer);
+      resolve(synth.getVoices());
+    };
+    const timer = setTimeout(done, timeoutMs);
+    synth.addEventListener("voiceschanged", done);
+  });
+}
 
 export function useSpeech() {
   const t = useTranslations("header");
@@ -29,28 +44,30 @@ export function useSpeech() {
     setSpeaking(false);
   }, []);
 
-  // Stop when the language changes or the component goes away.
-  useEffect(() => stop, [locale, stop]);
+  // Prime the voice list early, and stop speaking when the language changes or on unmount.
+  useEffect(() => {
+    window.speechSynthesis?.getVoices();
+    return stop;
+  }, [locale, stop]);
 
   const speak = useCallback(
-    (text: string) => {
+    async (text: string) => {
       const synth = typeof window !== "undefined" ? window.speechSynthesis : undefined;
       if (!synth) {
         setMessage(t("readAloudUnavailable"));
         return;
       }
-      const voices = synth.getVoices();
+      const voices = await loadVoices(synth);
       const voice = voicePrefixes[locale]
         .map((prefix) => voices.find((v) => v.lang.toLowerCase().startsWith(prefix)))
         .find(Boolean);
-      // An empty list means the browser has not loaded voices yet; let it choose.
-      if (voices.length > 0 && !voice) {
+      if (!voice) {
         setMessage(t("voiceMissing", { language: localeNames[locale] }));
         return;
       }
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = voice?.lang ?? htmlLang[locale];
-      if (voice) utterance.voice = voice;
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
       utterance.rate = 0.9;
       utterance.onend = () => setSpeaking(false);
       utterance.onerror = () => setSpeaking(false);

@@ -10,7 +10,7 @@
     "readAloud": "Gụpụta ya n'olu",
     "stopReading": "Kwụsị ịgụ",
     "readAloudUnavailable": "Ịgụpụta n'olu adịghị na ihe nchọgharị a ugbu a.",
-    "voiceMissing": "Ngwaọrụ a enweghị olu {language} ugbu a."
+    "voiceMissing": "Ngwaọrụ a enweghị olu {language} ugbu a. Gụọ kaadị ahụ, ma ọ bụ jụọ onye na-ahụ maka ọgwụ gị."
   },
   "landing": {
     "intro": "Nyochaa ọgwụ gị. Nụrụ otu esi aṅụ ya, n'asụsụ gị. Nweta ncheta mgbe oge ruru.",
@@ -20,12 +20,10 @@
     "dayTitle": "Otu ụbọchị nke onye ọrịa",
     "dayIntro": "Ihe atụ otu ụbọchị nke onye ọrịa. Aha ndị a abụghị nke ezi mmadụ.",
     "anyTime": "Oge ọ bụla",
-    "statusSms": "SMS",
     "statusMissed": "Agbaghara",
-    "statusUrgent": "Ngwa ngwa",
-    "morningDrug": "Amlodipine 5 mg",
+    "morningDrug": "Amlodipine",
     "stop": "Kwụsị",
-    "morningNote": "A na-agụpụta ya n'olu n'asụsụ onye ọrịa:",
+    "morningNote": "A na-agụpụta ya n'olu n'asụsụ onye ọrịa. Họrọ otu:",
     "afternoonTitle": "Na ekwentị nkịtị",
     "afternoonSms": "Oge eruola maka Metformin 500 mg. Ṅụọ otu mkpụrụ mgbe i risịrị nri. Zaa 1 ma ị ṅụọla ya, 2 ma ị gbagharala ya.",
     "afternoonNote": "Ọ dịghị ekwentị smart, ma ọ bụ data? Ncheta ga-abịa site na SMS ma ọ bụ oku.",
@@ -43,13 +41,16 @@
     "safety": "Medisent AI na-enyere gị aka ịgbaso ndụmọdụ ọgwụ gị. Ọ dịghị anọchi dọkịta gị ma ọ bụ onye na-ahụ maka ọgwụ.",
     "letterCheck": "Nlele mkpụrụedemede",
     "morningTitle": "N'asụsụ nke ha",
-    "listenIn": "Gee ntị n'{language}",
+    "listenIn": "Gee ntị n''{language}",
     "statusDueNow": "Oge eruola",
     "morningDose": "Otu mkpụrụ",
     "alertLabel": "Ọkwa",
     "urgentHeading": "Nweta enyemaka ugbu a",
     "urgentBody": "I kwuru “mgbu obi”. A gwala onye na-ahụ maka ọgwụ gị na onye na-elekọta gị.",
-    "exampleLabel": "Ihe atụ"
+    "exampleLabel": "Ihe atụ",
+    "statusSent": "Ezigara",
+    "chooseLanguage": "Họrọ asụsụ gị",
+    "morningStrength": "5 mg"
   },
   "placeholder": {
     "comingSoon": "Ihuenyo a na-abịa n'oge na-adịghị anya.",

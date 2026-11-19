@@ -10,7 +10,7 @@
     "readAloud": "Karanta da murya",
     "stopReading": "Daina karantawa",
     "readAloudUnavailable": "Karantawa da murya ba ya aiki a wannan burauza tukuna.",
-    "voiceMissing": "Wannan na'ura ba ta da muryar {language} tukuna."
+    "voiceMissing": "Wannan na'ura ba ta da muryar {language} tukuna. Karanta katin, ko ka tambayi mai harhaɗa maganinka."
   },
   "landing": {
     "intro": "Duba maganinka. Ji yadda ake shan sa, a harshenka. Sami tunatarwa idan lokaci ya yi.",
@@ -20,12 +20,10 @@
     "dayTitle": "Rana ɗaya ta mara lafiya",
     "dayIntro": "Misalin rana ɗaya ta mara lafiya. Sunayen ba na gaske ba ne.",
     "anyTime": "Kowane lokaci",
-    "statusSms": "SMS",
     "statusMissed": "An rasa",
-    "statusUrgent": "Gaggawa",
-    "morningDrug": "Amlodipine 5 mg",
+    "morningDrug": "Amlodipine",
     "stop": "Tsaya",
-    "morningNote": "Ana karanta shi da murya a harshen mara lafiyar:",
+    "morningNote": "Ana karanta shi da murya a harshen mara lafiyar. Zaɓi ɗaya:",
     "afternoonTitle": "A wayar hannu ta yau da kullum",
     "afternoonSms": "Lokacin Metformin 500 mg ya yi. Sha ƙwaya ɗaya bayan cin abinci. Amsa 1 idan ka sha, 2 idan ba ka sha ba.",
     "afternoonNote": "Babu wayar zamani, ko babu data? Tunatarwa za ta zo ta SMS ko kiran waya.",
@@ -49,7 +47,10 @@
     "alertLabel": "Faɗakarwa",
     "urgentHeading": "Nemi taimako yanzu",
     "urgentBody": "Ka ce “ciwon ƙirji”. An sanar da mai harhaɗa maganinka da mai kula da kai.",
-    "exampleLabel": "Misali"
+    "exampleLabel": "Misali",
+    "statusSent": "An aika",
+    "chooseLanguage": "Zaɓi harshenka",
+    "morningStrength": "5 mg"
   },
   "placeholder": {
     "comingSoon": "Wannan shafi yana nan tafe.",
