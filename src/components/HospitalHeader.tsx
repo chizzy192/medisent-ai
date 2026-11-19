@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { brand } from "@/config/brand";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { Logo } from "./Logo";
 import { ReadAloudButton } from "./ReadAloudButton";
 
 export type HeaderHospital = {
@@ -11,37 +12,28 @@ export type HeaderHospital = {
 };
 
 /**
- * Section 3 header rule: cream-light background, cocoa "Medisent AI" wordmark
- * (Young Serif), chocolate hospital name, 3px bottom bar in the hospital's
- * brand_color (denim when there is no hospital or no colour).
+ * Section 3 v2 header: white, logo left with the hospital name under it, language picker
+ * right (`IG ▾`), 3px bar at the bottom in the hospital's brand_color (#1D4E89 when it has
+ * none). With no hospital yet (public screens) the bar is primary (BUILD_PLAN Stage 0).
  */
 export async function HospitalHeader({ hospital }: { hospital?: HeaderHospital | null }) {
   const t = await getTranslations("header");
-  const barColor = hospital?.brandColor || brand.defaultBrandColor;
+  const barColor = hospital ? hospital.brandColor || brand.defaultBrandColor : "var(--color-primary)";
 
   return (
-    <header
-      className="border-b-[3px] bg-cream-light"
-      style={{ borderBottomColor: barColor }}
-    >
-      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          <Link
-            href="/"
-            aria-label={t("homeLink")}
-            className="flex min-h-12 items-center font-heading text-2xl text-cocoa"
-          >
-            {brand.name}
+    <header className="border-b-[3px] bg-surface" style={{ borderBottomColor: barColor }}>
+      <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6">
+        <div className="min-w-0">
+          <Link href="/" aria-label={t("homeLink")} className="flex min-h-12 items-center">
+            <Logo />
           </Link>
-          {hospital && (
-            <span className="min-w-0 border-l border-tan pl-3 font-bold text-chocolate">
-              {hospital.name}
-            </span>
-          )}
+          {hospital && <p className="-mt-1 text-sm text-ink-2">{hospital.name}</p>}
         </div>
-        <div className="flex flex-wrap items-center gap-2 max-sm:w-full">
+        <div className="flex items-center gap-2 max-sm:contents">
           <LanguageSwitcher />
-          <ReadAloudButton />
+          <div className="max-sm:flex max-sm:basis-full max-sm:justify-end">
+            <ReadAloudButton />
+          </div>
         </div>
       </div>
     </header>

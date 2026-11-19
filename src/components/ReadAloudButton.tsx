@@ -23,14 +23,14 @@ export function ReadAloudButton({ targetId = "main" }: { targetId?: string }) {
       <button
         type="button"
         onClick={toggle}
-        className="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-button border border-tan bg-surface px-3 font-bold text-chocolate hover:bg-cream"
+        className="flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-button border border-border bg-surface px-3 text-sm font-medium text-ink-2 hover:bg-surface-2"
       >
-        {speaking ? <StopIcon className="text-denim" /> : <SpeakerIcon className="text-denim" />}
+        {speaking ? <StopIcon size={20} className="text-primary" /> : <SpeakerIcon size={20} className="text-primary" />}
         <span>{speaking ? t("stopReading") : t("readAloud")}</span>
       </button>
       <p
         role="status"
-        className="absolute top-full right-0 z-10 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-card border border-sand bg-surface p-3 text-base shadow-card empty:hidden"
+        className="absolute top-full right-0 z-10 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-card border border-border bg-surface p-3 text-base text-ink empty:hidden"
       >
         {message}
       </p>

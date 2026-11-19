@@ -1,39 +1,32 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible, Noto_Sans, Noto_Serif, Young_Serif } from "next/font/google";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Noto_Sans } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 import { brand } from "@/config/brand";
 import { htmlLang, isLocale, defaultLocale } from "@/config/locales";
 import "./globals.css";
 
-const youngSerif = Young_Serif({
-  variable: "--font-young-serif",
-  subsets: ["latin", "latin-ext"],
-  weight: "400",
+// Section 3 v2: IBM Plex Sans (UI) + IBM Plex Mono (times, doses, IDs, labels).
+// The "vietnamese" subset carries ẹ ọ ị ụ; unicode-range downloads only what is used.
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
+  subsets: ["latin", "latin-ext", "vietnamese"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
-const atkinson = Atkinson_Hyperlegible({
-  variable: "--font-atkinson",
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "700"],
+const plexMono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
+  subsets: ["latin", "latin-ext", "vietnamese"],
+  weight: "500",
   display: "swap",
 });
 
-// Fallbacks for the Igbo / Yoruba dot-below letters (ẹ ọ ị ụ live in the
-// "vietnamese" subset). unicode-range means only the glyphs used are downloaded.
+// Fallback for stacked tone marks (e.g. ẹ̀) that Plex lacks.
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
   subsets: ["latin-ext", "vietnamese"],
-  weight: ["400", "700"],
-  display: "swap",
-  preload: false,
-});
-
-const notoSerif = Noto_Serif({
-  variable: "--font-noto-serif",
-  subsets: ["latin-ext", "vietnamese"],
-  weight: "400",
+  weight: ["400", "500", "600"],
   display: "swap",
   preload: false,
 });
@@ -54,8 +47,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FBF6EE" },
-    { media: "(prefers-color-scheme: dark)", color: "#1C130D" },
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#111A2B" },
   ],
 };
 
@@ -66,7 +59,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang={lang}
-      className={`${youngSerif.variable} ${atkinson.variable} ${notoSans.variable} ${notoSerif.variable} h-full antialiased`}
+      className={`${plexSans.variable} ${plexMono.variable} ${notoSans.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>

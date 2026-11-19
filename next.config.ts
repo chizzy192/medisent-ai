@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   // the locale comes from a cookie on every request, and with Cache Components
   // every cookie read must sit inside a Suspense boundary. Revisit after Stage 5.
   cacheComponents: false,
+  // The dev badge covers page content in design-review screenshots.
+  devIndicators: false,
   turbopack: {
     rules: {
       "*.css": {

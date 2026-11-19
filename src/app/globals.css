@@ -1,10 +1,9 @@
 @import "tailwindcss";
 
 /*
- * Medisent AI design tokens — BUILD_PLAN section 3 (FIXED, do not change values).
- * Utilities: bg-cream-light, text-cocoa, border-sand, bg-denim, text-on-denim, …
- * The section 3 "white" token is called `surface` so dark mode can remap it
- * without breaking Tailwind's real `white`.
+ * Medisent AI design tokens — BUILD_PLAN section 3 v2 "Clinical precision" (FIXED).
+ * Visual target: docs/mockups/. Utilities: bg-bg, bg-surface, border-border, text-ink,
+ * text-ink-2, bg-primary, text-on-primary, bg-success-tint, text-warning, …
  */
 @theme {
   --color-*: initial;
@@ -13,30 +12,37 @@
   --color-white: #ffffff;
   --color-black: #000000;
 
-  --color-cream-light: #fbf6ee;
+  --color-bg: #f6f8fa;
   --color-surface: #ffffff;
-  --color-cream: #f5ede0;
-  --color-sand: #ead9c2;
-  --color-tan: #cdb497;
-  --color-cocoa: #6f4a2e;
-  --color-chocolate: #4a2f1d;
-  --color-espresso: #2a1b12;
-  --color-mocha: #7a6352;
-  --color-caramel: #a9743f;
-  --color-denim: #2f5d8a;
-  --color-on-denim: #ffffff;
-  --color-denim-tint: #dce8f3;
-  --color-ochre: #c8901a;
-  --color-green: #3d7a4f;
-  --color-alert: #c62828;
+  --color-surface-2: #eef2f6;
+  --color-border: #d9e0e8;
+  --color-ink: #0e1726;
+  --color-ink-2: #44546a;
+  --color-ink-3: #5e6e84;
+  --color-primary: #1f4fd8;
+  --color-on-primary: #ffffff;
+  --color-primary-tint: #e6edfc;
 
-  /* Young Serif / Atkinson lack ẹ ọ ị ụ, so Noto fills those glyphs per character. */
-  --font-heading: var(--font-young-serif), var(--font-noto-serif), Georgia, serif;
-  --font-body: var(--font-atkinson), var(--font-noto-sans), system-ui, sans-serif;
-  --font-sans: var(--font-body);
-  --font-serif: var(--font-heading);
+  --color-success: #12805c;
+  --color-success-tint: #e3f4ec;
+  --color-warning: #9a4b05;
+  --color-warning-dot: #d97706;
+  --color-warning-tint: #fdf1dc;
+  --color-danger: #c81e1e;
+  --color-danger-tint: #fdecec;
+  /* Solid red-flag banner and the text on it. Same in every theme. */
+  --color-danger-solid: #c81e1e;
+  --color-on-danger: #ffffff;
 
-  /* Type scale: body is 18px minimum. 13px (xs) is only for bottom-nav labels. */
+  /* IBM Plex covers ẹ ọ ị ụ ṅ; Noto Sans catches stacked tone marks (ẹ̀). */
+  --font-sans: var(--font-plex-sans), var(--font-noto-sans), system-ui, sans-serif;
+  /* Plex Mono lacks ṣ and ṅ; Noto Sans draws them rather than a mismatched system mono. */
+  --font-mono: var(--font-plex-mono), var(--font-noto-sans), ui-monospace, monospace;
+
+  /* Type scale. Body 18px; 12px is only for mono section labels; 13px for nav labels. */
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.04em;
   --text-xs: 0.8125rem;
   --text-xs--line-height: 1.3;
   --text-sm: 1rem;
@@ -45,57 +51,73 @@
   --text-base--line-height: 1.5;
   --text-lg: 1.25rem;
   --text-lg--line-height: 1.5;
-  --text-xl: 1.5rem;
-  --text-xl--line-height: 1.35;
-  --text-2xl: 1.875rem;
+  --text-card-title: 1.1875rem;
+  --text-card-title--line-height: 1.35;
+  --text-time: 1.375rem;
+  --text-time--line-height: 1.2;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.3;
+  --text-2xl: 1.625rem;
   --text-2xl--line-height: 1.25;
-  --text-3xl: 2.25rem;
+  --text-3xl: 2rem;
   --text-3xl--line-height: 1.2;
-  --text-4xl: 3rem;
+  --text-4xl: 2.75rem;
   --text-4xl--line-height: 1.1;
-  --text-5xl: 3.75rem;
-  --text-5xl--line-height: 1.05;
 
-  /* Radii: cards 14px, buttons 12px. */
-  --radius-button: 12px;
-  --radius-card: 14px;
-
-  /* Soft, offset depth tinted from chocolate. */
-  --shadow-card: 0 1px 2px rgb(74 47 29 / 0.06), 0 6px 16px -4px rgb(74 47 29 / 0.1);
+  /* Shape: cards 12px, buttons 10px, chips fully rounded. No shadows. */
+  --radius-card: 12px;
+  --radius-button: 10px;
 }
 
-/* Dark mode values from section 3. Follows the OS unless data-theme is set. */
+/* Dark mode values from section 3 v2. Follows the OS unless data-theme is set.
+ * Status colours for dark mode are not in section 3; these are derived (listed for the owner). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-cream-light: #1c130d;
-    --color-surface: #2a1b12;
-    --color-cream: #241810;
-    --color-sand: #4a3426;
-    --color-tan: #6b5040;
-    --color-cocoa: #b98a5e;
-    --color-chocolate: #f5ede0;
-    --color-espresso: #f5ede0;
-    --color-mocha: #cdb497;
-    --color-denim: #7fa7cf;
-    --color-on-denim: #1c130d;
-    --color-denim-tint: #22364a;
+    --color-bg: #0b1220;
+    --color-surface: #111a2b;
+    --color-surface-2: #1a2538;
+    --color-border: #26344a;
+    --color-ink: #e6ebf2;
+    --color-ink-2: #aeb9c8;
+    --color-ink-3: #8a97aa;
+    --color-primary: #6e95ff;
+    --color-on-primary: #0b1220;
+    --color-primary-tint: #1b2a4d;
+    --color-success: #5dd3a1;
+    --color-success-tint: #12302a;
+    --color-warning: #f5b562;
+    --color-warning-tint: #33240f;
+    --color-danger: #ff8a8a;
+    --color-danger-tint: #3a1618;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --color-cream-light: #1c130d;
-  --color-surface: #2a1b12;
-  --color-cream: #241810;
-  --color-sand: #4a3426;
-  --color-tan: #6b5040;
-  --color-cocoa: #b98a5e;
-  --color-chocolate: #f5ede0;
-  --color-espresso: #f5ede0;
-  --color-mocha: #cdb497;
-  --color-denim: #7fa7cf;
-  --color-on-denim: #1c130d;
-  --color-denim-tint: #22364a;
+  --color-bg: #0b1220;
+  --color-surface: #111a2b;
+  --color-surface-2: #1a2538;
+  --color-border: #26344a;
+  --color-ink: #e6ebf2;
+  --color-ink-2: #aeb9c8;
+  --color-ink-3: #8a97aa;
+  --color-primary: #6e95ff;
+  --color-on-primary: #0b1220;
+  --color-primary-tint: #1b2a4d;
+  --color-success: #5dd3a1;
+  --color-success-tint: #12302a;
+  --color-warning: #f5b562;
+  --color-warning-tint: #33240f;
+  --color-danger: #ff8a8a;
+  --color-danger-tint: #3a1618;
   color-scheme: dark;
+}
+
+/* High-contrast mode (section 3 v2). The toggle itself ships in Stage 2. */
+:root[data-contrast="high"] {
+  --color-ink: #000000;
+  --color-ink-2: #000000;
+  --color-border: #5e6e84;
+  --color-primary: #1a3fb0;
 }
 
 @layer base {
@@ -105,9 +127,9 @@
   }
 
   body {
-    background-color: var(--color-cream-light);
-    color: var(--color-espresso);
-    font-family: var(--font-body);
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
     font-size: var(--text-base);
     line-height: 1.5;
   }
@@ -115,9 +137,8 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-heading);
-    font-weight: 400;
-    color: var(--color-chocolate);
+    font-weight: 600;
+    color: var(--color-ink);
     text-wrap: balance;
   }
 
@@ -126,19 +147,19 @@
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-denim);
+    outline: 3px solid var(--color-primary);
     outline-offset: 3px;
   }
 
   /* Browser surfaces carry the palette too. */
   :root {
-    accent-color: var(--color-denim);
-    caret-color: var(--color-denim);
-    scrollbar-color: var(--color-tan) var(--color-cream-light);
+    accent-color: var(--color-primary);
+    caret-color: var(--color-primary);
+    scrollbar-color: var(--color-border) var(--color-bg);
   }
   ::selection {
-    background-color: var(--color-denim-tint);
-    color: var(--color-espresso);
+    background-color: var(--color-primary-tint);
+    color: var(--color-ink);
   }
   a {
     text-underline-offset: 0.2em;
@@ -148,32 +169,53 @@
     *,
     *::before,
     *::after {
-      animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
   }
 }
 
 @layer components {
-  /* Primary button: denim with white text, 48px minimum, wraps for long translations. */
-  .btn-primary {
+  /* Primary button: cobalt with white text, 48px minimum, wraps for long translations. */
+  .btn-primary,
+  .btn-secondary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     min-height: 48px;
-    padding: 0.75rem 1.5rem;
+    padding: 0.625rem 1.25rem;
     border-radius: var(--radius-button);
-    background-color: var(--color-denim);
-    color: var(--color-on-denim);
-    font-weight: 700;
+    border: 1px solid var(--color-primary);
+    font-weight: 600;
     font-size: var(--text-base);
     line-height: 1.3;
     text-align: center;
     text-decoration: none;
     transition: background-color 120ms ease;
   }
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+  }
   .btn-primary:hover {
-    background-color: color-mix(in srgb, var(--color-denim) 88%, black);
+    background-color: color-mix(in srgb, var(--color-primary) 86%, black);
+  }
+  /* Secondary: outlined cobalt. */
+  .btn-secondary {
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+  }
+  .btn-secondary:hover {
+    background-color: var(--color-primary-tint);
+  }
+
+  /* Mono section label: 12px uppercase, 0.04em tracking (section 3 v2). */
+  .label-mono {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: var(--text-label);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
   }
 }

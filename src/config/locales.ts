@@ -13,6 +13,15 @@ export const localeNames: Record<Locale, string> = {
   pcm: "Naijá (Pidgin)",
 };
 
+/** Short code shown on the compact header picker (`IG ▾`). Not translated. */
+export const localeCodes: Record<Locale, string> = {
+  en: "EN",
+  ig: "IG",
+  yo: "YO",
+  ha: "HA",
+  pcm: "PCM",
+};
+
 /** BCP 47 tag for <html lang> and Intl formatting. */
 export const htmlLang: Record<Locale, string> = {
   en: "en-NG",

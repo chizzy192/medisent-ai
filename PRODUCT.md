@@ -55,7 +55,7 @@ The AI never diagnoses, prescribes, or changes or stops a dose. Red-flag words r
 
 - Name: **Medisent AI**. Tagline: **Ọgwụ. Oògùn. Magani. Your medicine, in your language.**
 - Personality: trustworthy, warm, calm, plain-spoken, Nigerian.
-- The visual system in BUILD_PLAN section 3 (palette, Young Serif + Atkinson Hyperlegible, header rule, denim buttons) is fixed and binding. Design tools work inside it; proposed changes are listed for the owner, not applied.
+- The visual system in BUILD_PLAN section 3 v2 "Clinical precision" (cool neutrals, one cobalt accent, IBM Plex Sans + IBM Plex Mono, cobalt-plus logo, header rule, cobalt buttons) and the mockups in `docs/mockups/` are fixed and binding. Design tools work inside them; proposed changes are listed for the owner, not applied.
 
 ## Evidence on Hand
 
