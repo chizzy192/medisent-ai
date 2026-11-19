@@ -1,0 +1,57 @@
+{
+  "_status": "source",
+  "meta": {
+    "description": "Scan your medicine, hear how to take it in your language, and get a reminder when it is time."
+  },
+  "header": {
+    "homeLink": "Medisent AI home",
+    "language": "Language",
+    "languageHint": "Choose the language for this app",
+    "readAloud": "Read aloud",
+    "stopReading": "Stop reading",
+    "readAloudUnavailable": "Reading aloud is not available in this browser yet."
+  },
+  "landing": {
+    "intro": "Scan your medicine. Hear how to take it, in your own language. Get a reminder when it is time.",
+    "forHospitals": "Made for Nigerian hospitals, their staff and their patients.",
+    "registerHospital": "Register your hospital",
+    "signIn": "Sign in",
+    "exampleLabel": "Example reminder",
+    "exampleDrug": "Amlodipine 5 mg",
+    "exampleInstruction": "Take 1 tablet in the morning.",
+    "exampleDue": "Due",
+    "exampleTime": "8:00 am",
+    "examplePlay": "Play the instruction",
+    "languagesTitle": "Hear your medicine in",
+    "stepsTitle": "How it works",
+    "step1": "Your hospital registers and adds its staff and patients.",
+    "step2": "You sign in with your hospital number and phone.",
+    "step3": "Scan your medicine pack. We read the label to you and set your reminders.",
+    "safety": "Medisent AI helps you follow your prescription. It does not replace your doctor or pharmacist.",
+    "letterCheck": "Letter check"
+  },
+  "placeholder": {
+    "comingSoon": "This screen is coming soon.",
+    "backHome": "Back to the start page"
+  },
+  "pages": {
+    "registerHospital": "Register your hospital",
+    "signup": "Create your account",
+    "login": "Sign in",
+    "home": "Home",
+    "scan": "Scan medicine",
+    "meds": "My medicines",
+    "assistant": "Ask a question",
+    "checkin": "Daily check-in",
+    "forum": "Forum",
+    "records": "My records",
+    "dashboard": "Dashboard",
+    "patients": "Patients",
+    "alerts": "Alerts",
+    "forumNew": "New forum post",
+    "roster": "Staff and patient lists",
+    "verifications": "Verifications",
+    "transfers": "Record transfers",
+    "approveHospitals": "Approve hospitals"
+  }
+}

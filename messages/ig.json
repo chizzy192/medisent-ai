@@ -1,0 +1,57 @@
+{
+  "_status": "machine-draft",
+  "meta": {
+    "description": "Nyochaa ọgwụ gị, nụrụ otu esi aṅụ ya n'asụsụ gị, ma nweta ncheta mgbe oge ruru."
+  },
+  "header": {
+    "homeLink": "Mbido Medisent AI",
+    "language": "Asụsụ",
+    "languageHint": "Họrọ asụsụ maka ngwa a",
+    "readAloud": "Gụpụta ya n'olu",
+    "stopReading": "Kwụsị ịgụ",
+    "readAloudUnavailable": "Ịgụpụta n'olu adịghị na ihe nchọgharị a ugbu a."
+  },
+  "landing": {
+    "intro": "Nyochaa ọgwụ gị. Nụrụ otu esi aṅụ ya, n'asụsụ gị. Nweta ncheta mgbe oge ruru.",
+    "forHospitals": "Emere ya maka ụlọ ọgwụ Naịjirịa, ndị ọrụ ha na ndị ọrịa ha.",
+    "registerHospital": "Debanye aha ụlọ ọgwụ gị",
+    "signIn": "Banye",
+    "exampleLabel": "Ihe atụ ncheta",
+    "exampleDrug": "Amlodipine 5 mg",
+    "exampleInstruction": "Ṅụọ otu mkpụrụ ọgwụ n'ụtụtụ.",
+    "exampleDue": "Oge ya",
+    "exampleTime": "8:00 ụtụtụ",
+    "examplePlay": "Kpọọ ntụziaka ahụ",
+    "languagesTitle": "Nụrụ maka ọgwụ gị na",
+    "stepsTitle": "Otu o si arụ ọrụ",
+    "step1": "Ụlọ ọgwụ gị na-edebanye aha ma tinye ndị ọrụ na ndị ọrịa ya.",
+    "step2": "Ị na-eji nọmba ụlọ ọgwụ gị na ekwentị gị abanye.",
+    "step3": "Nyochaa akpa ọgwụ gị. Anyị ga-agụrụ gị ihe edere na ya ma dozie ncheta gị.",
+    "safety": "Medisent AI na-enyere gị aka ịgbaso ndụmọdụ ọgwụ gị. Ọ dịghị anọchi dọkịta gị ma ọ bụ onye na-ahụ maka ọgwụ.",
+    "letterCheck": "Nlele mkpụrụedemede"
+  },
+  "placeholder": {
+    "comingSoon": "Ihuenyo a na-abịa n'oge na-adịghị anya.",
+    "backHome": "Laghachi na peeji mbido"
+  },
+  "pages": {
+    "registerHospital": "Debanye aha ụlọ ọgwụ gị",
+    "signup": "Mepụta akaụntụ gị",
+    "login": "Banye",
+    "home": "Mbido",
+    "scan": "Nyochaa ọgwụ",
+    "meds": "Ọgwụ m",
+    "assistant": "Jụọ ajụjụ",
+    "checkin": "Nlele kwa ụbọchị",
+    "forum": "Ọgbakọ",
+    "records": "Akụkọ m",
+    "dashboard": "Ihuenyo njikwa",
+    "patients": "Ndị ọrịa",
+    "alerts": "Ọkwa",
+    "forumNew": "Ozi ọhụrụ n'ọgbakọ",
+    "roster": "Ndepụta ndị ọrụ na ndị ọrịa",
+    "verifications": "Nkwenye",
+    "transfers": "Mbufe akụkọ",
+    "approveHospitals": "Kwado ụlọ ọgwụ"
+  }
+}

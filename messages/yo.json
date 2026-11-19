@@ -1,0 +1,57 @@
+{
+  "_status": "machine-draft",
+  "meta": {
+    "description": "Ṣe àyẹ̀wò oògùn rẹ, gbọ́ bí o ṣe máa lò ó ní èdè rẹ, kí o sì gba ìránnilétí nígbà tí àkókò bá tó."
+  },
+  "header": {
+    "homeLink": "Ojú-ìwé àkọ́kọ́ Medisent AI",
+    "language": "Èdè",
+    "languageHint": "Yan èdè fún áàpù yìí",
+    "readAloud": "Kà á sókè",
+    "stopReading": "Dúró kíkà",
+    "readAloudUnavailable": "Kíkà sókè kò tíì ṣiṣẹ́ lórí ẹ̀rọ aṣàwákiri yìí."
+  },
+  "landing": {
+    "intro": "Ṣe àyẹ̀wò oògùn rẹ. Gbọ́ bí o ṣe máa lò ó, ní èdè rẹ. Gba ìránnilétí nígbà tí àkókò bá tó.",
+    "forHospitals": "A ṣe é fún àwọn ilé-ìwòsàn Nàìjíríà, àwọn òṣìṣẹ́ wọn àti àwọn aláìsàn wọn.",
+    "registerHospital": "Forúkọ ilé-ìwòsàn rẹ sílẹ̀",
+    "signIn": "Wọlé",
+    "exampleLabel": "Àpẹẹrẹ ìránnilétí",
+    "exampleDrug": "Amlodipine 5 mg",
+    "exampleInstruction": "Lo kóró oògùn kan ní òwúrọ̀.",
+    "exampleDue": "Àkókò",
+    "exampleTime": "8:00 òwúrọ̀",
+    "examplePlay": "Gbọ́ ìtọ́sọ́nà náà",
+    "languagesTitle": "Gbọ́ nípa oògùn rẹ ní",
+    "stepsTitle": "Bí ó ṣe ń ṣiṣẹ́",
+    "step1": "Ilé-ìwòsàn rẹ yóò forúkọ sílẹ̀, yóò sì fi àwọn òṣìṣẹ́ àti aláìsàn rẹ̀ kún un.",
+    "step2": "O máa wọlé pẹ̀lú nọ́mbà ilé-ìwòsàn rẹ àti fóònù rẹ.",
+    "step3": "Ṣe àyẹ̀wò páálí oògùn rẹ. A ó ka ohun tí a kọ sí i fún ọ, a ó sì ṣètò ìránnilétí rẹ.",
+    "safety": "Medisent AI ń ràn ọ́ lọ́wọ́ láti tẹ̀lé ìwé oògùn rẹ. Kò rọ́pò dókítà tàbí oníṣègùn-oògùn rẹ.",
+    "letterCheck": "Àyẹ̀wò lẹ́tà"
+  },
+  "placeholder": {
+    "comingSoon": "Ojú-ìwé yìí ń bọ̀ láìpẹ́.",
+    "backHome": "Padà sí ojú-ìwé àkọ́kọ́"
+  },
+  "pages": {
+    "registerHospital": "Forúkọ ilé-ìwòsàn rẹ sílẹ̀",
+    "signup": "Ṣẹ̀dá àkáǹtì rẹ",
+    "login": "Wọlé",
+    "home": "Ilé",
+    "scan": "Ṣe àyẹ̀wò oògùn",
+    "meds": "Àwọn oògùn mi",
+    "assistant": "Béèrè ìbéèrè",
+    "checkin": "Àyẹ̀wò ojoojúmọ́",
+    "forum": "Àpéjọ",
+    "records": "Àkọsílẹ̀ mi",
+    "dashboard": "Pátákó ìṣàkóso",
+    "patients": "Àwọn aláìsàn",
+    "alerts": "Ìkìlọ̀",
+    "forumNew": "Ìfiránṣẹ́ tuntun",
+    "roster": "Àkójọ òṣìṣẹ́ àti aláìsàn",
+    "verifications": "Ìfìdímúlẹ̀",
+    "transfers": "Gbígbé àkọsílẹ̀",
+    "approveHospitals": "Fọwọ́ sí ilé-ìwòsàn"
+  }
+}

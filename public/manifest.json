@@ -1,0 +1,14 @@
+{
+  "name": "Medisent AI",
+  "short_name": "Medisent AI",
+  "description": "Your medicine, in your language.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF6EE",
+  "theme_color": "#FBF6EE",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

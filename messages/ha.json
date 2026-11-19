@@ -1,0 +1,57 @@
+{
+  "_status": "machine-draft",
+  "meta": {
+    "description": "Duba maganinka, ji yadda ake shan sa a harshenka, kuma ka sami tunatarwa idan lokaci ya yi."
+  },
+  "header": {
+    "homeLink": "Shafin farko na Medisent AI",
+    "language": "Harshe",
+    "languageHint": "Zaɓi harshen wannan manhaja",
+    "readAloud": "Karanta da murya",
+    "stopReading": "Daina karantawa",
+    "readAloudUnavailable": "Karantawa da murya ba ya aiki a wannan burauza tukuna."
+  },
+  "landing": {
+    "intro": "Duba maganinka. Ji yadda ake shan sa, a harshenka. Sami tunatarwa idan lokaci ya yi.",
+    "forHospitals": "An yi shi don asibitocin Najeriya, ma'aikatansu da marasa lafiyarsu.",
+    "registerHospital": "Yi rajistar asibitinka",
+    "signIn": "Shiga",
+    "exampleLabel": "Misalin tunatarwa",
+    "exampleDrug": "Amlodipine 5 mg",
+    "exampleInstruction": "Sha ƙwaya ɗaya da safe.",
+    "exampleDue": "Lokaci",
+    "exampleTime": "8:00 na safe",
+    "examplePlay": "Saurari umarnin",
+    "languagesTitle": "Ji bayanin maganinka a",
+    "stepsTitle": "Yadda yake aiki",
+    "step1": "Asibitinka zai yi rajista kuma ya saka ma'aikatansa da marasa lafiyarsa.",
+    "step2": "Za ka shiga da lambar asibitinka da wayarka.",
+    "step3": "Duba kwalin maganinka. Za mu karanta maka abin da aka rubuta kuma mu saita tunatarwarka.",
+    "safety": "Medisent AI yana taimaka maka ka bi umarnin maganinka. Ba ya maye gurbin likitanka ko mai harhaɗa magani.",
+    "letterCheck": "Gwajin haruffa"
+  },
+  "placeholder": {
+    "comingSoon": "Wannan shafi yana nan tafe.",
+    "backHome": "Koma shafin farko"
+  },
+  "pages": {
+    "registerHospital": "Yi rajistar asibitinka",
+    "signup": "Ƙirƙiri asusunka",
+    "login": "Shiga",
+    "home": "Gida",
+    "scan": "Duba magani",
+    "meds": "Magungunana",
+    "assistant": "Yi tambaya",
+    "checkin": "Duba lafiya na kullum",
+    "forum": "Dandali",
+    "records": "Bayanaina",
+    "dashboard": "Allon sarrafawa",
+    "patients": "Marasa lafiya",
+    "alerts": "Faɗakarwa",
+    "forumNew": "Sabon saƙo a dandali",
+    "roster": "Jerin ma'aikata da marasa lafiya",
+    "verifications": "Tabbatarwa",
+    "transfers": "Mayar da bayanai",
+    "approveHospitals": "Amince da asibitoci"
+  }
+}

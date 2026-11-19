@@ -1,0 +1,57 @@
+{
+  "_status": "machine-draft",
+  "meta": {
+    "description": "Scan your medicine, hear how to take am for your own language, and get reminder when time reach."
+  },
+  "header": {
+    "homeLink": "Medisent AI first page",
+    "language": "Language",
+    "languageHint": "Choose the language wey you want for this app",
+    "readAloud": "Read am out",
+    "stopReading": "Stop to read",
+    "readAloudUnavailable": "Reading out no dey work for this browser yet."
+  },
+  "landing": {
+    "intro": "Scan your medicine. Hear how to take am, for your own language. Get reminder when time reach.",
+    "forHospitals": "We make am for Nigerian hospitals, their staff and their patients.",
+    "registerHospital": "Register your hospital",
+    "signIn": "Sign in",
+    "exampleLabel": "Example reminder",
+    "exampleDrug": "Amlodipine 5 mg",
+    "exampleInstruction": "Take 1 tablet for morning.",
+    "exampleDue": "Time",
+    "exampleTime": "8:00 for morning",
+    "examplePlay": "Play the instruction",
+    "languagesTitle": "Hear about your medicine for",
+    "stepsTitle": "How e dey work",
+    "step1": "Your hospital go register, come add their staff and patients.",
+    "step2": "You go sign in with your hospital number and your phone.",
+    "step3": "Scan your medicine pack. We go read wetin dey the label give you, come set your reminders.",
+    "safety": "Medisent AI dey help you follow your prescription. E no fit replace your doctor or pharmacist.",
+    "letterCheck": "Letter check"
+  },
+  "placeholder": {
+    "comingSoon": "This screen dey come soon.",
+    "backHome": "Go back to the first page"
+  },
+  "pages": {
+    "registerHospital": "Register your hospital",
+    "signup": "Open your account",
+    "login": "Sign in",
+    "home": "Home",
+    "scan": "Scan medicine",
+    "meds": "My medicines",
+    "assistant": "Ask question",
+    "checkin": "Daily check-in",
+    "forum": "Forum",
+    "records": "My records",
+    "dashboard": "Dashboard",
+    "patients": "Patients",
+    "alerts": "Alerts",
+    "forumNew": "New forum post",
+    "roster": "Staff and patient list",
+    "verifications": "Verifications",
+    "transfers": "Move records",
+    "approveHospitals": "Approve hospitals"
+  }
+}
