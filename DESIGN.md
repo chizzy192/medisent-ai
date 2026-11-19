@@ -6,7 +6,7 @@ Source of truth: `docs/BUILD_PLAN.md` section 3 v2, **"Clinical precision"**. Vi
 
 Technical, precise and calm, like a well-made medical instrument. Cool neutrals, white cards, one cobalt accent, monospaced numbers for times, doses and IDs. Built for every age, including elderly, low-literacy and low-vision users on low-end Android phones: plain labels, big targets, high contrast, nothing decorative.
 
-## Colour tokens (light)
+## Colors (light)
 
 | Token | Hex | Use |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ ink `#000`, borders `#5E6E84`, primary `#1A3FB0`, set with `data-contrast="high"
 
 ## Typography
 
-- **IBM Plex Sans** (400 / 500 / 600) for all UI text, loaded with `next/font/google` including the Vietnamese subset, which carries ẹ ọ ị ụ.
+- **IBM Plex Sans** (400 / 500 / 600) for all UI text, loaded with the Next.js Google Fonts loader (next/font) including the Vietnamese subset, which carries ẹ ọ ị ụ.
 - **IBM Plex Mono** (500) for times (`08:00`), doses, counts, percentages, IDs (`AH-0002`, NAFDAC numbers) and small uppercase section labels.
 - Fallback: **Noto Sans**, for stacked tone marks (ẹ̀) and the ṣ / ṅ that Plex Mono lacks. All of ẹ ọ ṣ ị ụ ṅ must render.
 - `tabular-nums` only on columns of numbers, never inside a single time.
@@ -83,7 +83,7 @@ Button (primary, outline: `.btn-primary`, `.btn-outline`), Card, SectionLabel (`
 
 ## Landing page (`/`)
 
-Drawn to `docs/mockups/medisent-landing.png`, nine sections (BUILD_PLAN Stage 0): top bar with section links, hero on the dot grid with the mono kicker chip and a 64px headline whose "your language" is primary, the live preview console (`src/components/landing/PreviewConsole.tsx`: language tabs swap the spoken sentence; audio from `public/audio/landing/<code>.mp3` with a browser-voice fallback), four numbered steps on a line, the three-views spec table (three cards below 768px), the drawn feature phone (`FeaturePhone.tsx`; its body and green LCD colours are an illustration, like pill colours, not tokens), four safety cards, the dark CTA band (`.theme-dark` remaps the tokens to the dark values inside it) and the footer with the language codes in mono. The brand name appears in the top bar and footer only.
+Drawn to `docs/mockups/medisent-landing.png`, nine sections (BUILD_PLAN Stage 0): top bar with section links, hero on the dot grid with the mono kicker chip and a 64px headline whose "your language" is primary, the live preview console (`src/components/landing/PreviewConsole.tsx`: language tabs swap the spoken sentence; audio files per language under the public audio/landing folder (not yet generated) with a browser-voice fallback), four numbered steps on a line, the three-views spec table (three cards below 768px), the drawn feature phone (`FeaturePhone.tsx`; its body and green LCD colours are an illustration, like pill colours, not tokens), four safety cards, the dark CTA band (`.theme-dark` remaps the tokens to the dark values inside it) and the footer with the language codes in mono. The brand name appears in the top bar and footer only.
 
 ## Known contrast gaps (owner decisions)
 
