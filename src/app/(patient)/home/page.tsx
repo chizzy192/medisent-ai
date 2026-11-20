@@ -8,6 +8,8 @@ import type { PillShape } from "@/components/PillIcon";
 import { RefillBanner, type RefillItem } from "@/components/RefillBanner";
 import { StatusChip } from "@/components/StatusChip";
 import { TodayRing } from "@/components/TodayRing";
+import { CourseCard } from "@/components/CourseCard";
+import { loadCourses } from "@/lib/course";
 import { ButtonLink, SectionLabel } from "@/components/ui";
 import { patientRoles, requireRole } from "@/lib/auth/dal";
 import { createClient } from "@/lib/db/server";
@@ -44,6 +46,10 @@ export default async function HomePage({ searchParams }: PageProps<"/home">) {
     supabase.from("prescriptions").select("id,drug_name,strength,status,rejection_reason,verified_at").eq("source", "self").neq("status", "pending").gte("verified_at", weekAgo).order("verified_at", { ascending: false }),
   ]);
   const reviews = (reviewed ?? []) as Reviewed[];
+  const courses = await loadCourses(supabase, { patientId: profile.id }).catch((e) => {
+    console.error("[course]", e);
+    return [];
+  });
   const prescriptions = new Map(((meds ?? []) as Prescription[]).map((p) => [p.id, p]));
   const logByKey = new Map(((logs ?? []) as Log[]).map((l) => [`${l.reminder_id}|${new Date(l.scheduled_at).getTime()}`, l]));
   const supply = new Map<string, number>();
@@ -94,7 +100,18 @@ export default async function HomePage({ searchParams }: PageProps<"/home">) {
       {typeof params.added === "string" && (
         <div role="status" className="rounded-button bg-primary-tint p-3 text-base text-primary" data-testid="added-notice">
           {t("addedNotice")}
+          {typeof params.interaction === "string" && <span className="mt-1 block font-medium">{t("interactionNotice")}</span>}
         </div>
+      )}
+      {courses.length > 0 && (
+        <section aria-labelledby="courses-title" className="space-y-3">
+          <SectionLabel as="h2">
+            <span id="courses-title">{t("coursesLabel")}</span>
+          </SectionLabel>
+          {courses.map((c) => (
+            <CourseCard key={c.prescriptionId} course={c} rate={rate} />
+          ))}
+        </section>
       )}
       {reviews.length > 0 && (
         <section aria-labelledby="reviews-title" className="space-y-2">

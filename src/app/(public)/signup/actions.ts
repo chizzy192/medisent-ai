@@ -2,7 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/db/admin";
-import { isServiceRoleConfigured, isValidNigerianPhone, normalizePhone, syntheticEmailForPhone } from "@/lib/db/env";
+import { isValidNigerianPhone, normalizePhone, syntheticEmailForPhone } from "@/lib/db/env";
+import { isServiceRoleConfigured } from "@/lib/db/secrets";
 import { homeForRole, NO_HOSPITAL, type LicenceBody, type Role, type SignupSession, type VerifyResult, licenceBodies, signupRoles } from "@/lib/db/types";
 import { checkOtp, consumeOtp, issueOtp, type IssueResult } from "@/lib/auth/otp";
 import { createSessionForEmail, ensureAuthUser } from "@/lib/auth/session";

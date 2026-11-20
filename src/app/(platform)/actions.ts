@@ -5,6 +5,20 @@ import { createAdminClient } from "@/lib/db/admin";
 import { platformRoles, requireRole } from "@/lib/auth/dal";
 import { sendSms } from "@/lib/sms";
 import { brand } from "@/config/brand";
+import { demoMode } from "@/lib/db/env";
+import { resetDemoData } from "@/lib/demo-reset";
+
+/** Platform admin, demo mode only: reset.sql + seed.sql over DATABASE_URL (see docs/DEPLOY.md). */
+export type ResetState = { ok: true; ms: number } | { ok: false; error: string } | undefined;
+export async function resetDemo(): Promise<ResetState> {
+  const { profile } = await requireRole(platformRoles);
+  if (!demoMode) return { ok: false, error: "NEXT_PUBLIC_DEMO_MODE is not true" };
+  const result = await resetDemoData();
+  const admin = createAdminClient();
+  await admin.from("audit_log").insert({ actor_id: profile.id, action: "demo_reset", target_table: "hospitals", target_id: null, detail: { ok: result.ok, error: result.ok ? null : result.error } });
+  revalidatePath("/", "layout");
+  return result;
+}
 
 /** Platform admin: approve or reject a registered hospital (BUILD_PLAN Stage 1). */
 export type ReviewState = { error?: string } | undefined;

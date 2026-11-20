@@ -6,6 +6,8 @@ import { requireRole } from "@/lib/auth/dal";
 import { getDrug } from "@/lib/formulary";
 import { dispenserRoles, patientOfHospital } from "@/lib/intake";
 import { cleanDosing, unitsFromDose } from "@/lib/dosing";
+import { createAdminClient } from "@/lib/db/admin";
+import { checkAgainstCurrent, hasMajor, raiseInteractionAlerts, type InteractionHit } from "@/lib/interactions";
 import { createPrescription } from "@/lib/prescriptions";
 
 /**
@@ -13,7 +15,7 @@ import { createPrescription } from "@/lib/prescriptions";
  * the drug from the formulary, type dose / frequency / duration. Saved as source 'hospital',
  * status 'verified', verified_by = the dispenser. Error strings are keys under `dispense.errors`.
  */
-export type DispenseState = { error?: string; fieldErrors?: Record<string, string>; savedId?: string; instruction?: string; patientName?: string } | undefined;
+export type DispenseState = { error?: string; fieldErrors?: Record<string, string>; savedId?: string; instruction?: string; patientName?: string; interactions?: InteractionHit[] } | undefined;
 
 const field = (fd: FormData, n: string) => String(fd.get(n) ?? "").trim();
 const shapes: PillShape[] = ["round", "capsule", "oval", "inhaler", "liquid", "injection"];
@@ -34,6 +36,11 @@ export async function dispense(_prev: DispenseState, formData: FormData): Promis
     quantity: field(formData, "quantity"),
   });
   if (Object.keys(errors).length) return { fieldErrors: errors };
+
+  // Interaction rules (table only). A major one needs the pharmacist's explicit review tick.
+  const interactions = await checkAgainstCurrent(patient.id, { generic: drug.generic_name, name: drug.name });
+  const reviewed = field(formData, "reviewed") === "on";
+  if (hasMajor(interactions) && !reviewed) return { error: "reviewRequired", interactions };
 
   try {
     const saved = await createPrescription({
@@ -63,10 +70,19 @@ export async function dispense(_prev: DispenseState, formData: FormData): Promis
       ai_prefill: null,
       expiry_date: null,
       batch_no: field(formData, "batchNo").slice(0, 40) || null,
+      course_required: drug.course_required,
     });
+    if (interactions.length) {
+      await raiseInteractionAlerts({ patientId: patient.id, hospitalId: session.profile.hospital_id, prescriptionId: saved.id, candidateName: drug.name, hits: interactions });
+      if (reviewed) {
+        const admin = createAdminClient();
+        await admin.from("prescriptions").update({ interaction_reviewed_by: session.profile.id, interaction_reviewed_at: new Date().toISOString() }).eq("id", saved.id);
+        await admin.from("audit_log").insert({ actor_id: session.profile.id, action: "interaction_reviewed", target_table: "prescriptions", target_id: saved.id, detail: { patient_id: patient.id, pairs: interactions.map((h) => ({ severity: h.severity, with: h.withName, pair: h.pair })) } });
+      }
+    }
     revalidatePath(`/patients/${patient.id}`);
     revalidatePath("/dispense");
-    return { savedId: saved.id, instruction: saved.instruction, patientName: patient.full_name };
+    return { savedId: saved.id, instruction: saved.instruction, patientName: patient.full_name, interactions };
   } catch (error) {
     console.error("[dispense]", error);
     return { error: "server" };

@@ -6,6 +6,7 @@ import type { PrescriptionStatus } from "@/lib/db/types";
 import { checkDrug, recordDrugCheck, type DrugCheck } from "@/lib/drugcheck";
 import { samePrescription, suggestFromPack, type FormularyDrug } from "@/lib/formulary";
 import { lagosDate } from "@/lib/reminders";
+import { currentMeds, findInteractions, type InteractionHit } from "@/lib/interactions";
 
 /**
  * POST multipart { image } → { pack, check, formulary, matches, expired } (BUILD_PLAN section 5).
@@ -33,6 +34,8 @@ export type ScanResponse = {
   matches: MyMedMatch[];
   /** The printed expiry date is before today (Lagos). */
   expired: boolean;
+  /** Interactions between this pack and the patient's other medicines (table rules only). */
+  interactions: InteractionHit[];
   needsRetry: boolean;
 };
 
@@ -57,6 +60,7 @@ export async function POST(request: Request) {
     const formulary = await suggestFromPack({ name, strength: pack.strength.value, nafdac: pack.nafdac_no.value, barcode: pack.barcode.value });
 
     let matches: MyMedMatch[] = [];
+    let interactions: InteractionHit[] = [];
     if (session.profile.role === "patient") {
       const admin = createAdminClient();
       const [{ data: meds }, { data: rems }] = await Promise.all([
@@ -70,6 +74,9 @@ export async function POST(request: Request) {
         .filter((m) => samePrescription({ drugId: m.drug_id && packIds.has(m.drug_id) ? m.drug_id : null, name, strength: pack.strength.value }, m))
         .sort((a, b) => Number(b.status !== "pending") - Number(a.status !== "pending"))
         .map((m) => ({ id: m.id, drug_name: m.drug_name, strength: m.strength, dose: m.dose, frequency_per_day: m.frequency_per_day, instructions_plain: m.instructions_plain, status: m.status as PrescriptionStatus, times: times.get(m.id) ?? [] }));
+      const candidate = { id: matches[0]?.id ?? null, generic: formulary[0]?.generic_name ?? null, name: name ?? formulary[0]?.name ?? "" };
+      const others = (await currentMeds(session.profile.id)).filter((m) => !matches.some((x) => x.id === m.id));
+      interactions = name ? await findInteractions(candidate, others) : [];
       // Every check is logged and a not-found / mismatch alerts the pharmacist even if the patient stops here.
       if (check && (check.result === "not_found" || check.result === "mismatch")) {
         await recordDrugCheck({ patientId: session.profile.id, hospitalId: session.profile.hospital_id, prescriptionId: matches[0]?.id ?? null, scannedName: name ?? "", check });
@@ -77,7 +84,7 @@ export async function POST(request: Request) {
     }
 
     const expired = Boolean(pack.expiry_date.value && pack.expiry_date.value < lagosDate());
-    const response: ScanResponse = { pack, check, formulary, matches, expired, needsRetry: !name || pack.drug_name.confidence < 0.6 };
+    const response: ScanResponse = { pack, check, formulary, matches, expired, interactions, needsRetry: !name || pack.drug_name.confidence < 0.6 };
     return NextResponse.json(response);
   } catch (error) {
     console.error("[scan]", error);

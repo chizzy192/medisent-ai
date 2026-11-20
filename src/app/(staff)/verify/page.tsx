@@ -7,6 +7,7 @@ import { requireRole } from "@/lib/auth/dal";
 import { createAdminClient } from "@/lib/db/admin";
 import { createClient } from "@/lib/db/server";
 import { verifierRoles } from "@/lib/intake";
+import { checkAgainstCurrent } from "@/lib/interactions";
 
 type Row = {
   id: string;
@@ -29,6 +30,8 @@ type Row = {
   rx_photo_path: string | null;
   ai_prefill: { pack?: PackRead } | null;
   created_at: string;
+  drug_id: string | null;
+  drugs: { generic_name: string | null } | { generic_name: string | null }[] | null;
 };
 
 /**
@@ -41,7 +44,7 @@ export default async function VerifyPage() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("prescriptions")
-    .select("id,patient_id,drug_name,strength,form,dose,frequency_per_day,duration_days,with_food,quantity_dispensed,instructions,instructions_plain,nafdac_no,check_result,expiry_date,batch_no,pack_photo_path,rx_photo_path,ai_prefill,created_at")
+    .select("id,patient_id,drug_name,strength,form,dose,frequency_per_day,duration_days,with_food,quantity_dispensed,instructions,instructions_plain,nafdac_no,check_result,expiry_date,batch_no,pack_photo_path,rx_photo_path,ai_prefill,created_at,drug_id,drugs(generic_name)")
     .eq("source", "self")
     .eq("status", "pending")
     .order("created_at", { ascending: true });
@@ -65,8 +68,15 @@ export default async function VerifyPage() {
     for (const u of urls ?? []) if (u.path && u.signedUrl) signed.set(u.path, u.signedUrl);
   }
 
-  const entries: QueueEntry[] = rows.map((r) => ({
+  const interactions = await Promise.all(
+    rows.map((r) => {
+      const g = Array.isArray(r.drugs) ? r.drugs[0] : r.drugs;
+      return checkAgainstCurrent(r.patient_id, { id: r.id, generic: g?.generic_name ?? null, name: r.drug_name });
+    }),
+  );
+  const entries: QueueEntry[] = rows.map((r, i) => ({
     ...r,
+    interactions: interactions[i],
     patient_name: person.get(r.patient_id)?.full_name ?? "",
     hospital_number: person.get(r.patient_id)?.hospital_number ?? null,
     times: times.get(r.id) ?? [],

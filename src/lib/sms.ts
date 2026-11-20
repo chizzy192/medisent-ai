@@ -1,4 +1,5 @@
-import { demoMode, isSmsConfigured } from "@/lib/db/env";
+import { demoMode } from "@/lib/db/env";
+import { isSmsConfigured } from "@/lib/db/secrets";
 
 /**
  * Outbound SMS through Africa's Talking (BUILD_PLAN section 2). Stage 1 sends OTP codes;

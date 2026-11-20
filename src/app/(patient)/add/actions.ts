@@ -7,6 +7,7 @@ import { patientRoles, requireRole } from "@/lib/auth/dal";
 import { createAdminClient } from "@/lib/db/admin";
 import { getDrug } from "@/lib/formulary";
 import { cleanDosing, unitsFromDose } from "@/lib/dosing";
+import { checkAgainstCurrent, raiseInteractionAlerts, type InteractionHit } from "@/lib/interactions";
 import { createPrescription, type SavedPrescription } from "@/lib/prescriptions";
 
 /**
@@ -16,7 +17,7 @@ import { createPrescription, type SavedPrescription } from "@/lib/prescriptions"
  * "Not checked yet", until a pharmacist approves, edits or rejects it. The AI pre-fill is kept
  * beside the entry so the pharmacist sees both.
  */
-export type AddResult = { ok: true; saved: SavedPrescription } | { ok: false; error: string; fieldErrors?: Record<string, string> };
+export type AddResult = { ok: true; saved: SavedPrescription; interactions: InteractionHit[] } | { ok: false; error: string; fieldErrors?: Record<string, string> };
 
 const shapes: PillShape[] = ["round", "capsule", "oval", "inhaler", "liquid", "injection"];
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -61,6 +62,8 @@ export async function addMyMedicine(formData: FormData): Promise<AddResult> {
     }
     const read = (aiPrefill ?? {}) as { pack?: { nafdac_no?: { value: string | null }; manufacturer?: { value: string | null }; expiry_date?: { value: string | null }; batch_no?: { value: string | null } } };
 
+    // Checked before the row exists so the new medicine is not compared with itself.
+    const interactions = await checkAgainstCurrent(profile.id, { generic: drug.generic_name, name: drug.name });
     const admin = createAdminClient();
     const packPath = await upload(admin, profile.id, pack, "pack");
     const rxPath = await upload(admin, profile.id, rx instanceof File ? rx : null, "rx");
@@ -92,10 +95,12 @@ export async function addMyMedicine(formData: FormData): Promise<AddResult> {
       ai_prefill: aiPrefill,
       expiry_date: /^\d{4}-\d{2}-\d{2}$/.test(read.pack?.expiry_date?.value ?? "") ? read.pack!.expiry_date!.value : null,
       batch_no: read.pack?.batch_no?.value ?? null,
+      course_required: drug.course_required,
     });
+    await raiseInteractionAlerts({ patientId: profile.id, hospitalId: profile.hospital_id, prescriptionId: saved.id, candidateName: drug.name, hits: interactions });
     revalidatePath("/home");
     revalidatePath("/meds");
-    return { ok: true, saved };
+    return { ok: true, saved, interactions };
   } catch (error) {
     console.error("[add medicine]", error);
     return { ok: false, error: error instanceof Error && error.message === "photo_invalid" ? "photoInvalid" : "server" };

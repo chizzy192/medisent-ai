@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/db/admin";
-import { isServiceRoleConfigured } from "@/lib/db/env";
+import { isServiceRoleConfigured } from "@/lib/db/secrets";
 import { daysLeft, lagosDate } from "@/lib/reminders";
 import { sendSms } from "@/lib/sms";
+import { checkCourseRisk, loadCourses } from "@/lib/course";
 
 /**
  * Daily refill job (BUILD_PLAN Stage 2): for every active refill running out within
@@ -50,5 +51,8 @@ export async function GET(request: Request) {
     await admin.from("refills").update({ alerted_at: new Date().toISOString() }).eq("id", r.id);
     alerted++;
   }
-  return NextResponse.json({ ok: true, checked: refills?.length ?? 0, alerted, today });
+  // Finish-your-course: every active course with 2+ missed doses gets one alert and one SMS.
+  let coursesAtRisk = 0;
+  for (const c of await loadCourses(admin, {})) if (c.atRisk && (await checkCourseRisk(c.prescriptionId))) coursesAtRisk++;
+  return NextResponse.json({ ok: true, checked: refills?.length ?? 0, alerted, coursesAtRisk, today });
 }

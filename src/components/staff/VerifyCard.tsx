@@ -8,6 +8,9 @@ import type { WithFood } from "@/lib/db/types";
 import type { DrugCheckResult } from "@/lib/drugcheck";
 import { DosingFields, type Dosing } from "@/components/DosingFields";
 import { DrugCheckChip } from "@/components/DrugCheckChip";
+import { InteractionCards } from "@/components/InteractionCards";
+import type { InteractionHit } from "@/lib/interactions";
+import { CheckboxField } from "@/components/forms";
 import { FormMessage, Textarea } from "@/components/forms";
 import { PackReadCard } from "@/components/PackReadCard";
 import { StatusChip } from "@/components/StatusChip";
@@ -38,6 +41,7 @@ export type QueueEntry = {
   rx_url: string | null;
   pack: PackRead | null;
   created_at: string;
+  interactions: InteractionHit[];
 };
 
 /**
@@ -50,6 +54,7 @@ export function VerifyCard({ entry }: { entry: QueueEntry }) {
   const td = tr("dosing");
   const [state, formAction] = useActionState(reviewEntry, undefined as ReviewState);
   const [mode, setMode] = useState<"view" | "edit" | "reject">("view");
+  const [reviewed, setReviewed] = useState(false);
   const [dosing, setDosing] = useState<Dosing>({
     dose: entry.dose ?? "",
     frequency: entry.frequency_per_day,
@@ -132,7 +137,20 @@ export function VerifyCard({ entry }: { entry: QueueEntry }) {
         </section>
       </div>
 
-      {state?.error && (
+      {(() => {
+        const hits = state?.interactions?.length ? state.interactions : entry.interactions;
+        const major = hits.some((h) => h.severity === "major");
+        return hits.length ? (
+          <section className="space-y-3" data-testid="verify-interactions">
+            <SectionLabel as="h3">{t("interactionsTitle")}</SectionLabel>
+            <InteractionCards hits={hits} compact />
+            {major && mode !== "reject" && (
+              <CheckboxField id={`reviewed-${entry.id}`} name="reviewed" form={`approve-${entry.id}`} label={t("reviewed")} error={state?.error === "reviewRequired" ? t("errors.reviewRequired") : undefined} onChange={(e) => setReviewed(e.target.checked)} />
+            )}
+          </section>
+        ) : null;
+      })()}
+      {state?.error && state.error !== "reviewRequired" && (
         <FormMessage tone="error">
           <p>{t(`errors.${state.error}`)}</p>
           {state.detail && <p className="mt-1 font-mono text-sm">{state.detail}</p>}
@@ -141,7 +159,7 @@ export function VerifyCard({ entry }: { entry: QueueEntry }) {
 
       {mode === "view" && (
         <div className="flex flex-col gap-3 sm:flex-row">
-          <form action={formAction} className="flex-1" data-testid="verify-approve">
+          <form id={`approve-${entry.id}`} action={formAction} className="flex-1" data-testid="verify-approve">
             <input type="hidden" name="id" value={entry.id} />
             <input type="hidden" name="intent" value="approve" />
             <SubmitButton pendingLabel={t("working")} className="w-full">
@@ -161,6 +179,7 @@ export function VerifyCard({ entry }: { entry: QueueEntry }) {
         <form action={formAction} className="space-y-4 rounded-button bg-bg p-3" noValidate>
           <input type="hidden" name="id" value={entry.id} />
           <input type="hidden" name="intent" value="edit" />
+          {reviewed && <input type="hidden" name="reviewed" value="on" />}
           <SectionLabel as="h3">{t("editTitle")}</SectionLabel>
           <DosingFields value={dosing} onChange={setDosing} errors={state?.fieldErrors} form={entry.form ?? ""} idPrefix={`edit-${entry.id.slice(0, 8)}`} />
           <div className="flex flex-col gap-3 sm:flex-row">

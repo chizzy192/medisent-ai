@@ -1,4 +1,6 @@
 /**
+ * Client-safe environment switches (this module is imported by client components, so only
+ * NEXT_PUBLIC_* names appear here; server secrets live in src/lib/db/secrets.ts).
  * Environment switches for Stage 1. Supabase keys are optional in development: pages and
  * actions that need them show a setup notice instead of crashing (BUILD_PLAN: keys only in env).
  */
@@ -10,14 +12,6 @@ export const DEMO_OTP = "123456";
 
 export function isSupabaseConfigured(): boolean {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-}
-
-export function isServiceRoleConfigured(): boolean {
-  return isSupabaseConfigured() && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-}
-
-export function isSmsConfigured(): boolean {
-  return Boolean(process.env.AFRICASTALKING_USERNAME && process.env.AFRICASTALKING_API_KEY);
 }
 
 /** Patients have no email; Supabase Auth still needs one per user. */

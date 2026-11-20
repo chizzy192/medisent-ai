@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { patientRoles, requireRole } from "@/lib/auth/dal";
 import { createAdminClient } from "@/lib/db/admin";
+import { checkCourseRisk } from "@/lib/course";
 import { lagosDate, LATE_AFTER_MS, SNOOZE_MS } from "@/lib/reminders";
 
 /**
@@ -16,7 +17,7 @@ export async function logDose(reminderId: string, scheduledAtIso: string, action
   const scheduledAt = new Date(scheduledAtIso);
   if (Number.isNaN(scheduledAt.getTime())) return { ok: false };
   const admin = createAdminClient();
-  const { data: reminder } = await admin.from("reminders").select("id,patient_id").eq("id", reminderId).maybeSingle();
+  const { data: reminder } = await admin.from("reminders").select("id,patient_id,prescription_id").eq("id", reminderId).maybeSingle();
   if (!reminder || reminder.patient_id !== profile.id) return { ok: false };
 
   const now = new Date();
@@ -34,6 +35,7 @@ export async function logDose(reminderId: string, scheduledAtIso: string, action
     { onConflict: "reminder_id,scheduled_at" },
   );
   if (error) return { ok: false };
+  if (status === "missed") await checkCourseRisk(reminder.prescription_id).catch((e) => console.error("[course]", e));
   revalidatePath("/home");
   return { ok: true, status };
 }

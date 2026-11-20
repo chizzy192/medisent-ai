@@ -3,7 +3,7 @@ import { RegisterHospitalForm } from "@/components/auth/RegisterHospitalForm";
 import { FormPage } from "@/components/forms";
 import { HospitalHeader } from "@/components/HospitalHeader";
 import { SetupNotice } from "@/components/SetupNotice";
-import { isServiceRoleConfigured } from "@/lib/db/env";
+import { isServiceRoleConfigured } from "@/lib/db/secrets";
 
 export default async function RegisterHospitalPage() {
   const t = tr("registerHospital");

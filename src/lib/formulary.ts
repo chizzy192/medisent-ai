@@ -5,14 +5,14 @@ import { createAdminClient } from "@/lib/db/admin";
  * from. Pharmacists pick from it when dispensing; patients pick from it when adding a medicine
  * (the pack photo only pre-fills the search). Matching is name-first, strength-second.
  */
-export type FormularyDrug = { id: string; name: string; generic_name: string | null; strength: string | null; form: string | null; nafdac_no: string | null; manufacturer: string | null; barcode: string | null };
+export type FormularyDrug = { id: string; name: string; generic_name: string | null; strength: string | null; form: string | null; nafdac_no: string | null; manufacturer: string | null; barcode: string | null; course_required: boolean };
 
 export const norm = (s: string | null | undefined) => (s ?? "").toLowerCase().replace(/[^a-z0-9/]/g, "");
 
 export async function searchFormulary(query: string, limit = 12): Promise<FormularyDrug[]> {
   const q = query.trim().slice(0, 80);
   const admin = createAdminClient();
-  let req = admin.from("drugs").select("id,name,generic_name,strength,form,nafdac_no,manufacturer,barcode").eq("nafdac_listed", true).order("name").order("strength").limit(limit);
+  let req = admin.from("drugs").select("id,name,generic_name,strength,form,nafdac_no,manufacturer,barcode,course_required").eq("nafdac_listed", true).order("name").order("strength").limit(limit);
   if (q) {
     const safe = q.replace(/[%_,()]/g, " ");
     req = req.or(`name.ilike.%${safe}%,generic_name.ilike.%${safe}%`);
@@ -23,7 +23,7 @@ export async function searchFormulary(query: string, limit = 12): Promise<Formul
 
 export async function getDrug(id: string): Promise<FormularyDrug | null> {
   const admin = createAdminClient();
-  const { data } = await admin.from("drugs").select("id,name,generic_name,strength,form,nafdac_no,manufacturer,barcode").eq("id", id).maybeSingle();
+  const { data } = await admin.from("drugs").select("id,name,generic_name,strength,form,nafdac_no,manufacturer,barcode,course_required").eq("id", id).maybeSingle();
   return (data as FormularyDrug | null) ?? null;
 }
 
@@ -33,7 +33,7 @@ export async function getDrug(id: string): Promise<FormularyDrug | null> {
  */
 export async function suggestFromPack(read: { name: string | null; strength: string | null; nafdac: string | null; barcode: string | null }): Promise<FormularyDrug[]> {
   const admin = createAdminClient();
-  const select = "id,name,generic_name,strength,form,nafdac_no,manufacturer,barcode";
+  const select = "id,name,generic_name,strength,form,nafdac_no,manufacturer,barcode,course_required";
   if (read.barcode) {
     const { data } = await admin.from("drugs").select(select).eq("barcode", read.barcode).limit(3);
     if (data?.length) return data as FormularyDrug[];

@@ -150,7 +150,9 @@ export const strings = {
       "edited": "approved with corrected instructions. Listen to the new sentence.",
       "rejected": "not approved."
     },
-    "reviewReason": "Reason: {reason}"
+    "reviewReason": "Reason: {reason}",
+    "coursesLabel": "Finish the course",
+    "interactionNotice": "One of your medicines may interact with this one. Read the warning on the previous screen, and ask your pharmacist before your next dose."
   },
   "placeholder": {
     "label": "Coming soon",
@@ -318,6 +320,20 @@ export const strings = {
       "noPhoneOnFile": "This account has no phone number, so we cannot send a code. Ask the records desk to add one.",
       "notConfigured": "This app is not fully set up yet, so sign-in does not work. Tell the person who runs it.",
       "server": "Something went wrong on our side, not yours. Press the button to try again."
+    },
+    "demo": {
+      "title": "Demo accounts (fictional)",
+      "patient": "Patient (Folake Adebayo):",
+      "patientPhone": "0800 000 0304",
+      "pharmacist": "Pharmacist (Chidinma Okafor):",
+      "pharmacistPhone": "0800 000 0104",
+      "doctor": "Doctor (Dr Amina Bello):",
+      "doctorPhone": "0800 000 0103",
+      "hospitalAdmin": "Hospital admin (Ngozi Eze):",
+      "hospitalAdminPhone": "0800 000 0101",
+      "platformAdmin": "Platform admin:",
+      "platformAdminPhone": "0800 000 0001",
+      "code": "The code for every demo account is"
     }
   },
   "registerHospital": {
@@ -541,7 +557,12 @@ export const strings = {
     "intakeTitle": "Medication intake",
     "intakeBody": "Dispense from the formulary, or check what patients added from their phones.",
     "dispense": "Dispense",
-    "verifyQueue": "{count, plural, =0 {Entries to check} one {Check # entry} other {Check # entries}}"
+    "verifyQueue": "{count, plural, =0 {Entries to check} one {Check # entry} other {Check # entries}}",
+    "interactionAlerts": "Interaction alerts",
+    "coursesCompleted": "Courses completed (finished with at most 1 missed dose)",
+    "coursesAtRiskTitle": "Courses at risk",
+    "coursesAtRiskNone": "No patient has missed two or more doses of a course.",
+    "courseRisk": "Day {day} of {total} · {missed} missed"
   },
   "me": {
     "label": "Me",
@@ -663,7 +684,8 @@ export const strings = {
       "offline": "You are offline. Scanning needs the internet; your saved medicines still work.",
       "tooBig": "That photo is too large. Try again."
     },
-    "cameraPreview": "Camera preview"
+    "cameraPreview": "Camera preview",
+    "interactionsTitle": "Check before you take it"
   },
   "reminder": {
     "label": "Time for your medicine",
@@ -708,7 +730,8 @@ export const strings = {
       "hospital": "from your hospital",
       "self": "added by you"
     },
-    "pendingNote": "A pharmacist has not checked this entry yet. Follow what you were told."
+    "pendingNote": "A pharmacist has not checked this entry yet. Follow what you were told.",
+    "coursesLabel": "Finish the course"
   },
   "refill": {
     "label": "Refill soon",
@@ -776,7 +799,13 @@ export const strings = {
       "rejected": "Rejected"
     },
     "dispense": "Dispense for this patient",
-    "reviewPending": "Check waiting entries"
+    "reviewPending": "Check waiting entries",
+    "interactionAlerts": "{count, plural, =0 {No interaction alerts} one {# interaction alert} other {# interaction alerts}}",
+    "interactionsTitle": "Interaction alerts",
+    "courses": "Courses",
+    "courseProgress": "Day {day} of {total} · {missed} missed",
+    "courseAtRisk": "At risk",
+    "courseOnTrack": "On track"
   },
   "packRead": {
     "title": "What we read on the pack",
@@ -883,7 +912,9 @@ export const strings = {
       "doseRequired": "Type how much to take each time.",
       "frequencyRequired": "Choose how often.",
       "server": "We could not save. Check your network and try again."
-    }
+    },
+    "interactionsTitle": "Check with your pharmacist",
+    "interactionsNote": "You can still save this medicine. Your pharmacist sees this warning when they check your entry."
   },
   "dispense": {
     "title": "Dispense",
@@ -911,8 +942,11 @@ export const strings = {
       "drugRequired": "Pick the medicine from the formulary.",
       "doseRequired": "Type the dose.",
       "frequencyRequired": "Choose how often.",
-      "server": "We could not save. Try again."
-    }
+      "server": "We could not save. Try again.",
+      "reviewRequired": "This is a major interaction. Tick the review box to dispense it, or choose another medicine."
+    },
+    "interactionsTitle": "Interaction check",
+    "reviewed": "I have reviewed this interaction with the prescriber or the patient."
   },
   "verify": {
     "title": "Entries to check",
@@ -962,7 +996,43 @@ export const strings = {
       "reasonRequired": "Type the reason first.",
       "notYours": "This entry is not from your hospital.",
       "alreadyReviewed": "Someone has already checked this entry.",
-      "server": "We could not save. Try again."
-    }
+      "server": "We could not save. Try again.",
+      "reviewRequired": "This is a major interaction. Tick the review box to approve it, or reject the entry."
+    },
+    "interactionsTitle": "Interaction check (against the patient's other medicines)",
+    "reviewed": "I have reviewed this interaction."
+  },
+  "interactions": {
+    "majorTitle": "Do not take with {name}",
+    "moderateTitle": "Take care with {name}",
+    "majorLead": "Don't take these together. Ask your pharmacist before your next dose.",
+    "moderateLead": "These two can affect each other. Tell your pharmacist."
+  },
+  "course": {
+    "label": "Finish the course",
+    "progress": "Day {day} of {total} · {left, plural, =0 {all doses done} one {# dose left} other {# doses left}}",
+    "meterLabel": "Doses taken",
+    "takenOf": "{taken} of {total}",
+    "dontStop": "Don't stop early, even if you feel better.",
+    "onTrack": "On track",
+    "atRisk": "At risk",
+    "stopped": "Stopped early",
+    "missedNote": "{count, plural, one {# dose missed.} other {# doses missed.}} Keep going with the next one; do not take two at once.",
+    "stopButton": "I stopped taking this early",
+    "stopConfirm": "Stopping early can let the illness come back stronger. We will tell your doctor so they can advise you.",
+    "stopYes": "Yes, I stopped",
+    "stopNo": "No, I am still taking it",
+    "stoppedNote": "Your doctor has been told. Reminders for this medicine are off.",
+    "notSaved": "Not saved. Please try again."
+  },
+  "resetDemo": {
+    "title": "Reset demo data",
+    "body": "Puts every demo hospital, account, medicine, reminder and log back to the seeded state and removes anything created during rehearsals. Takes about half a minute. Use it between rehearsals and right before judging.",
+    "button": "Reset demo data…",
+    "confirm": "Yes, reset everything now",
+    "cancel": "Cancel",
+    "working": "Resetting…",
+    "done": "Done in {seconds} seconds. Demo data is back to the seed.",
+    "failed": "The reset did not finish. Nothing was changed if the error happened before the first step."
   }
 } as const;

@@ -1,7 +1,8 @@
 "use server";
 
 import { createAdminClient } from "@/lib/db/admin";
-import { isServiceRoleConfigured, isValidNigerianPhone, normalizePhone } from "@/lib/db/env";
+import { isValidNigerianPhone, normalizePhone } from "@/lib/db/env";
+import { isServiceRoleConfigured } from "@/lib/db/secrets";
 import { sendSms } from "@/lib/sms";
 import { brand } from "@/config/brand";
 

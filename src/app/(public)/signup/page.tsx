@@ -6,7 +6,7 @@ import { HospitalHeader } from "@/components/HospitalHeader";
 import { SetupNotice } from "@/components/SetupNotice";
 import { getSession } from "@/lib/auth/dal";
 import { createAdminClient } from "@/lib/db/admin";
-import { isServiceRoleConfigured } from "@/lib/db/env";
+import { isServiceRoleConfigured } from "@/lib/db/secrets";
 import { homeForRole } from "@/lib/db/types";
 
 export default async function SignupPage() {

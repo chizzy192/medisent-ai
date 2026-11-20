@@ -6,6 +6,7 @@ import { tr } from "@/lib/strings";
 import type { ScanResponse } from "@/app/api/scan/route";
 import { DrugCheckChip, DrugCheckNote } from "@/components/DrugCheckChip";
 import { FormMessage } from "@/components/forms";
+import { InteractionCards } from "@/components/InteractionCards";
 import { ListenButton } from "@/components/ListenButton";
 import { PackReadCard } from "@/components/PackReadCard";
 import { StatusChip } from "@/components/StatusChip";
@@ -181,6 +182,12 @@ export function ScanFlow({ rate }: { rate: number }) {
       {result && (
         <div className="space-y-4" data-testid="scan-result">
           {result.expired && <FormMessage tone="error">{t("expired", { date: result.pack.expiry_date.value ?? "" })}</FormMessage>}
+          {result.interactions.length > 0 && (
+            <section className="space-y-2">
+              <SectionLabel as="h2">{t("interactionsTitle")}</SectionLabel>
+              <InteractionCards hits={result.interactions} rate={rate} />
+            </section>
+          )}
 
           {match && (
             <Card as="section" className={`space-y-3 ${verdict === "match" ? "border-2 border-success" : ""}`}>

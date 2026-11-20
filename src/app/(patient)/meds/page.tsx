@@ -11,6 +11,8 @@ import { createClient } from "@/lib/db/server";
 import type { DrugCheckResult } from "@/lib/drugcheck";
 import type { PrescriptionSource, PrescriptionStatus } from "@/lib/db/types";
 import { StatusChip } from "@/components/StatusChip";
+import { CourseCard } from "@/components/CourseCard";
+import { loadCourses } from "@/lib/course";
 import { daysLeft, lagosDate } from "@/lib/reminders";
 
 type Med = {
@@ -50,6 +52,10 @@ export default async function MedsPage() {
   const supply = new Map(((refills ?? []) as Refill[]).map((r) => [r.prescription_id, r]));
   const today = lagosDate();
   const rate = Number(profile.speech_rate) || 1;
+  const courses = await loadCourses(supabase, { patientId: profile.id }).catch((e) => {
+    console.error("[course]", e);
+    return [];
+  });
 
   return (
     <main id="main" className="mx-auto w-full max-w-xl flex-1 space-y-4 px-4 py-5 sm:px-6">
@@ -63,6 +69,17 @@ export default async function MedsPage() {
           {t("addAnother")}
         </ButtonLink>
       </div>
+
+      {courses.length > 0 && (
+        <section aria-labelledby="meds-courses" className="space-y-3">
+          <SectionLabel as="h2">
+            <span id="meds-courses">{t("coursesLabel")}</span>
+          </SectionLabel>
+          {courses.map((c) => (
+            <CourseCard key={c.prescriptionId} course={c} rate={rate} allowStop />
+          ))}
+        </section>
+      )}
 
       {list.length === 0 ? (
         <EmptyState label={t("label")} title={t("emptyTitle")} icon={<ScanIcon size={24} />} action={<ButtonLink href="/add">{t("addFirst")}</ButtonLink>}>

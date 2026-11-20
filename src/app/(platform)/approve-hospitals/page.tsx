@@ -1,6 +1,8 @@
 import { tr, formatDate } from "@/lib/strings";
 import { licenceLink } from "@/app/(platform)/actions";
+import { ResetDemoForm } from "@/components/admin/ResetDemoForm";
 import { ReviewForm } from "@/components/admin/ReviewForm";
+import { demoMode } from "@/lib/db/env";
 import { EmptyState } from "@/components/EmptyState";
 import { StatusChip, type ChipTone } from "@/components/StatusChip";
 import { Card, SectionLabel } from "@/components/ui";
@@ -105,6 +107,8 @@ export default async function ApproveHospitalsPage() {
           </ul>
         </section>
       )}
+
+      {demoMode && <ResetDemoForm />}
     </main>
   );
 }

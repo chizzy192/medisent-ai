@@ -10,6 +10,7 @@ import { OtpStep } from "@/components/OtpStep";
 import { SubmitButton } from "@/components/SubmitButton";
 import { EmptyState } from "@/components/EmptyState";
 import { ButtonLink } from "@/components/ui";
+import { DEMO_OTP, demoMode } from "@/lib/db/env";
 
 /** Login: phone or email → OTP to the phone on file → the role's home. */
 export function LoginForm({ next, reason }: { next: string; reason?: string }) {
@@ -35,6 +36,21 @@ export function LoginForm({ next, reason }: { next: string; reason?: string }) {
     <form ref={formRef} action={formAction} className="space-y-5" noValidate>
       <input type="hidden" name="next" value={next} />
       {reason === "unverified" && <FormMessage tone="info">{t("unverified")}</FormMessage>}
+      {demoMode && (
+        <div className="rounded-button border border-border bg-bg p-3 text-base" data-testid="demo-hints">
+          <p className="font-semibold">{t("demo.title")}</p>
+          <ul className="mt-1 space-y-0.5 text-ink-2">
+            {(["patient", "pharmacist", "doctor", "hospitalAdmin", "platformAdmin"] as const).map((k) => (
+              <li key={k}>
+                {t(`demo.${k}`)} <span className="font-mono text-ink">{t(`demo.${k}Phone`)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1 text-ink-2">
+            {t("demo.code")} <span className="font-mono text-ink">{DEMO_OTP}</span>
+          </p>
+        </div>
+      )}
       {state.error && !fieldError && <FormMessage tone="error">{t(`errors.${state.error}`)}</FormMessage>}
       <Field label={t("identifier")} htmlFor="identifier" hint={t("identifierHint")} error={fieldError ? t(`errors.${fieldError}`) : undefined}>
         <Input

@@ -227,13 +227,13 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 | staff_roster | id, hospital_id, staff_id, full_name, role, phone, email, licence_body, licence_no |
 | patient_registry | id, hospital_id, hospital_number, full_name, phone, age, sex |
 | profiles | id (= auth user), device_type (smartphone / basic), preferred_channel (app / sms / voice), role (platform_admin / hospital_admin / doctor / pharmacist / nurse / patient), hospital_id (nullable for independent patients), full_name, phone, licence_no, licence_body (MDCN / PCN / NMCN), verified_status (pending / verified / rejected / blocked), failed_attempts |
-| prescriptions | id, patient_id, hospital_id, drug_id (→ drugs, the formulary), drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, pill_shape (round / capsule / oval / inhaler / liquid / injection), pill_color (hex), quantity_dispensed, **source (hospital / self)**, **status (pending / verified / edited / rejected)**, verified_by, verified_at, rejection_reason, pack_photo_path, rx_photo_path (Storage bucket `med-photos`, path `<patient_id>/…`), ai_prefill (jsonb: what the reader saw, with a confidence per field), expiry_date, batch_no, patient_notified_at, created_by, active |
+| prescriptions | id, patient_id, hospital_id, drug_id (→ drugs, the formulary), drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, pill_shape (round / capsule / oval / inhaler / liquid / injection), pill_color (hex), quantity_dispensed, **source (hospital / self)**, **status (pending / verified / edited / rejected)**, verified_by, verified_at, rejection_reason, pack_photo_path, rx_photo_path (Storage bucket `med-photos`, path `<patient_id>/…`), ai_prefill (jsonb: what the reader saw, with a confidence per field), expiry_date, batch_no, patient_notified_at, course_required (copied from the drug), interaction_reviewed_by / _at (pharmacist's tick on a major interaction), stopped_early_at, created_by, active |
 | reminders | id, prescription_id, patient_id, time_of_day, days, channel (app / sms / voice), active |
 | dose_logs | id, reminder_id, patient_id, scheduled_at, status (taken / missed / snoozed / late), logged_at, synced |
 | conditions | id, patient_id, hospital_id, name, noted_by, started_on |
 | allergies | id, patient_id, substance, reaction |
 | checkins | id, patient_id, transcript, mood, side_effects (jsonb), red_flag (bool), created_at |
-| alerts | id, patient_id, hospital_id, type (red_flag / side_effect / missed_doses / high_risk / interaction / question), detail, status (open / handled), handled_by |
+| alerts | id, patient_id, hospital_id, prescription_id, type (red_flag / side_effect / missed_doses / high_risk / interaction / question / drug_not_found / refill / course_at_risk / course_stopped), detail, status (open / handled), handled_by |
 | assistant_messages | id, patient_id, question, answer, escalated (bool), cited_post_id |
 | forum_posts | id, author_id, hospital_id, category (medication / diet / mental_health), title, body, audio_url, drug_tags (text[]), status (published / hidden), is_demo |
 | transfers | id, patient_id, from_hospital_id, to_hospital_id, scope (jsonb), consent_at, status (requested / accepted / completed / declined), summary |
@@ -241,12 +241,12 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 | ussd_sessions | id, session_id, phone, patient_id, menu_path, created_at |
 | voice_calls | id, patient_id, reminder_id, call_id, status (queued / answered / no_answer / failed), dtmf (pressed key), recording_url, created_at |
 | clinics | id, name, address, lat, lng, phone, hours, is_demo |
-| drugs (formulary) | id, name, generic_name, strength, form, manufacturer, nafdac_no, barcode (nullable), nafdac_listed (bool), is_demo. The ONLY source of a medicine's name / strength / form: pharmacists and patients pick from it, never type it. |
+| drugs (formulary) | id, name, generic_name, strength, form, manufacturer, nafdac_no, barcode (nullable), course_required (bool: antibiotics and antimalarials), nafdac_listed (bool), is_demo. The ONLY source of a medicine's name / strength / form: pharmacists and patients pick from it, never type it. |
 | caregivers | id, patient_id, full_name, relationship, phone, channel (sms / whatsapp / app), notify_after_missed (int, default 1), consent_at, active |
 | caregiver_alerts | id, caregiver_id, patient_id, dose_log_id, sent_at, channel, status (sent / failed) |
 | refills | id, prescription_id, patient_id, quantity_dispensed, doses_per_day, units_per_dose, dispensed_on, runs_out_on (computed), alert_days_before (default 3), alerted_at, refilled (bool) |
 | drug_checks | id, patient_id, scanned_name, nafdac_no, result (registered / not_found / mismatch / unreadable), checked_at |
-| interactions | id, drug_a, drug_b, severity, note |
+| interactions | id, drug_a_generic, drug_b_generic, severity (major / moderate), message (plain English), advice. **The only source of interaction rules**; the AI may rephrase a message but never invents an interaction. |
 | risk_scores | patient_id, score, band (low / medium / high), updated_at |
 
 ### RLS
@@ -275,7 +275,7 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 | Instruction builder + speech | `/api/speak` | prescription → plain English sentence → audio |
 | Voice assistant | `/api/assistant` | question + patient context → answer + audio, or escalation |
 | Check-in parser | `/api/checkin` | transcript → mood, side effects, red flag |
-| Interaction checker | inside `/api/scan` | new drug + current meds + allergies → pharmacist alert |
+| Interaction checker | `src/lib/interactions.ts` | new drug + current meds → hits from the `interactions` table (major / moderate) → cards, pharmacist alert, review tick |
 | Adherence risk score | after each dose log | dose logs + check-ins → 0–100 + band |
 | Transfer summary / weekly insight | `/api/transfer`, cron | records → one-page summary / insight card |
 
@@ -286,6 +286,18 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 3. **Verification queue** (`/verify`, pharmacists and doctors): pending entries with the photos, the reader's fields and the patient's entry side by side → **Approve** / **Edit** (corrects the dosing, rebuilds the sentence and reminders, status `edited`) / **Reject** (reason required; reminders stop). The patient is told (SMS + a notice on Home). Every action is written to `audit_log`.
 
 **Scan tab = "Is this my drug?"** Scanning a pack reads name / strength / barcode / expiry only, then matches against the patient's prescriptions. Results: **match** (show the dose FROM THE RECORD and read it aloud; "not checked yet" when pending) · **no match** (warn + "ask your pharmacist" + "Add this medicine") · **expired** · **not found on the NAFDAC list**. The screen never shows a dose that is not in the record.
+
+### Drug interaction warnings (2026-11-20)
+- Rules come from the `interactions` table only; matching is exact on normalised generic-name parts ("artemether/lumefantrine" → artemether, lumefantrine) and on drug classes from `drug_classes` in `src/lib/drug-match.ts` (ibuprofen → nsaid, lisinopril → ace_inhibitor, magnesium trisilicate → antacid …), never a substring (~30 seeded pairs: warfarin + aspirin / NSAIDs / ciprofloxacin / metronidazole, ACE inhibitor or ARB + spironolactone, NSAIDs + ACE inhibitors, ciprofloxacin or doxycycline + antacids / iron, artemether-lumefantrine + halofantrine / clarithromycin, clarithromycin + statins, amlodipine + simvastatin, metformin + alcohol, sildenafil + nitrates, …). The AI never invents an interaction.
+- The check runs when a pharmacist dispenses, a patient self-adds, a pharmacist verifies, and on "Is this my drug?" (the pack vs the patient's other medicines).
+- Shown as a red card for **major** ("Don't take these together. Ask your pharmacist before your next dose.") and an amber card for **moderate**, each read aloud. A pharmacist must tick "I have reviewed this interaction" to dispense or approve a major one; the tick is stamped on the row and written to `audit_log` (`interaction_reviewed`). Every hit raises one open `interaction` alert per patient and pair.
+- Staff patient page and dashboard show the "Interaction alerts" count.
+
+### Finish-your-course tracker (2026-11-20)
+- `drugs.course_required` marks antibiotics and antimalarials; a prescription with such a drug and a duration is a course (`prescriptions.course_required`).
+- Patient Home and Meds show a course card: "Day 3 of 5 · 6 doses left", a progress bar, "Don't stop early, even if you feel better.", read aloud. Progress comes from dose_logs (`src/lib/course.ts`).
+- Two or more missed doses → "At risk": one patient SMS and one staff alert (`course_at_risk`) per course, raised when a dose is logged missed and by the daily cron. "I stopped taking this early" (Meds) records `stopped_early_at`, stops the reminders and alerts the doctor (`course_stopped`).
+- Dashboard: "Courses completed %" and the list of courses at risk. **One definition:** a course is completed when it finished (not stopped early) with at most one missed dose; the percentage is completed ÷ finished courses.
 
 ### Pack reader JSON schema (Gemini structured output)
 ```json
@@ -394,6 +406,7 @@ Finish each stage's **Done when** test before the next. After each stage: list f
     - Look up in the `drugs` table. Results: **Registered** (green: name, strength and manufacturer match) · **Not found** (warning: "We couldn't find this NAFDAC number in our list. Show this pack to your pharmacist before taking it.") · **Mismatch** (warning: number belongs to a different drug) · **Unreadable** (ask for another photo or typing).
     - Never say a drug is "fake". Wording is always "not found in our list — check with your pharmacist". Log every check in `drug_checks`; "not found" and "mismatch" create a pharmacist alert.
     - Add a link "Report to NAFDAC" pointing to NAFDAC's official site (no data sent automatically).
+- **Interaction warnings** and the **finish-your-course tracker** (section 5): `0011_interactions_courses.sql`, `src/lib/interactions.ts`, `src/lib/course.ts`, `InteractionCards`, `CourseCard`.
 - Accessibility settings: three text sizes, high contrast, speech speed.
 - **Impeccable (Stage 2):** `/impeccable shape scan and reminder flow` first. After building: `/impeccable critique scan flow`, `/impeccable harden scan` (camera denied, blurry photo, low confidence, unknown drug, no network), `/impeccable typeset medicine card` (dose and time must be the most readable text on screen), `/impeccable adapt reminder screen` (small Android screens, large text size setting), `/impeccable audit patient home`, `/impeccable clarify drug check result` (warning must be calm, not scary), `/impeccable critique refill banner`. Fix P0 and P1.
 - **Done when:** a pharmacist dispenses from the formulary and the patient hears it in plain English with reminders; a patient adds a medicine from its pack, it shows "Not checked yet", and the pharmacist approves / edits / rejects it from the queue; scanning the pack answers "Is this my drug?" with the dose from the record; the card shows "days left"; a seeded "not found" NAFDAC number shows the check-with-pharmacist warning and creates an alert.
@@ -566,6 +579,7 @@ All caregiver phones = `DEMO_TEST_PHONE` during the demo.
 ### Formulary / drug registration list (`drugs`, all `is_demo = true`)
 - Seed ~40 common Nigerian medicines (Amlodipine, Metformin, Lisinopril, Artemether-lumefantrine, Amoxicillin, Ciprofloxacin, Paracetamol, Azithromycin, Nifedipine, Atorvastatin, insulin, ORS, …) with a fictional demo NAFDAC number (`DEMO-A4-0001` …), manufacturer and a demo EAN barcode.
 - Seed three pending patient entries (Folake: Amoxicillin; Chukwudi: Paracetamol; Emeka: Atorvastatin) with `ai_prefill` so the verification queue has something to show. Seeded rows have no photos.
+- Courses and interactions for the demo: Aisha Lawal mid-course on Amoxicillin (day 3 of 5, on track), Musa Abdullahi on Artemether-lumefantrine with two missed doses (at risk, alert seeded), Ifeoma Chukwu's finished Azithromycin course (completed), Yusuf Ibrahim on warfarin + aspirin (major interaction, alert seeded).
 - Seed the roster row `AH-PH-003` "Amara Test-Pharmacist" (never an account): `scripts/stage1-flow-test.mjs` signs her up.
 - Add one fictional "not found" test number `DEMO-X9-9999` printed on a demo pack image, for the warning demo.
 - Real NAFDAC data is not used in the demo; label the list "Demo registration list".
@@ -600,6 +614,8 @@ Both demo hospitals plus 3 invented "Demo clinic" entries in Nsukka and Enugu wi
 3. Pharmacist opens Dispense → Folake → Amoxicillin 500 mg from the formulary → 1 capsule, 3 times a day, 5 days → saved and confirmed; Folake hears it in plain English and the reminders appear.
 3a. Folake adds a medicine herself: pack photo → the reader shows name / strength / NAFDAC with confidence (never a dose) → she picks it from the list and types the dose as told → Home shows the card with "Not checked yet".
 3b. Pharmacist opens "Entries to check": photos, what the reader saw and what Folake typed side by side → Approve (or Edit the dose, or Reject with a reason) → Folake's Home shows "Your pharmacist checked"; the audit log has the action.
+3d. Interaction: pharmacist dispenses ibuprofen to Yusuf (warfarin + aspirin) → red "Don't take these together" card → save is refused until "I have reviewed this interaction" is ticked → audit_log row; Yusuf's page and the dashboard show the interaction alert.
+3e. Course (8 finished courses seeded, 6 completed → 75%): Aisha's Home shows "Day 3 of 5 · 6 doses left · Don't stop early" read aloud; Musa's card is amber "At risk, 2 doses missed"; the dashboard lists Musa under "Courses at risk" and shows "Courses completed %"; Musa taps "I stopped taking this early" → doctor alert.
 3c. Scan tab, "Is this my drug?": Folake scans the Amoxicillin pack → match → the dose from the record is read aloud; scanning a pack not on her list → "Not on your list, ask your pharmacist"; an expired pack → warning; `DEMO-X9-9999` → "not found in our list — check with your pharmacist" → pharmacist alert.
 4. Ask by voice: "Can I take this after food?" → spoken answer with linked forum post.
 5. "I have been feeling dizzy" logs side effect; "chest pain" opens red-flag alert with nearest clinic.

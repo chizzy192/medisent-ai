@@ -5,6 +5,7 @@ import { StatusChip } from "@/components/StatusChip";
 import { ButtonLink, Card, SectionLabel } from "@/components/ui";
 import { requireRole, staffRoles } from "@/lib/auth/dal";
 import { createClient } from "@/lib/db/server";
+import { loadCourses } from "@/lib/course";
 
 /**
  * Staff dashboard, Stage 1: branded welcome and live counts through RLS (the signed-in staff
@@ -20,6 +21,21 @@ export default async function DashboardPage() {
     supabase.from("alerts").select("id", { count: "exact", head: true }).eq("status", "open").eq("type", "red_flag"),
     supabase.from("prescriptions").select("id", { count: "exact", head: true }).eq("source", "self").eq("status", "pending"),
   ]);
+  const [interactionAlerts, allCourses] = await Promise.all([
+    supabase.from("alerts").select("id", { count: "exact", head: true }).eq("status", "open").eq("type", "interaction"),
+    loadCourses(supabase, { includeFinished: true }).catch((e) => {
+      console.error("[course]", e);
+      return [];
+    }),
+  ]);
+  const ended = allCourses.filter((c) => c.finished);
+  const completedPct = ended.length ? Math.round((ended.filter((c) => c.completed).length / ended.length) * 100) : null;
+  const atRisk = allCourses.filter((c) => c.atRisk);
+  const names = new Map<string, string>();
+  if (atRisk.length) {
+    const { data: people } = await supabase.from("profiles").select("id,full_name").in("id", [...new Set(atRisk.map((c) => c.patientId))]);
+    for (const p of people ?? []) names.set(p.id, p.full_name);
+  }
   const canDispense = profile.role === "pharmacist" || profile.role === "doctor";
 
   const stats = [
@@ -27,6 +43,8 @@ export default async function DashboardPage() {
     { key: "openAlerts", value: alerts.count ?? 0 },
     { key: "redFlags", value: redFlags.count ?? 0 },
     { key: "pendingChecks", value: pending.count ?? 0, href: canDispense ? "/verify" : undefined },
+    { key: "interactionAlerts", value: interactionAlerts.count ?? 0 },
+    { key: "coursesCompleted", value: completedPct === null ? "—" : `${completedPct}%` },
   ];
 
   return (
@@ -40,7 +58,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {stats.map((s) => (
           <Card as="li" key={s.key} className={s.href ? "p-0" : ""}>
             {s.href ? (
@@ -57,6 +75,27 @@ export default async function DashboardPage() {
           </Card>
         ))}
       </ul>
+
+      <Card as="section" className="space-y-3" testId="courses-at-risk">
+        <h2 className="text-xl">{t("coursesAtRiskTitle")}</h2>
+        {atRisk.length === 0 ? (
+          <p className="text-base text-ink-2">{t("coursesAtRiskNone")}</p>
+        ) : (
+          <ul className="divide-y divide-surface-2">
+            {atRisk.map((c) => (
+              <li key={c.prescriptionId} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <Link href={`/patients/${c.patientId}`} className="font-semibold text-primary underline">
+                  {names.get(c.patientId) ?? "—"}
+                </Link>
+                <span>
+                  {c.drugName} <span className="font-mono text-sm text-ink-2">{c.strength}</span>
+                </span>
+                <span className="font-mono text-sm text-warning">{t("courseRisk", { day: c.day, total: c.durationDays, missed: c.missed })}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
 
       {canDispense && (
         <Card as="section" className="space-y-3">

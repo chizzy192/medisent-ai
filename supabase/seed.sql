@@ -8,6 +8,8 @@
 begin;
 set client_min_messages = warning;
 select setseed(0.42);
+-- Every date in this file is the Lagos calendar date (the app's lagosDate()), not the server's UTC date.
+create or replace function pg_temp.lagos_today() returns date language sql stable as $ select (now() at time zone 'Africa/Lagos')::date $;
 
 -- ---------- hospitals ----------
 insert into hospitals (id, slug, name, city, state, brand_color, status, is_demo, address, contact_name, contact_phone, contact_email, reviewed_at)
@@ -135,7 +137,7 @@ insert into drugs (id, name, generic_name, strength, form, manufacturer, nafdac_
   ('e0000000-0000-4000-8000-000000000025', 'Atenolol', 'atenolol', '50 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0025', '6150000000255', true, true),
   ('e0000000-0000-4000-8000-000000000026', 'Methyldopa', 'methyldopa', '250 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0026', '6150000000262', true, true),
   ('e0000000-0000-4000-8000-000000000027', 'Atorvastatin', 'atorvastatin', '20 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0027', '6150000000279', true, true),
-  ('e0000000-0000-4000-8000-000000000028', 'Aspirin', 'acetylsalicylic acid', '75 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0028', '6150000000286', true, true),
+  ('e0000000-0000-4000-8000-000000000028', 'Aspirin', 'aspirin', '75 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0028', '6150000000286', true, true),
   ('e0000000-0000-4000-8000-000000000029', 'Gliclazide', 'gliclazide', '80 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0029', '6150000000293', true, true),
   ('e0000000-0000-4000-8000-000000000030', 'Insulin (mixtard 30/70)', 'insulin human', '100 IU/ml', 'injection', 'Demo Pharma Ltd', 'DEMO-A4-0030', '6150000000309', true, true),
   ('e0000000-0000-4000-8000-000000000031', 'Diclofenac', 'diclofenac', '50 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0031', '6150000000316', true, true),
@@ -151,24 +153,53 @@ insert into drugs (id, name, generic_name, strength, form, manufacturer, nafdac_
   ('e0000000-0000-4000-8000-000000000041', 'Fluoxetine', 'fluoxetine', '20 mg', 'capsule', 'Demo Pharma Ltd', 'DEMO-A4-0041', '6150000000415', true, true),
   ('e0000000-0000-4000-8000-000000000042', 'Paracetamol', 'paracetamol', '1 g', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0042', '6150000000422', true, true),
   ('e0000000-0000-4000-8000-000000000043', 'Salbutamol', 'salbutamol', '2 mg/5 ml', 'syrup', 'Demo Pharma Ltd', 'DEMO-A4-0043', '6150000000439', true, true),
-  ('e0000000-0000-4000-8000-000000000044', 'Amoxicillin', 'amoxicillin', '125 mg/5 ml', 'suspension', 'Demo Pharma Ltd', 'DEMO-A4-0044', '6150000000446', true, true)
+  ('e0000000-0000-4000-8000-000000000044', 'Amoxicillin', 'amoxicillin', '125 mg/5 ml', 'suspension', 'Demo Pharma Ltd', 'DEMO-A4-0044', '6150000000446', true, true),
+  ('e0000000-0000-4000-8000-000000000045', 'Warfarin', 'warfarin', '5 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0045', '6150000000453', true, true),
+  ('e0000000-0000-4000-8000-000000000046', 'Simvastatin', 'simvastatin', '40 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0046', '6150000000460', true, true),
+  ('e0000000-0000-4000-8000-000000000047', 'Spironolactone', 'spironolactone', '25 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0047', '6150000000477', true, true),
+  ('e0000000-0000-4000-8000-000000000048', 'Clarithromycin', 'clarithromycin', '500 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0048', '6150000000484', true, true),
+  ('e0000000-0000-4000-8000-000000000049', 'Magnesium trisilicate (antacid)', 'antacid', '500 mg', 'tablet', 'Demo Pharma Ltd', 'DEMO-A4-0049', '6150000000491', true, true)
 on conflict (id) do update set barcode = excluded.barcode, generic_name = excluded.generic_name;
+-- Courses that must be finished: antibiotics and antimalarials.
+update drugs set course_required = true where generic_name in ('amoxicillin', 'amoxicillin/clavulanic acid', 'azithromycin', 'metronidazole', 'doxycycline', 'cefuroxime', 'ciprofloxacin', 'clarithromycin', 'artemether/lumefantrine', 'artesunate/amodiaquine', 'sulfadoxine/pyrimethamine');
 -- DEMO-X9-9999 is deliberately NOT in the list: scanning it shows the "not found" warning.
 
--- ---------- interactions ----------
-insert into interactions (drug_a, drug_b, severity, note)
-select * from (values
-  ('ibuprofen', 'lisinopril', 'moderate', 'Ibuprofen can reduce the blood-pressure effect of lisinopril and strain the kidneys. Ask your pharmacist before taking them together.'),
-  ('ibuprofen', 'losartan', 'moderate', 'Ibuprofen can reduce the blood-pressure effect of losartan and strain the kidneys. Ask your pharmacist first.'),
-  ('ciprofloxacin', 'antacids', 'timing', 'Take ciprofloxacin at least 2 hours before or after antacids.'),
-  ('ciprofloxacin', 'dairy', 'timing', 'Keep milk and other dairy 2 hours away from ciprofloxacin.'),
-  ('metformin', 'alcohol', 'caution', 'Alcohol with metformin can lower blood sugar too much. Keep alcohol to a minimum.')
-) as v(a, b, s, n)
-where not exists (select 1 from interactions i where i.drug_a = v.a and i.drug_b = v.b);
+-- ---------- interactions (the ONLY source of interaction rules; the AI never invents one) ----------
+delete from interactions;
+insert into interactions (drug_a_generic, drug_b_generic, severity, message, advice) values
+  ('warfarin', 'aspirin', 'major', 'Warfarin and aspirin together raise the chance of serious bleeding.', 'Do not take them together unless your doctor has planned it. Ask your pharmacist before your next dose.'),
+  ('warfarin', 'nsaid', 'major', 'A painkiller like ibuprofen or diclofenac with warfarin can cause bleeding in the stomach.', 'Use paracetamol for pain instead, and ask your pharmacist.'),
+  ('warfarin', 'ciprofloxacin', 'major', 'Ciprofloxacin makes warfarin stronger and can cause bleeding.', 'Your doctor may need to check your blood (INR). Ask before your next dose.'),
+  ('warfarin', 'metronidazole', 'major', 'Metronidazole makes warfarin stronger and can cause bleeding.', 'Your doctor may need to check your blood (INR). Ask before your next dose.'),
+  ('warfarin', 'clarithromycin', 'major', 'Clarithromycin makes warfarin stronger and can cause bleeding.', 'Ask your pharmacist before your next dose.'),
+  ('warfarin', 'sulfadoxine/pyrimethamine', 'moderate', 'This malaria medicine can make warfarin stronger.', 'Tell your pharmacist; your blood may need checking.'),
+  ('ace_inhibitor', 'potassium_sparing_diuretic', 'major', 'This blood pressure medicine with spironolactone can push potassium too high, which can stop the heart.', 'Do not take both unless your doctor planned it and checks your blood.'),
+  ('arb', 'potassium_sparing_diuretic', 'major', 'This blood pressure medicine with spironolactone can push potassium too high.', 'Do not take both unless your doctor planned it and checks your blood.'),
+  ('ace_inhibitor', 'nsaid', 'moderate', 'A painkiller like ibuprofen or diclofenac can weaken this blood pressure medicine and strain the kidneys.', 'Use paracetamol for pain instead. Ask your pharmacist.'),
+  ('arb', 'nsaid', 'moderate', 'A painkiller like ibuprofen or diclofenac can weaken this blood pressure medicine and strain the kidneys.', 'Use paracetamol for pain instead. Ask your pharmacist.'),
+  ('ciprofloxacin', 'antacid', 'moderate', 'Antacids stop ciprofloxacin from being absorbed, so it may not work.', 'Take ciprofloxacin at least 2 hours before or after the antacid.'),
+  ('ciprofloxacin', 'iron', 'moderate', 'Iron tablets stop ciprofloxacin from being absorbed, so it may not work.', 'Take ciprofloxacin at least 2 hours before or after the iron.'),
+  ('doxycycline', 'antacid', 'moderate', 'Antacids stop doxycycline from being absorbed, so it may not work.', 'Take doxycycline at least 2 hours before or after the antacid.'),
+  ('doxycycline', 'iron', 'moderate', 'Iron tablets stop doxycycline from being absorbed.', 'Take doxycycline at least 2 hours before or after the iron.'),
+  ('artemether/lumefantrine', 'halofantrine', 'major', 'These two malaria medicines together can cause a dangerous heart rhythm.', 'Do not take them together. Ask your pharmacist.'),
+  ('artemether/lumefantrine', 'clarithromycin', 'major', 'Clarithromycin with this malaria medicine can cause a dangerous heart rhythm.', 'Do not take them together. Ask your pharmacist.'),
+  ('artemether/lumefantrine', 'fluoxetine', 'moderate', 'Fluoxetine can raise the level of this malaria medicine.', 'Tell your pharmacist; they may change the timing.'),
+  ('azithromycin', 'amitriptyline', 'moderate', 'Azithromycin with amitriptyline can affect the heart rhythm.', 'Tell your pharmacist before you start.'),
+  ('clarithromycin', 'simvastatin', 'major', 'Clarithromycin raises simvastatin to a level that can damage muscles.', 'Stop the statin while on clarithromycin, or ask your pharmacist for another antibiotic.'),
+  ('clarithromycin', 'atorvastatin', 'moderate', 'Clarithromycin raises atorvastatin and can cause muscle pain.', 'Tell your pharmacist; the statin dose may need a pause.'),
+  ('amlodipine', 'simvastatin', 'moderate', 'Amlodipine raises simvastatin; a high statin dose can damage muscles.', 'Keep simvastatin at 20 mg or less with amlodipine. Ask your pharmacist.'),
+  ('metformin', 'alcohol', 'moderate', 'Alcohol with metformin can lower blood sugar too much and strain the body.', 'Keep alcohol to a minimum, and never drink on an empty stomach.'),
+  ('sildenafil', 'nitrate', 'major', 'Sildenafil with a nitrate (such as GTN or isosorbide) can drop blood pressure to a dangerous level.', 'Never take them together. Ask your pharmacist.'),
+  ('glibenclamide', 'ciprofloxacin', 'moderate', 'Ciprofloxacin can make glibenclamide drop your sugar too low.', 'Watch for shaking, sweating or dizziness; keep sugar nearby. Tell your pharmacist.'),
+  ('gliclazide', 'ciprofloxacin', 'moderate', 'Ciprofloxacin can make gliclazide drop your sugar too low.', 'Watch for shaking, sweating or dizziness; keep sugar nearby. Tell your pharmacist.'),
+  ('sertraline', 'nsaid', 'moderate', 'Sertraline with a painkiller like ibuprofen raises the chance of stomach bleeding.', 'Use paracetamol for pain instead. Ask your pharmacist.'),
+  ('aspirin', 'ibuprofen', 'moderate', 'Ibuprofen can stop low-dose aspirin from protecting the heart and adds stomach risk.', 'Use paracetamol for pain instead, or take ibuprofen 8 hours before the aspirin.'),
+  ('prednisolone', 'nsaid', 'moderate', 'Prednisolone with a painkiller like ibuprofen raises the chance of a stomach ulcer.', 'Use paracetamol for pain instead. Ask your pharmacist.'),
+  ('clarithromycin', 'statin', 'moderate', 'Clarithromycin raises statin levels and can cause muscle pain.', 'Tell your pharmacist; the statin may need a pause.');
 
 -- ---------- conditions and allergies ----------
 insert into conditions (patient_id, hospital_id, name, noted_by, started_on)
-select p.id, p.hospital_id, c.name, 'b0000000-0000-4000-8000-000000000102', current_date - 365
+select p.id, p.hospital_id, c.name, 'b0000000-0000-4000-8000-000000000102', pg_temp.lagos_today() - 365
 from seed_people p
 join (values
   ('AH-0001', 'Hypertension'), ('AH-0001', 'Type 2 diabetes'),
@@ -190,30 +221,51 @@ where not exists (select 1 from allergies where patient_id = 'c0000000-0000-4000
 
 -- ---------- prescriptions ----------
 insert into prescriptions (id, patient_id, hospital_id, drug_id, drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, pill_shape, pill_color, quantity_dispensed, source, status, verified_by, verified_at, confirmed_by_patient, created_by, started_on) values
-  ('f0000000-0000-4000-8000-000000000001', 'c0000000-0000-4000-8000-000000000301', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000001', 'Amlodipine', '5 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d.', 'Take one tablet every morning.', 'round', '#E05A5A', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000104', current_date - 60),
-  ('f0000000-0000-4000-8000-000000000002', 'c0000000-0000-4000-8000-000000000301', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000002', 'Metformin', '500 mg', 'tablet', '1 tablet', 2, null, 'after', '1 tab b.d. p.c.', 'Take one tablet after breakfast and one after dinner.', 'round', '#F2F2F2', 60, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000104', current_date - 25),
-  ('f0000000-0000-4000-8000-000000000003', 'c0000000-0000-4000-8000-000000000302', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000004', 'Lisinopril', '10 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d.', 'Take one tablet every morning.', 'oval', '#F2C94C', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000104', current_date - 28),
-  ('f0000000-0000-4000-8000-000000000004', 'c0000000-0000-4000-8000-000000000303', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000005', 'Artemether-lumefantrine', '80/480 mg', 'tablet', '1 tablet', 2, 3, 'after', '1 tab b.d. x 3/7 p.c.', 'Take one tablet after food, morning and evening, for three days.', 'oval', '#F2C94C', 6, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000104', current_date - 1),
-  ('f0000000-0000-4000-8000-000000000005', 'c0000000-0000-4000-8000-000000000304', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000006', 'Omeprazole', '20 mg', 'capsule', '1 capsule', 1, null, 'before', '1 cap o.d. a.c.', 'Take one capsule before breakfast.', 'capsule', '#7B61FF', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000102', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000102', current_date - 20),
-  ('f0000000-0000-4000-8000-000000000006', 'c0000000-0000-4000-8000-000000000305', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000007', 'Losartan', '50 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d.', 'Take one tablet every morning.', 'round', '#FFFFFF', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000103', current_date - 40),
-  ('f0000000-0000-4000-8000-000000000007', 'c0000000-0000-4000-8000-000000000306', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000008', 'Budesonide', '200 mcg', 'inhaler', '2 puffs', 2, null, 'any', '2 puffs b.d.', 'Two puffs in the morning and two at night.', 'inhaler', '#8B5E3C', 200, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000102', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000102', current_date - 45),
-  ('f0000000-0000-4000-8000-000000000008', 'c0000000-0000-4000-8000-000000000306', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000009', 'Salbutamol', '100 mcg', 'inhaler', '2 puffs when needed', 1, null, 'any', '2 puffs p.r.n.', 'Two puffs when you feel short of breath.', 'inhaler', '#2F80ED', 200, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000102', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000102', current_date - 45),
-  ('f0000000-0000-4000-8000-000000000009', 'c0000000-0000-4000-8000-000000000307', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000010', 'Sertraline', '50 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d.', 'Take one tablet every morning.', 'round', '#F2F2F2', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000102', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000102', current_date - 30),
-  ('f0000000-0000-4000-8000-000000000010', 'c0000000-0000-4000-8000-000000000308', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000003', 'Metformin', '1000 mg', 'tablet', '1 tablet', 2, null, 'after', '1 tab b.d. p.c.', 'Take one tablet after breakfast and one after dinner.', 'oval', '#F2F2F2', 60, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000103', current_date - 15),
-  ('f0000000-0000-4000-8000-000000000011', 'c0000000-0000-4000-8000-000000000308', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000011', 'Glibenclamide', '5 mg', 'tablet', '1 tablet', 1, null, 'before', '1 tab o.d. a.c.', 'Take one tablet before breakfast.', 'round', '#6FCF97', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000103', current_date - 15),
-  ('f0000000-0000-4000-8000-000000000012', 'c0000000-0000-4000-8000-000000000309', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000012', 'Ciprofloxacin', '500 mg', 'tablet', '1 tablet', 2, 7, 'any', '1 tab b.d. x 7/7', 'Take one tablet morning and evening for seven days. Keep milk two hours away.', 'oval', '#F2F2F2', 14, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000105', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000105', current_date - 2),
-  ('f0000000-0000-4000-8000-000000000013', 'c0000000-0000-4000-8000-000000000310', 'a0000000-0000-4000-8000-000000000002', 'e0000000-0000-4000-8000-000000000013', 'Paracetamol', '1 g', 'tablet', '2 tablets', 3, null, 'any', '1 g t.d.s. p.r.n.', 'Two tablets up to three times a day when the pain is bad.', 'round', '#FFFFFF', 60, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000203', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000203', current_date - 30)
+  ('f0000000-0000-4000-8000-000000000001', 'c0000000-0000-4000-8000-000000000301', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000001', 'Amlodipine', '5 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d.', 'Take one tablet every morning.', 'round', '#E05A5A', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 60),
+  ('f0000000-0000-4000-8000-000000000002', 'c0000000-0000-4000-8000-000000000301', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000002', 'Metformin', '500 mg', 'tablet', '1 tablet', 2, null, 'after', '1 tab b.d. p.c.', 'Take one tablet after breakfast and one after dinner.', 'round', '#F2F2F2', 60, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 25),
+  ('f0000000-0000-4000-8000-000000000003', 'c0000000-0000-4000-8000-000000000302', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000004', 'Lisinopril', '10 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d.', 'Take one tablet every morning.', 'oval', '#F2C94C', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 28),
+  ('f0000000-0000-4000-8000-000000000004', 'c0000000-0000-4000-8000-000000000303', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000005', 'Artemether-lumefantrine', '80/480 mg', 'tablet', '1 tablet', 2, 3, 'after', '1 tab b.d. x 3/7 p.c.', 'Take one tablet after food, morning and evening, for three days.', 'oval', '#F2C94C', 6, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '2 days', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 2),
+  ('f0000000-0000-4000-8000-000000000005', 'c0000000-0000-4000-8000-000000000304', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000006', 'Omeprazole', '20 mg', 'capsule', '1 capsule', 1, null, 'before', '1 cap o.d. a.c.', 'Take one capsule before breakfast.', 'capsule', '#7B61FF', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000102', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000102', pg_temp.lagos_today() - 20),
+  ('f0000000-0000-4000-8000-000000000006', 'c0000000-0000-4000-8000-000000000305', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000007', 'Losartan', '50 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d.', 'Take one tablet every morning.', 'round', '#FFFFFF', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000103', pg_temp.lagos_today() - 40),
+  ('f0000000-0000-4000-8000-000000000007', 'c0000000-0000-4000-8000-000000000306', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000008', 'Budesonide', '200 mcg', 'inhaler', '2 puffs', 2, null, 'any', '2 puffs b.d.', 'Two puffs in the morning and two at night.', 'inhaler', '#8B5E3C', 200, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000102', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000102', pg_temp.lagos_today() - 45),
+  ('f0000000-0000-4000-8000-000000000008', 'c0000000-0000-4000-8000-000000000306', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000009', 'Salbutamol', '100 mcg', 'inhaler', '2 puffs when needed', 1, null, 'any', '2 puffs p.r.n.', 'Two puffs when you feel short of breath.', 'inhaler', '#2F80ED', 200, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000102', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000102', pg_temp.lagos_today() - 45),
+  ('f0000000-0000-4000-8000-000000000009', 'c0000000-0000-4000-8000-000000000307', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000010', 'Sertraline', '50 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d.', 'Take one tablet every morning.', 'round', '#F2F2F2', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000102', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000102', pg_temp.lagos_today() - 30),
+  ('f0000000-0000-4000-8000-000000000010', 'c0000000-0000-4000-8000-000000000308', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000003', 'Metformin', '1000 mg', 'tablet', '1 tablet', 2, null, 'after', '1 tab b.d. p.c.', 'Take one tablet after breakfast and one after dinner.', 'oval', '#F2F2F2', 60, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000103', pg_temp.lagos_today() - 15),
+  ('f0000000-0000-4000-8000-000000000011', 'c0000000-0000-4000-8000-000000000308', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000011', 'Glibenclamide', '5 mg', 'tablet', '1 tablet', 1, null, 'before', '1 tab o.d. a.c.', 'Take one tablet before breakfast.', 'round', '#6FCF97', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000103', pg_temp.lagos_today() - 15),
+  ('f0000000-0000-4000-8000-000000000012', 'c0000000-0000-4000-8000-000000000309', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000012', 'Ciprofloxacin', '500 mg', 'tablet', '1 tablet', 2, 7, 'any', '1 tab b.d. x 7/7', 'Take one tablet morning and evening for seven days. Keep milk two hours away.', 'oval', '#F2F2F2', 14, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000105', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000105', pg_temp.lagos_today() - 2),
+  -- Aisha: Amoxicillin course, day 3 of 5, on track (every dose taken; see the dose-log fix-up below).
+  ('f0000000-0000-4000-8000-000000000014', 'c0000000-0000-4000-8000-000000000306', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000015', 'Amoxicillin', '500 mg', 'capsule', '1 capsule', 3, 5, 'after', '1 cap t.d.s. x 5/7 p.c.', 'Take 1 capsule 3 times a day, after food, for 5 days, at 08:00, 14:00, 20:00.', 'capsule', '#E05A5A', 15, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '2 days', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 2),
+  -- Yusuf: warfarin + aspirin, the major interaction for the demo (alert seeded below).
+  ('f0000000-0000-4000-8000-000000000015', 'c0000000-0000-4000-8000-000000000308', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000045', 'Warfarin', '5 mg', 'tablet', '1 tablet', 1, null, 'any', '1 tab o.d. nocte', 'Take 1 tablet once a day, at 20:00.', 'round', '#F2C94C', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '10 days', false, 'b0000000-0000-4000-8000-000000000103', pg_temp.lagos_today() - 10),
+  ('f0000000-0000-4000-8000-000000000016', 'c0000000-0000-4000-8000-000000000308', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000028', 'Aspirin', '75 mg', 'tablet', '1 tablet', 1, null, 'after', '1 tab o.d. p.c.', 'Take 1 tablet once a day, after food, at 08:00.', 'round', '#FFFFFF', 30, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '3 days', false, 'b0000000-0000-4000-8000-000000000103', pg_temp.lagos_today() - 3),
+  -- Finished courses for the "courses completed" figure (8 finished, 6 completed → 75%; dose-log fix-ups below).
+  ('f0000000-0000-4000-8000-000000000018', 'c0000000-0000-4000-8000-000000000301', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000015', 'Amoxicillin', '500 mg', 'capsule', '1 capsule', 3, 5, 'after', '1 cap t.d.s. x 5/7', 'Take 1 capsule 3 times a day, after food, for 5 days.', 'capsule', '#E05A5A', 15, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '20 days', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 20),
+  ('f0000000-0000-4000-8000-000000000019', 'c0000000-0000-4000-8000-000000000302', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000005', 'Artemether-lumefantrine', '80/480 mg', 'tablet', '1 tablet', 2, 3, 'after', '1 tab b.d. x 3/7', 'Take 1 tablet twice a day, after food, for 3 days.', 'oval', '#F2C94C', 6, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '15 days', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 15),
+  ('f0000000-0000-4000-8000-000000000020', 'c0000000-0000-4000-8000-000000000304', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000018', 'Metronidazole', '400 mg', 'tablet', '1 tablet', 2, 5, 'after', '1 tab b.d. x 5/7', 'Take 1 tablet twice a day, after food, for 5 days.', 'round', '#FFFFFF', 10, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000105', now() - interval '25 days', false, 'b0000000-0000-4000-8000-000000000105', pg_temp.lagos_today() - 25),
+  ('f0000000-0000-4000-8000-000000000021', 'c0000000-0000-4000-8000-000000000305', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000012', 'Ciprofloxacin', '500 mg', 'tablet', '1 tablet', 2, 5, 'any', '1 tab b.d. x 5/7', 'Take 1 tablet twice a day, for 5 days.', 'oval', '#F2F2F2', 10, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '18 days', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 18),
+  ('f0000000-0000-4000-8000-000000000022', 'c0000000-0000-4000-8000-000000000309', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000021', 'Artesunate-amodiaquine', '100/270 mg', 'tablet', '1 tablet', 1, 3, 'after', '1 tab o.d. x 3/7', 'Take 1 tablet once a day, after food, for 3 days.', 'oval', '#F2C94C', 3, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000105', now() - interval '12 days', false, 'b0000000-0000-4000-8000-000000000105', pg_temp.lagos_today() - 12),
+  ('f0000000-0000-4000-8000-000000000023', 'c0000000-0000-4000-8000-000000000308', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000019', 'Doxycycline', '100 mg', 'capsule', '1 capsule', 1, 7, 'after', '1 cap o.d. x 7/7', 'Take 1 capsule once a day, after food, for 7 days.', 'capsule', '#F2C94C', 7, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000103', now() - interval '27 days', false, 'b0000000-0000-4000-8000-000000000103', pg_temp.lagos_today() - 27),
+  ('f0000000-0000-4000-8000-000000000024', 'c0000000-0000-4000-8000-000000000306', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000017', 'Azithromycin', '500 mg', 'tablet', '1 tablet', 1, 3, 'any', '1 tab o.d. x 3/7', 'Take 1 tablet once a day, for 3 days.', 'oval', '#F2F2F2', 3, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '10 days', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 10),
+  -- Ifeoma: a finished Azithromycin course, completed (for the "courses completed" figure).
+  ('f0000000-0000-4000-8000-000000000017', 'c0000000-0000-4000-8000-000000000307', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000017', 'Azithromycin', '500 mg', 'tablet', '1 tablet', 1, 3, 'any', '1 tab o.d. x 3/7', 'Take 1 tablet once a day, for 3 days, at 08:00.', 'oval', '#F2F2F2', 3, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000104', now() - interval '6 days', false, 'b0000000-0000-4000-8000-000000000104', pg_temp.lagos_today() - 6),
+  ('f0000000-0000-4000-8000-000000000013', 'c0000000-0000-4000-8000-000000000310', 'a0000000-0000-4000-8000-000000000002', 'e0000000-0000-4000-8000-000000000013', 'Paracetamol', '1 g', 'tablet', '2 tablets', 3, null, 'any', '1 g t.d.s. p.r.n.', 'Two tablets up to three times a day when the pain is bad.', 'round', '#FFFFFF', 60, 'hospital', 'verified', 'b0000000-0000-4000-8000-000000000203', now() - interval '1 day', false, 'b0000000-0000-4000-8000-000000000203', pg_temp.lagos_today() - 30)
 on conflict (id) do nothing;
+
+update prescriptions p set course_required = true from drugs d where d.id = p.drug_id and d.course_required and p.duration_days is not null and p.id::text like 'f0000000-%';
+-- Finished courses leave the patient's active list.
+update prescriptions set active = false where id in ('f0000000-0000-4000-8000-000000000017', 'f0000000-0000-4000-8000-000000000018', 'f0000000-0000-4000-8000-000000000019', 'f0000000-0000-4000-8000-000000000020', 'f0000000-0000-4000-8000-000000000021', 'f0000000-0000-4000-8000-000000000022', 'f0000000-0000-4000-8000-000000000023', 'f0000000-0000-4000-8000-000000000024');
 
 -- Patient entries waiting for a pharmacist (BUILD_PLAN "Verification queue"): what the reader saw is kept in ai_prefill.
 insert into prescriptions (id, patient_id, hospital_id, drug_id, drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, pill_shape, pill_color, quantity_dispensed, source, status, confirmed_by_patient, created_by, nafdac_no, manufacturer, check_result, expiry_date, batch_no, ai_prefill, started_on) values
-  ('f0000000-0000-4000-8000-000000000101', 'c0000000-0000-4000-8000-000000000304', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000015', 'Amoxicillin', '500 mg', 'capsule', '1 capsule', 3, 5, 'after', 'Pharmacist said one capsule three times a day after food for five days', 'Take 1 capsule 3 times a day, after food, for 5 days, at 08:00, 14:00, 20:00.', 'capsule', '#E05A5A', 15, 'self', 'pending', true, 'c0000000-0000-4000-8000-000000000304', 'DEMO-A4-0015', 'Demo Pharma Ltd', 'registered', current_date + 400, 'B2026-07',
-   '{"pack":{"drug_name":{"value":"Amoxicillin","confidence":0.96},"strength":{"value":"500 mg","confidence":0.93},"form":{"value":"capsule","confidence":0.9},"nafdac_no":{"value":"DEMO-A4-0015","confidence":0.88},"manufacturer":{"value":"Demo Pharma Ltd","confidence":0.85},"batch_no":{"value":"B2026-07","confidence":0.8},"expiry_date":{"value":"2027-12-31","confidence":0.82},"barcode":{"value":"6150000000156","confidence":0.7},"dosage":null,"confidence":0.9},"read_at":"2026-11-20T08:00:00Z"}'::jsonb, current_date),
-  ('f0000000-0000-4000-8000-000000000102', 'c0000000-0000-4000-8000-000000000305', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000013', 'Paracetamol', '500 mg', 'tablet', '2 tablets', 3, null, 'any', 'Two tablets when the headache is bad', 'Take 2 tablets 3 times a day, at 08:00, 14:00, 20:00.', 'round', '#FFFFFF', 24, 'self', 'pending', true, 'c0000000-0000-4000-8000-000000000305', 'DEMO-A4-0013', 'Demo Pharma Ltd', 'registered', current_date + 300, 'PCM-4411',
-   '{"pack":{"drug_name":{"value":"Paracetamol","confidence":0.97},"strength":{"value":"500 mg","confidence":0.95},"form":{"value":"tablet","confidence":0.92},"nafdac_no":{"value":"DEMO-A4-0013","confidence":0.9},"manufacturer":{"value":"Demo Pharma Ltd","confidence":0.86},"batch_no":{"value":"PCM-4411","confidence":0.75},"expiry_date":{"value":"2027-08-31","confidence":0.8},"barcode":{"value":null,"confidence":0},"dosage":null,"confidence":0.91},"read_at":"2026-11-20T09:30:00Z"}'::jsonb, current_date - 1),
-  ('f0000000-0000-4000-8000-000000000103', 'c0000000-0000-4000-8000-000000000301', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000027', 'Atorvastatin', '20 mg', 'tablet', '1 tablet', 1, null, 'any', 'Doctor said one at night', 'Take 1 tablet once a day, at 21:00.', 'oval', '#F2F2F2', 30, 'self', 'pending', true, 'c0000000-0000-4000-8000-000000000301', 'DEMO-A4-0027', 'Demo Pharma Ltd', 'registered', current_date + 500, 'ATV-0912',
-   '{"pack":{"drug_name":{"value":"Atorvastatin","confidence":0.94},"strength":{"value":"20 mg","confidence":0.9},"form":{"value":"tablet","confidence":0.88},"nafdac_no":{"value":"DEMO-A4-0027","confidence":0.84},"manufacturer":{"value":"Demo Pharma Ltd","confidence":0.8},"batch_no":{"value":"ATV-0912","confidence":0.7},"expiry_date":{"value":"2028-03-31","confidence":0.78},"barcode":{"value":"6150000000279","confidence":0.65},"dosage":null,"confidence":0.87},"read_at":"2026-11-20T10:15:00Z"}'::jsonb, current_date - 2)
+  ('f0000000-0000-4000-8000-000000000101', 'c0000000-0000-4000-8000-000000000304', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000015', 'Amoxicillin', '500 mg', 'capsule', '1 capsule', 3, 5, 'after', 'Pharmacist said one capsule three times a day after food for five days', 'Take 1 capsule 3 times a day, after food, for 5 days, at 08:00, 14:00, 20:00.', 'capsule', '#E05A5A', 15, 'self', 'pending', true, 'c0000000-0000-4000-8000-000000000304', 'DEMO-A4-0015', 'Demo Pharma Ltd', 'registered', pg_temp.lagos_today() + 400, 'B2026-07',
+   '{"pack":{"drug_name":{"value":"Amoxicillin","confidence":0.96},"strength":{"value":"500 mg","confidence":0.93},"form":{"value":"capsule","confidence":0.9},"nafdac_no":{"value":"DEMO-A4-0015","confidence":0.88},"manufacturer":{"value":"Demo Pharma Ltd","confidence":0.85},"batch_no":{"value":"B2026-07","confidence":0.8},"expiry_date":{"value":"2027-12-31","confidence":0.82},"barcode":{"value":"6150000000156","confidence":0.7},"dosage":null,"confidence":0.9},"read_at":"2026-11-20T08:00:00Z"}'::jsonb, pg_temp.lagos_today()),
+  ('f0000000-0000-4000-8000-000000000102', 'c0000000-0000-4000-8000-000000000305', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000013', 'Paracetamol', '500 mg', 'tablet', '2 tablets', 3, null, 'any', 'Two tablets when the headache is bad', 'Take 2 tablets 3 times a day, at 08:00, 14:00, 20:00.', 'round', '#FFFFFF', 24, 'self', 'pending', true, 'c0000000-0000-4000-8000-000000000305', 'DEMO-A4-0013', 'Demo Pharma Ltd', 'registered', pg_temp.lagos_today() + 300, 'PCM-4411',
+   '{"pack":{"drug_name":{"value":"Paracetamol","confidence":0.97},"strength":{"value":"500 mg","confidence":0.95},"form":{"value":"tablet","confidence":0.92},"nafdac_no":{"value":"DEMO-A4-0013","confidence":0.9},"manufacturer":{"value":"Demo Pharma Ltd","confidence":0.86},"batch_no":{"value":"PCM-4411","confidence":0.75},"expiry_date":{"value":"2027-08-31","confidence":0.8},"barcode":{"value":null,"confidence":0},"dosage":null,"confidence":0.91},"read_at":"2026-11-20T09:30:00Z"}'::jsonb, pg_temp.lagos_today() - 1),
+  ('f0000000-0000-4000-8000-000000000103', 'c0000000-0000-4000-8000-000000000301', 'a0000000-0000-4000-8000-000000000001', 'e0000000-0000-4000-8000-000000000027', 'Atorvastatin', '20 mg', 'tablet', '1 tablet', 1, null, 'any', 'Doctor said one at night', 'Take 1 tablet once a day, at 21:00.', 'oval', '#F2F2F2', 30, 'self', 'pending', true, 'c0000000-0000-4000-8000-000000000301', 'DEMO-A4-0027', 'Demo Pharma Ltd', 'registered', pg_temp.lagos_today() + 500, 'ATV-0912',
+   '{"pack":{"drug_name":{"value":"Atorvastatin","confidence":0.94},"strength":{"value":"20 mg","confidence":0.9},"form":{"value":"tablet","confidence":0.88},"nafdac_no":{"value":"DEMO-A4-0027","confidence":0.84},"manufacturer":{"value":"Demo Pharma Ltd","confidence":0.8},"batch_no":{"value":"ATV-0912","confidence":0.7},"expiry_date":{"value":"2028-03-31","confidence":0.78},"barcode":{"value":"6150000000279","confidence":0.65},"dosage":null,"confidence":0.87},"read_at":"2026-11-20T10:15:00Z"}'::jsonb, pg_temp.lagos_today() - 2)
 on conflict (id) do nothing;
+
+update prescriptions set course_required = true where id = 'f0000000-0000-4000-8000-000000000101';
 
 -- ---------- reminders: 1/day 08:00 · 2/day 08:00 + 20:00 · 3/day 08:00 + 14:00 + 20:00 ----------
 insert into reminders (prescription_id, patient_id, time_of_day, channel)
@@ -251,10 +303,10 @@ begin
      where p.status in ('verified', 'edited')
   loop
     for d in reverse 29..0 loop
-      sched := ((current_date - d)::timestamp + r.time_of_day) at time zone 'Africa/Lagos';
+      sched := ((pg_temp.lagos_today() - d)::timestamp + r.time_of_day) at time zone 'Africa/Lagos';
       continue when sched > now();
-      continue when (current_date - d) < r.started_on;
-      continue when r.duration_days is not null and (current_date - d) >= r.started_on + r.duration_days;
+      continue when (pg_temp.lagos_today() - d) < r.started_on;
+      continue when r.duration_days is not null and (pg_temp.lagos_today() - d) >= r.started_on + r.duration_days;
       roll := random();
       if r.adherence = 'good' then
         st := case when roll < 0.95 then 'taken' when roll < 0.98 then 'late' else 'missed' end;
@@ -275,25 +327,39 @@ begin
     end loop;
   end loop;
 end $$;
+-- Finish-your-course demo. Completed = finished with at most 1 missed dose (6 of the 8 finished courses):
+update dose_logs set status = 'taken', logged_at = scheduled_at + interval '10 minutes'
+ where reminder_id in (select id from reminders where prescription_id in (
+   'f0000000-0000-4000-8000-000000000014', 'f0000000-0000-4000-8000-000000000017', 'f0000000-0000-4000-8000-000000000018', 'f0000000-0000-4000-8000-000000000020',
+   'f0000000-0000-4000-8000-000000000022', 'f0000000-0000-4000-8000-000000000023', 'f0000000-0000-4000-8000-000000000024', 'f0000000-0000-4000-8000-000000000019', 'f0000000-0000-4000-8000-000000000021'));
+-- One missed dose still counts as completed (Bisi, Yusuf); three missed does not (Nkechi, Chukwudi).
+update dose_logs set status = 'missed', logged_at = null where id in (select dl.id from dose_logs dl join reminders r on r.id = dl.reminder_id where r.prescription_id = 'f0000000-0000-4000-8000-000000000022' order by dl.scheduled_at limit 1);
+update dose_logs set status = 'missed', logged_at = null where id in (select dl.id from dose_logs dl join reminders r on r.id = dl.reminder_id where r.prescription_id = 'f0000000-0000-4000-8000-000000000023' order by dl.scheduled_at limit 1);
+update dose_logs set status = 'missed', logged_at = null where id in (select dl.id from dose_logs dl join reminders r on r.id = dl.reminder_id where r.prescription_id = 'f0000000-0000-4000-8000-000000000019' order by dl.scheduled_at limit 3);
+update dose_logs set status = 'missed', logged_at = null where id in (select dl.id from dose_logs dl join reminders r on r.id = dl.reminder_id where r.prescription_id = 'f0000000-0000-4000-8000-000000000021' order by dl.scheduled_at limit 3);
+-- Musa missed the first two of his malaria course (at risk).
+update dose_logs set status = 'missed', logged_at = scheduled_at + interval '3 hours'
+ where id in (select dl.id from dose_logs dl join reminders r on r.id = dl.reminder_id
+               where r.prescription_id = 'f0000000-0000-4000-8000-000000000004' order by dl.scheduled_at limit 2);
 
 -- ---------- check-ins ----------
 delete from checkins where patient_id in (select id from seed_people where role = 'patient');
 insert into checkins (patient_id, transcript, mood, side_effects, created_at)
 select sp.id, 'I am fine today.', case when random() < 0.7 then 'good' else 'okay' end, '[]'::jsonb,
-       (current_date - g.d)::timestamp + time '19:30'
+       (pg_temp.lagos_today() - g.d)::timestamp + time '19:30'
 from seed_people sp, generate_series(0, 13, 2) as g(d)
 where sp.role = 'patient';
 -- Ifeoma: low mood on 5 of the last 7 days.
 update checkins set mood = 'low', transcript = 'I did not feel like getting up today.'
- where patient_id = 'c0000000-0000-4000-8000-000000000307' and created_at >= current_date - 6;
+ where patient_id = 'c0000000-0000-4000-8000-000000000307' and created_at >= pg_temp.lagos_today() - 6;
 insert into checkins (patient_id, transcript, mood, side_effects, created_at)
-select 'c0000000-0000-4000-8000-000000000307', 'Still feeling low.', 'low', '[]'::jsonb, (current_date - d)::timestamp + time '19:30'
+select 'c0000000-0000-4000-8000-000000000307', 'Still feeling low.', 'low', '[]'::jsonb, (pg_temp.lagos_today() - d)::timestamp + time '19:30'
 from unnest(array[1, 3, 5]) as d
-where not exists (select 1 from checkins c where c.patient_id = 'c0000000-0000-4000-8000-000000000307' and c.created_at::date = current_date - d);
+where not exists (select 1 from checkins c where c.patient_id = 'c0000000-0000-4000-8000-000000000307' and c.created_at::date = pg_temp.lagos_today() - d);
 -- Chukwudi: dizziness twice this week.
 insert into checkins (patient_id, transcript, mood, side_effects, created_at) values
-  ('c0000000-0000-4000-8000-000000000305', 'I have been feeling dizzy since morning.', 'okay', '["dizziness"]'::jsonb, (current_date - 1)::timestamp + time '10:15'),
-  ('c0000000-0000-4000-8000-000000000305', 'The dizziness came back a little.', 'okay', '["dizziness"]'::jsonb, (current_date - 4)::timestamp + time '09:40');
+  ('c0000000-0000-4000-8000-000000000305', 'I have been feeling dizzy since morning.', 'okay', '["dizziness"]'::jsonb, (pg_temp.lagos_today() - 1)::timestamp + time '10:15'),
+  ('c0000000-0000-4000-8000-000000000305', 'The dizziness came back a little.', 'okay', '["dizziness"]'::jsonb, (pg_temp.lagos_today() - 4)::timestamp + time '09:40');
 
 -- ---------- alerts the dashboards show on day one ----------
 insert into alerts (patient_id, hospital_id, type, detail)
@@ -301,9 +367,13 @@ select * from (values
   ('c0000000-0000-4000-8000-000000000305'::uuid, 'a0000000-0000-4000-8000-000000000001'::uuid, 'side_effect'::alert_type_t, 'Chukwudi Agu reported dizziness twice this week (losartan).'),
   ('c0000000-0000-4000-8000-000000000302'::uuid, 'a0000000-0000-4000-8000-000000000001'::uuid, 'missed_doses'::alert_type_t, 'Nkechi Okeke missed most lisinopril doses in the last 3 days.'),
   ('c0000000-0000-4000-8000-000000000302'::uuid, 'a0000000-0000-4000-8000-000000000001'::uuid, 'high_risk'::alert_type_t, 'Adherence risk high (78).'),
-  ('c0000000-0000-4000-8000-000000000305'::uuid, 'a0000000-0000-4000-8000-000000000001'::uuid, 'high_risk'::alert_type_t, 'Adherence risk high (74).')
+  ('c0000000-0000-4000-8000-000000000305'::uuid, 'a0000000-0000-4000-8000-000000000001'::uuid, 'high_risk'::alert_type_t, 'Adherence risk high (74).'),
+  ('c0000000-0000-4000-8000-000000000308'::uuid, 'a0000000-0000-4000-8000-000000000001'::uuid, 'interaction'::alert_type_t, 'Major interaction: Aspirin with Warfarin. Warfarin and aspirin together raise the chance of serious bleeding.'),
+  ('c0000000-0000-4000-8000-000000000303'::uuid, 'a0000000-0000-4000-8000-000000000001'::uuid, 'course_at_risk'::alert_type_t, 'Course at risk: Musa Abdullahi has missed 2 doses of Artemether-lumefantrine 80/480 mg (day 3 of 3).')
 ) as v(patient_id, hospital_id, type, detail)
 where not exists (select 1 from alerts a where a.patient_id = v.patient_id and a.type = v.type);
+update alerts set prescription_id = 'f0000000-0000-4000-8000-000000000016' where type = 'interaction' and patient_id = 'c0000000-0000-4000-8000-000000000308' and prescription_id is null;
+update alerts set prescription_id = 'f0000000-0000-4000-8000-000000000004' where type = 'course_at_risk' and patient_id = 'c0000000-0000-4000-8000-000000000303' and prescription_id is null;
 
 -- ---------- risk scores ----------
 insert into risk_scores (patient_id, score, band)
@@ -327,9 +397,9 @@ insert into refills (prescription_id, patient_id, quantity_dispensed, doses_per_
 select p.id, p.patient_id, p.quantity_dispensed, p.frequency_per_day,
        case when p.dose like '2 %' then 2 else 1 end,
        case p.id
-         when 'f0000000-0000-4000-8000-000000000003' then current_date - 28   -- Nkechi lisinopril: 2 days left
-         when 'f0000000-0000-4000-8000-000000000002' then current_date - 25   -- Emeka metformin: 5 days left
-         else greatest(p.started_on, current_date - 10) end
+         when 'f0000000-0000-4000-8000-000000000003' then pg_temp.lagos_today() - 28   -- Nkechi lisinopril: 2 days left
+         when 'f0000000-0000-4000-8000-000000000002' then pg_temp.lagos_today() - 25   -- Emeka metformin: 5 days left
+         else greatest(p.started_on, pg_temp.lagos_today() - 10) end
 from prescriptions p
 where p.id::text like 'f0000000-%' and p.quantity_dispensed is not null and p.status <> 'rejected'
   and not exists (select 1 from refills r where r.prescription_id = p.id);

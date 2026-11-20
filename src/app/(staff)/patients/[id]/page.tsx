@@ -9,6 +9,8 @@ import { ButtonLink, Card, SectionLabel } from "@/components/ui";
 import type { PrescriptionSource, PrescriptionStatus } from "@/lib/db/types";
 import { requireRole, staffRoles } from "@/lib/auth/dal";
 import { createClient } from "@/lib/db/server";
+import { loadCourses } from "@/lib/course";
+import { AlertIcon } from "@/components/icons";
 import type { DrugCheckResult } from "@/lib/drugcheck";
 
 type Med = { id: string; drug_name: string; strength: string | null; dose: string | null; frequency_per_day: number; pill_shape: PillShape; pill_color: string; check_result: DrugCheckResult | null; source: PrescriptionSource; status: PrescriptionStatus; rejection_reason: string | null; created_at: string };
@@ -23,11 +25,17 @@ export default async function PatientPage({ params }: PageProps<"/patients/[id]"
   const weekAgo = new Date(new Date().getTime() - 7 * 86_400_000).toISOString();
   const { data: patient } = await supabase.from("profiles").select("id,full_name,hospital_number,phone,role").eq("id", id).eq("role", "patient").maybeSingle();
   if (!patient) notFound();
-  const [{ data: meds }, { data: conditions }, { data: logs }] = await Promise.all([
+  const [{ data: meds }, { data: conditions }, { data: logs }, { data: interactionAlerts }, courses] = await Promise.all([
     supabase.from("prescriptions").select("id,drug_name,strength,dose,frequency_per_day,pill_shape,pill_color,check_result,source,status,rejection_reason,created_at").eq("patient_id", id).or("active.eq.true,status.eq.rejected").order("created_at", { ascending: false }),
     supabase.from("conditions").select("id,name").eq("patient_id", id),
     supabase.from("dose_logs").select("status").eq("patient_id", id).gte("scheduled_at", weekAgo),
+    supabase.from("alerts").select("id,detail").eq("patient_id", id).eq("type", "interaction").eq("status", "open"),
+    loadCourses(supabase, { patientId: id }).catch((e) => {
+      console.error("[course]", e);
+      return [];
+    }),
   ]);
+  const interactions = interactionAlerts ?? [];
   const list = (meds ?? []) as Med[];
   const week = logs ?? [];
   const takenPct = week.length ? Math.round((week.filter((l) => l.status === "taken" || l.status === "late").length / week.length) * 100) : null;
@@ -49,8 +57,44 @@ export default async function PatientPage({ params }: PageProps<"/patients/[id]"
             </StatusChip>
           ))}
           {takenPct !== null && <StatusChip tone={takenPct >= 80 ? "success" : "warning"}>{t("weekAdherence", { pct: takenPct })}</StatusChip>}
+          <StatusChip tone={interactions.length ? "danger" : "neutral"}>{t("interactionAlerts", { count: interactions.length })}</StatusChip>
         </div>
       </div>
+
+      {interactions.length > 0 && (
+        <section aria-labelledby="interactions-title" className="space-y-2" data-testid="patient-interactions">
+          <SectionLabel as="h2">
+            <span id="interactions-title">{t("interactionsTitle")}</span>
+          </SectionLabel>
+          <ul className="space-y-2">
+            {interactions.map((a) => (
+              <li key={a.id} className="flex items-start gap-2 rounded-button border-2 border-danger bg-danger-tint p-3 text-base">
+                <AlertIcon size={20} className="mt-0.5 shrink-0 text-danger" />
+                <span>{a.detail}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {courses.length > 0 && (
+        <section aria-labelledby="courses-title" className="space-y-2">
+          <SectionLabel as="h2">
+            <span id="courses-title">{t("courses")}</span>
+          </SectionLabel>
+          <ul className="space-y-2">
+            {courses.map((c) => (
+              <li key={c.prescriptionId} className="flex flex-wrap items-center justify-between gap-2 rounded-button border border-border bg-surface p-3">
+                <span className="font-semibold">
+                  {c.drugName} <span className="font-mono text-sm font-medium text-ink-2">{c.strength}</span>
+                </span>
+                <span className="font-mono text-sm">{t("courseProgress", { day: c.day, total: c.durationDays, missed: c.missed })}</span>
+                <StatusChip tone={c.atRisk ? "warning" : "success"}>{c.atRisk ? t("courseAtRisk") : t("courseOnTrack")}</StatusChip>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section aria-labelledby="meds-title" className="space-y-3">
         <SectionLabel as="h2">

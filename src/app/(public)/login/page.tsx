@@ -5,7 +5,7 @@ import { FormPage } from "@/components/forms";
 import { HospitalHeader } from "@/components/HospitalHeader";
 import { SetupNotice } from "@/components/SetupNotice";
 import { getSession } from "@/lib/auth/dal";
-import { isServiceRoleConfigured } from "@/lib/db/env";
+import { isServiceRoleConfigured } from "@/lib/db/secrets";
 import { homeForRole } from "@/lib/db/types";
 
 export default async function LoginPage({ searchParams }: PageProps<"/login">) {

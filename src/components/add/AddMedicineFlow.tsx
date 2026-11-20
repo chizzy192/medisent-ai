@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { tr } from "@/lib/strings";
 import type { ScanResponse } from "@/app/api/scan/route";
 import { addMyMedicine } from "@/app/(patient)/add/actions";
+import { previewInteractions } from "@/app/formulary/actions";
+import type { InteractionHit } from "@/lib/interactions";
+import { InteractionCards } from "@/components/InteractionCards";
 import type { FormularyDrug } from "@/lib/formulary";
 import { DosingFields, emptyDosing, type Dosing } from "@/components/DosingFields";
 import { DrugCheckChip, DrugCheckNote } from "@/components/DrugCheckChip";
@@ -42,6 +45,15 @@ export function AddMedicineFlow({ rate, hasHospital }: { rate: number; hasHospit
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [pending, start] = useTransition();
+  const [hits, setHits] = useState<InteractionHit[]>([]);
+  useEffect(() => {
+    if (!drug) return;
+    let active = true;
+    previewInteractions(drug.id).then((h) => active && setHits(h)).catch(() => active && setHits([]));
+    return () => {
+      active = false;
+    };
+  }, [drug]);
 
   async function read() {
     if (!pack) return;
@@ -92,7 +104,7 @@ export function AddMedicineFlow({ rate, hasHospital }: { rate: number; hasHospit
           setFieldErrors(res.fieldErrors ?? {});
           return;
         }
-        router.push(`/home?added=${res.saved.id}`);
+        router.push(`/home?added=${res.saved.id}${res.interactions.length ? "&interaction=1" : ""}`);
       } catch {
         setError("server");
       }
@@ -140,8 +152,15 @@ export function AddMedicineFlow({ rate, hasHospital }: { rate: number; hasHospit
           {scan?.expired && <FormMessage tone="error">{t("expired", { date: scan.pack.expiry_date.value ?? "" })}</FormMessage>}
           <Card as="section" className="space-y-3">
             <SectionLabel as="h2">{t("pickTitle")}</SectionLabel>
-            <DrugPicker value={drug} onChange={setDrug} suggestions={scan?.formulary ?? []} initialQuery={scan?.pack.drug_name.value?.split(" ")[0] ?? ""} />
+            <DrugPicker value={drug} onChange={(d) => { setDrug(d); setHits([]); }} suggestions={scan?.formulary ?? []} initialQuery={scan?.pack.drug_name.value?.split(" ")[0] ?? ""} />
           </Card>
+          {drug && hits.length > 0 && (
+            <Card as="section" className="space-y-3" testId="add-interactions">
+              <SectionLabel as="h2">{t("interactionsTitle")}</SectionLabel>
+              <InteractionCards hits={hits} rate={rate} />
+              <p className="text-base text-ink-2">{t("interactionsNote")}</p>
+            </Card>
+          )}
           {error === "drugRequired" && <FormMessage tone="error">{t("errors.drugRequired")}</FormMessage>}
           <div className="flex flex-col gap-3 sm:flex-row">
             <button

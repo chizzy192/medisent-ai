@@ -127,7 +127,7 @@ await step("B2 pharmacist approves the entry; it leaves the queue", async () => 
 
 await step("B3 dispense from the formulary for Folake", async () => {
   await goto("/dispense?q=Folake"); await waitFor("Folake Adebayo"); await clickText("Dispense"); await waitForSel('[data-testid="drug-search"]');
-  await setValue('[data-testid="drug-search"]', "Omeprazole"); await wait(1200); await click('[data-testid="drug-option"]'); await waitForSel('[data-testid="drug-picked"]');
+  await setValue('[data-testid="drug-search"]', "Omeprazole"); { const t0 = Date.now(); while (Date.now() - t0 < 30000 && !((await evaluate('document.querySelector("[data-testid=drug-option]")?.innerText ?? ""')).includes("Omeprazole"))) await wait(300); } await click('[data-testid="drug-option"]'); await waitForSel('[data-testid="drug-picked"]');
   await setValue('[data-testid="dose"]', "1 capsule"); await setValue('[data-testid="quantity"]', "30"); await wait(300);
   await evaluate('[...document.querySelectorAll("button[type=submit]")].find(b => b.innerText.includes("Dispense and confirm")).click()');
   await waitFor("Saved for Folake Adebayo", 30000); await shot("B3-dispensed");

@@ -28,8 +28,9 @@ export async function issueOtp(args: { target: string; purpose: "signup" | "logi
   const ownerId = "profileId" in args.owner ? args.owner.profileId : args.owner.signupSessionId;
 
   // Cooldown: one new code per minute per owner (each one costs an SMS to the person's phone).
-  const { data: last } = await admin.from("otp_codes").select("created_at").eq(ownerCol, ownerId).eq("purpose", args.purpose).order("created_at", { ascending: false }).limit(1).maybeSingle();
-  if (last) {
+  // It only applies while that code is still unused: after a completed sign-in a fresh one is issued at once.
+  const { data: last } = await admin.from("otp_codes").select("created_at,used_at").eq(ownerCol, ownerId).eq("purpose", args.purpose).order("created_at", { ascending: false }).limit(1).maybeSingle();
+  if (last && !last.used_at) {
     const age = Date.now() - new Date(last.created_at).getTime();
     if (age < RESEND_COOLDOWN_MS) return { delivery: demoMode ? "demo" : "sms", maskedTarget: maskPhone(args.target), cooldownSeconds: Math.ceil((RESEND_COOLDOWN_MS - age) / 1000) };
   }

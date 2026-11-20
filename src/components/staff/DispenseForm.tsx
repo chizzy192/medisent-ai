@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { tr } from "@/lib/strings";
 import { dispense, type DispenseState } from "@/app/(staff)/dispense/actions";
+import { previewInteractions } from "@/app/formulary/actions";
+import type { InteractionHit } from "@/lib/interactions";
+import { InteractionCards } from "@/components/InteractionCards";
+import { CheckboxField } from "@/components/forms";
 import type { FormularyDrug } from "@/lib/formulary";
 import { DosingFields, emptyDosing, type Dosing } from "@/components/DosingFields";
 import { DrugPicker } from "@/components/DrugPicker";
@@ -22,6 +26,17 @@ export function DispenseForm({ patientId, patientName }: { patientId: string; pa
   const [shape, setShape] = useState<PillShape>("round");
   const [colour, setColour] = useState("#FFFFFF");
   const errors = state?.fieldErrors ?? {};
+  const [hits, setHits] = useState<InteractionHit[]>([]);
+  const shown = state?.interactions?.length ? state.interactions : hits;
+  const major = shown.some((h) => h.severity === "major");
+  useEffect(() => {
+    if (!drug) return;
+    let active = true;
+    previewInteractions(drug.id, patientId).then((h) => active && setHits(h)).catch(() => active && setHits([]));
+    return () => {
+      active = false;
+    };
+  }, [drug, patientId]);
 
   if (state?.savedId) {
     return (
@@ -30,6 +45,7 @@ export function DispenseForm({ patientId, patientName }: { patientId: string; pa
           <p className="font-semibold">{t("saved", { name: state.patientName ?? patientName })}</p>
           <p className="mt-1">{state.instruction}</p>
         </FormMessage>
+        {state.interactions && state.interactions.length > 0 && <InteractionCards hits={state.interactions} compact />}
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link href={`/dispense?patient=${patientId}`} className="btn-primary">
             {t("another")}
@@ -48,13 +64,21 @@ export function DispenseForm({ patientId, patientName }: { patientId: string; pa
       <input type="hidden" name="drugId" value={drug?.id ?? ""} />
       <input type="hidden" name="pillShape" value={shape} />
       <input type="hidden" name="pillColor" value={colour} />
-      {state?.error && <FormMessage tone="error">{t(`errors.${state.error}`)}</FormMessage>}
+      {state?.error && state.error !== "reviewRequired" && <FormMessage tone="error">{t(`errors.${state.error}`)}</FormMessage>}
 
       <Card as="section" className="space-y-3">
         <SectionLabel as="h2">{t("sectionDrug")}</SectionLabel>
-        <DrugPicker value={drug} onChange={setDrug} label={t("findDrug")} />
+        <DrugPicker value={drug} onChange={(d) => { setDrug(d); setHits([]); }} label={t("findDrug")} />
         {errors.drug && <FormMessage tone="error">{t("errors.drugRequired")}</FormMessage>}
       </Card>
+
+      {shown.length > 0 && (
+        <Card as="section" className="space-y-3" testId="dispense-interactions">
+          <SectionLabel as="h2">{t("interactionsTitle")}</SectionLabel>
+          <InteractionCards hits={shown} />
+          {major && <CheckboxField id="reviewed" name="reviewed" label={t("reviewed")} error={state?.error === "reviewRequired" ? t("errors.reviewRequired") : undefined} />}
+        </Card>
+      )}
 
       <Card as="section" className="space-y-4">
         <SectionLabel as="h2">{t("sectionDosing")}</SectionLabel>

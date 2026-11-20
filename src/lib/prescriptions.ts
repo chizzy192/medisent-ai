@@ -39,6 +39,8 @@ export type NewPrescription = {
   ai_prefill: unknown | null;
   expiry_date: string | null;
   batch_no: string | null;
+  /** From the formulary row: an antibiotic / antimalarial course that must be finished. */
+  course_required: boolean;
 };
 
 export type SavedPrescription = { id: string; instruction: string; check: DrugCheck | null; runsOutOn: string | null };
@@ -85,6 +87,7 @@ export async function createPrescription(p: NewPrescription): Promise<SavedPresc
       ai_prefill: p.ai_prefill ?? null,
       expiry_date: p.expiry_date,
       batch_no: p.batch_no,
+      course_required: p.course_required && p.duration_days !== null,
       started_on: lagosDate(),
     })
     .select("id")
