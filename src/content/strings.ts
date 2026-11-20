@@ -1,40 +1,39 @@
-{
-  "_status": "source",
+/**
+ * Every piece of UI text, in English (owner decision, 2026-11-19: Medisent AI is English only).
+ * Read through `tr()` in src/lib/strings.ts. Placeholders use {name}; plurals use ICU-style
+ * {count, plural, one {...} other {...}}.
+ */
+export const strings = {
   "meta": {
-    "description": "Scan your medicine, hear how to take it in your language, and get a reminder when it is time."
+    "description": "Scan your medicine, hear how to take it in plain English, and get a reminder when it is time."
   },
   "header": {
     "homeLink": "Medisent AI home",
-    "language": "Language",
-    "languageHint": "Choose the language for this app",
     "readAloud": "Read aloud",
     "stopReading": "Stop reading",
-    "readAloudUnavailable": "Reading aloud is not available in this browser yet.",
-    "voiceMissing": "This device has no {language} voice yet. Read the card, or ask your pharmacist."
+    "readAloudUnavailable": "Reading aloud is not available in this browser."
   },
   "landing": {
     "navHowItWorks": "How it works",
     "navForHospitals": "For hospitals",
     "navSafety": "Safety",
-    "navLanguages": "Languages",
     "navLabel": "Page sections",
     "signIn": "Sign in",
     "tryDemo": "Try the demo",
     "registerHospital": "Register your hospital",
-    "kicker": "Medication companion · 5 Nigerian languages",
-    "headlineBefore": "Your medicine, explained in ",
-    "headlineAccent": "your language",
+    "kicker": "Medication companion · Built for Nigerian hospitals",
+    "headlineBefore": "Your medicine, explained ",
+    "headlineAccent": "simply",
     "headlineAfter": ", on time, every time.",
-    "lead": "Scan a label and hear it in Igbo, Yoruba, Hausa, Pidgin or English. Get reminders on any phone. Your pharmacist sees when you need help.",
-    "previewLabel": "Live preview · One prescription, five languages",
-    "previewTabs": "Preview language",
+    "lead": "Scan a label and hear it read out in plain English. Get reminders on any phone. Your pharmacist sees when you need help.",
+    "previewLabel": "Live preview · One prescription",
     "previewCell1": "1 · Scanned label",
     "previewRegistered": "Registered",
     "previewConfidence": "Confidence {value}%",
-    "previewCell2": "2 · Spoken in {language}",
-    "previewPlay": "Play in {language}",
+    "previewCell2": "2 · Read out loud",
+    "previewPlay": "Play the instruction",
     "previewStop": "Stop",
-    "previewVoiceMissing": "No {language} voice on this device yet. Read the sentence instead.",
+    "previewVoiceMissing": "No voice on this device yet. Read the sentence instead.",
     "previewCell3": "3 · Reminder set",
     "previewReminderMeta": "daily · 30 days · app + SMS",
     "previewRefill": "Refill in {days} days",
@@ -45,7 +44,7 @@
     "step1Title": "Scan",
     "step1Body": "Point the camera at the label or prescription. AI reads drug, dose and NAFDAC number.",
     "step2Title": "Hear",
-    "step2Body": "Instructions are spoken in your language, in plain words.",
+    "step2Body": "Instructions are read out loud in plain, simple English.",
     "step3Title": "Remember",
     "step3Body": "Reminders by app, SMS or voice call. Caregivers alerted if a dose is missed.",
     "step4Title": "Get help",
@@ -90,10 +89,10 @@
     "ctaLabel": "Demo mode · Fictional data",
     "ctaTitle": "See it work in under a minute.",
     "ctaBody": "Pick a role: patient, pharmacist or hospital admin.",
-    "footerLanguages": "Languages",
     "letterCheck": "Letter check",
     "previewDemo": "Demo data",
-    "previewAudioSoon": "Audio for this language is coming. Read the sentence for now."
+    "previewAudioSoon": "Audio is coming. Read the sentence for now.",
+    "footerNote": "Plain English · Works on any phone"
   },
   "nav": {
     "main": "Main navigation",
@@ -117,8 +116,8 @@
     "ringLabel": "{taken} of {total} doses taken today",
     "todayLabel": "Today",
     "emptyTitle": "Add your first medicine",
-    "emptyBody": "Scan the pack or the prescription. We read the label to you and set your reminders.",
-    "emptyAction": "Scan a medicine",
+    "emptyBody": "Add your medicine from the pack and we set your reminders. A pharmacist checks what you add.",
+    "emptyAction": "Add a medicine",
     "greetingName": "Welcome, {name}",
     "welcomeHospital": "Welcome to {hospital}",
     "welcomeIndependent": "Your medicines, your way.",
@@ -142,7 +141,16 @@
       "snoozed": "Snoozed"
     },
     "notSaved": "Not saved. Please try again.",
-    "notSavedOffline": "Not saved: no connection. Keep this screen open and try again when you are back online."
+    "notSavedOffline": "Not saved: no connection. Keep this screen open and try again when you are back online.",
+    "addedNotice": "Saved. Your reminders are set. A pharmacist will check this entry; until then it shows “Not checked yet”.",
+    "notChecked": "Not checked yet",
+    "reviewsLabel": "Your pharmacist checked",
+    "review": {
+      "verified": "approved.",
+      "edited": "approved with corrected instructions. Listen to the new sentence.",
+      "rejected": "not approved."
+    },
+    "reviewReason": "Reason: {reason}"
   },
   "placeholder": {
     "label": "Coming soon",
@@ -172,7 +180,10 @@
     "demo": "Try the demo",
     "hospital": "Hospital dashboard",
     "registry": "Patient registry",
-    "reminder": "Reminder"
+    "reminder": "Reminder",
+    "add": "Add a medicine",
+    "dispense": "Dispense",
+    "verify": "Entries to check"
   },
   "setup": {
     "title": "Supabase is not set up yet",
@@ -221,8 +232,6 @@
     "phone": "Phone number",
     "phoneHint": "The number you gave the hospital. The code goes to that number, not to a new one.",
     "phoneHintIndependent": "We will text the code to this number.",
-    "language": "Language",
-    "languageHint": "The app will talk and write to you in this language.",
     "consent": "I agree that Medisent AI keeps my details and medicines to remind me and to help my hospital care for me (NDPA 2023). I can download or delete my data at any time.",
     "continue": "Continue",
     "checking": "Checking the hospital list…",
@@ -418,7 +427,6 @@
       "hospitalNumberMissing": "hospital_number is empty",
       "ageInvalid": "age must be a whole number between 0 and 130",
       "sexInvalid": "sex must be M, F or other",
-      "languageInvalid": "language must be en, ig, yo, ha or pcm",
       "phoneMissing": "phone is empty"
     },
     "template": "Download a sample CSV",
@@ -528,7 +536,12 @@
       "pharmacist": "Pharmacist",
       "nurse": "Nurse",
       "patient": "Patient"
-    }
+    },
+    "pendingChecks": "Entries to check",
+    "intakeTitle": "Medication intake",
+    "intakeBody": "Dispense from the formulary, or check what patients added from their phones.",
+    "dispense": "Dispense",
+    "verifyQueue": "{count, plural, =0 {Entries to check} one {Check # entry} other {Check # entries}}"
   },
   "me": {
     "label": "Me",
@@ -539,8 +552,6 @@
     "hospitalNumber": "Hospital number",
     "staffId": "Staff ID",
     "licence": "Licence",
-    "language": "Language",
-    "languageBody": "The app, reminders and voice use this language.",
     "comingTitle": "Coming in the next stages",
     "comingBody": "My progress, caregivers, refills, records, accessibility and privacy settings.",
     "signOut": "Sign out",
@@ -570,8 +581,8 @@
   "voice": {
     "listen": "Listen",
     "stop": "Stop",
-    "browserVoice": "Playing with the phone's own voice.",
-    "unavailable": "No {language} voice is available right now. Read the words on screen."
+    "unavailable": "No voice is available right now. Read the words on screen.",
+    "offlineVoice": "Offline voice"
   },
   "pill": {
     "shape": "Shape",
@@ -617,91 +628,42 @@
     "reportLead": "If your pharmacist agrees, you can tell NAFDAC:"
   },
   "scan": {
-    "stepLabel": "Scan · Step {step} of {total}",
-    "pointTitle": "Point at the label",
-    "foundTitle": "Here is what we read",
+    "label": "Scan",
+    "pointTitle": "Is this my medicine?",
+    "intro": "Point the camera at the pack. We read what is printed and check it against your list. We never read a dose from the pack.",
+    "resultTitle": "Here is what we found",
     "ready": "Ready",
-    "reading": "Reading label… {pct}%",
-    "done": "Read · {pct}% sure",
-    "weak": "Not sure · {pct}%",
+    "reading": "Reading the pack… {pct}%",
     "capture": "Take the photo",
     "choosePhoto": "Choose a photo instead",
-    "continue": "Looks right, continue",
-    "continueAnyway": "Continue and fix it myself",
-    "retake": "Try another photo",
-    "foundSoFar": "Found so far",
-    "turnPack": "Turn the pack",
-    "weakHint": "We are less than {pct}% sure. Hold the pack flat in good light, or fix the details on the next screen.",
-    "fields": {
-      "drug": "Drug",
-      "strength": "Strength",
-      "nafdac": "NAFDAC"
+    "retake": "Scan another pack",
+    "verdict": {
+      "match": "This is on your list",
+      "pending": "On your list · not checked yet",
+      "noMatch": "Not on your list",
+      "unreadable": "Could not read the name"
     },
-    "check": {
-      "registered": "Registered",
-      "not_found": "Not found in our list",
-      "mismatch": "Number belongs to another medicine",
-      "unreadable": "Number not readable"
-    },
+    "yourRecord": "Your record says",
+    "pendingNote": "A pharmacist has not checked this entry yet. Follow what your pharmacist told you.",
+    "noMatchTitle": "We could not find this medicine on your list",
+    "noMatchBody": "The pack says {name}. None of your medicines match it. Do not take it until a pharmacist has checked it.",
+    "askPharmacist": "Ask your pharmacist. If they gave you this medicine, you can add it and they will check it.",
+    "addThis": "Add this medicine",
+    "unreadableBody": "We could not read the name on this pack. Hold it flat in good light and try again, or ask your pharmacist.",
+    "expired": "This pack is past its expiry date ({date}). Do not take it. Show it to your pharmacist.",
+    "addLead": "Got a new medicine?",
+    "addLink": "Add it to your list",
     "camera": {
       "denied": "The camera is switched off for this app. You can still choose a photo from your phone.",
       "unavailable": "No camera found. Choose a photo from your phone instead.",
       "unsupported": "This browser cannot open the camera. Choose a photo from your phone instead."
     },
     "errors": {
-      "readerFailed": "We could not read that photo. Try again with the label flat and in good light.",
+      "readerFailed": "We could not read that photo. Try again with the pack flat and in good light.",
       "offline": "You are offline. Scanning needs the internet; your saved medicines still work.",
       "tooBig": "That photo is too large. Try again."
     },
     "cameraPreview": "Camera preview"
-  },
-  "confirm": {
-    "title": "Check and confirm",
-    "intro": "Fix anything that is wrong. Nothing is saved until you press Save.",
-    "sectionMedicine": "Medicine",
-    "drugName": "Medicine name",
-    "strength": "Strength",
-    "strengthHint": "For example 500 mg",
-    "form": "Form",
-    "sectionHow": "How to take it",
-    "dose": "Each time, take",
-    "doseHint": "For example 1 tablet or 2 puffs",
-    "frequency": "How often",
-    "perDay": "{count, plural, one {Once a day} =2 {Twice a day} other {# times a day}}",
-    "withFood": "Food",
-    "food": {
-      "any": "Any time",
-      "before": "Before food",
-      "after": "After food",
-      "with": "With food"
-    },
-    "duration": "For how many days",
-    "durationHint": "Leave empty if it is every day.",
-    "times": "Reminder times",
-    "timesHint": "Tap a time to change it.",
-    "timeN": "Reminder {n}",
-    "willSay": "The app will say",
-    "sectionLooks": "What does your medicine look like?",
-    "looksIntro": "So you can match the screen to the pack.",
-    "sectionSupply": "Supply",
-    "quantity": "How many did you get?",
-    "quantityHint": "Tablets, capsules or puffs in the pack. We remind you before they run out.",
-    "sectionCheck": "NAFDAC check",
-    "nafdac": "NAFDAC number",
-    "nafdacHint": "Printed on the pack after 'NAFDAC Reg. No.', for example A4-1234.",
-    "warnings": "On the label",
-    "save": "Save and set reminders",
-    "saving": "Saving…",
-    "back": "Back to the photo",
-    "errors": {
-      "nameRequired": "Type the medicine name.",
-      "doseRequired": "Type how much to take each time.",
-      "timesRequired": "Set at least one reminder time.",
-      "server": "We could not save. Check your network and try again."
-    },
-    "checking": "Checking…",
-    "checkFailed": "Couldn't check",
-    "checkFailedNote": "We could not reach the list just now. We check again when you save; you can still save."
   },
   "reminder": {
     "label": "Time for your medicine",
@@ -731,10 +693,22 @@
     "scanAnother": "Scan a medicine",
     "scanFirst": "Scan your first medicine",
     "emptyTitle": "No medicines yet",
-    "emptyBody": "Scan the pack or the prescription and we set your reminders.",
+    "emptyBody": "Add the medicine from its pack and we set your reminders.",
     "perDay": "{count, plural, one {# a day} other {# a day}}",
     "daysLeft": "{count, plural, =0 {Runs out today} one {# day left} other {# days left}}",
-    "supply": "Supply left"
+    "supply": "Supply left",
+    "addAnother": "Add a medicine",
+    "addFirst": "Add your first medicine",
+    "status": {
+      "pending": "Not checked yet",
+      "verified": "Checked by pharmacist",
+      "edited": "Checked and corrected"
+    },
+    "source": {
+      "hospital": "from your hospital",
+      "self": "added by you"
+    },
+    "pendingNote": "A pharmacist has not checked this entry yet. Follow what you were told."
   },
   "refill": {
     "label": "Refill soon",
@@ -789,21 +763,55 @@
     "medicines": "Medicines",
     "noMedicines": "No active medicines.",
     "perDay": "{count, plural, one {# a day} other {# a day}}",
-    "confirmed": "Confirmed by patient",
-    "unconfirmed": "Not confirmed yet",
     "source": {
-      "scan": "scanned by patient",
-      "staff": "added by staff"
+      "hospital": "dispensed by staff",
+      "self": "added by patient"
     },
-    "addTitle": "Add a prescription",
-    "addBody": "The patient sees it on their phone with reminders and hears it in their language."
+    "addTitle": "Dispense a medicine",
+    "addBody": "Pick from the formulary and type the dose. The patient sees it with reminders and hears it in plain English.",
+    "status": {
+      "pending": "Not checked yet",
+      "verified": "Verified",
+      "edited": "Edited and verified",
+      "rejected": "Rejected"
+    },
+    "dispense": "Dispense for this patient",
+    "reviewPending": "Check waiting entries"
   },
-  "staffPrescription": {
-    "sectionMedicine": "Medicine",
-    "drugName": "Medicine name",
-    "strength": "Strength",
-    "form": "Form",
+  "packRead": {
+    "title": "What we read on the pack",
+    "notSeen": "Not seen",
+    "noDoseNote": "We never read how much to take from a pack. That comes from your pharmacist.",
+    "fields": {
+      "drug_name": "Name",
+      "strength": "Strength",
+      "form": "Form",
+      "nafdac_no": "NAFDAC",
+      "manufacturer": "Made by",
+      "batch_no": "Batch",
+      "expiry_date": "Expires",
+      "barcode": "Barcode"
+    }
+  },
+  "formulary": {
+    "search": "Find the medicine",
+    "placeholder": "Type the name, for example Amlodipine",
+    "results": "Medicines",
+    "fromPhoto": "From the photo",
+    "change": "Change",
+    "none": "No medicine with that name in our list.",
+    "notListed": "Not in the list? Ask your pharmacist to add it for you."
+  },
+  "photo": {
+    "required": "required",
+    "optional": "optional",
+    "takePhoto": "Take a photo",
+    "choose": "Choose from phone",
+    "retake": "Retake"
+  },
+  "dosing": {
     "dose": "Each time, take",
+    "doseHint": "For example 1 tablet, 2 puffs or 5 ml",
     "frequency": "How often",
     "perDay": "{count, plural, one {Once a day} =2 {Twice a day} other {# times a day}}",
     "withFood": "Food",
@@ -813,26 +821,148 @@
       "after": "After food",
       "with": "With food"
     },
-    "duration": "Days",
+    "duration": "For how many days",
+    "durationHint": "Leave empty if it is every day.",
+    "days": "{count, plural, one {# day} other {# days}}",
     "times": "Reminder times",
+    "timesHint": "Tap a time to change it.",
     "timeN": "Reminder {n}",
-    "sectionSupply": "Supply and registration",
-    "quantity": "Quantity dispensed",
-    "quantityHint": "Tablets, capsules or puffs given.",
-    "nafdac": "NAFDAC number",
-    "nafdacHint": "Checked against the registration list.",
+    "quantity": "How many in the pack?",
+    "quantityHint": "Tablets, capsules or puffs. We remind you before they run out.",
+    "willSay": "The app will say",
+    "errors": {
+      "doseRequired": "Type how much to take each time.",
+      "frequencyRequired": "Choose how often."
+    }
+  },
+  "add": {
+    "stepLabel": "Add a medicine · Step {step} of {total}",
+    "titles": {
+      "photos": "Take a photo of the pack",
+      "reading": "Reading the pack…",
+      "pick": "Which medicine is it?",
+      "dosing": "How were you told to take it?"
+    },
+    "intros": {
+      "photos": "We read the name and strength from the pack. A photo of your prescription helps your pharmacist check it.",
+      "reading": "This takes a few seconds.",
+      "pick": "Pick the medicine from our list. The photo only helps us find it.",
+      "dosing": "Type what your pharmacist or doctor told you. A pharmacist will check it before it counts as confirmed."
+    },
+    "packPhoto": "Photo of the pack",
+    "packPhotoHint": "Show the name, strength and NAFDAC number.",
+    "rxPhoto": "Photo of your prescription or note",
+    "rxPhotoHint": "If the pharmacist wrote the dose on paper, photograph it.",
+    "readPack": "Read the pack",
+    "reading": "Reading…",
+    "readErrors": {
+      "readerFailed": "We could not read the photo. You can still pick the medicine from the list.",
+      "offline": "You are offline, so we could not read the photo. Pick the medicine from the list.",
+      "tooBig": "That photo is too large. Go back and take a smaller one, or pick from the list."
+    },
+    "expired": "This pack is past its expiry date ({date}). Show it to your pharmacist before taking it.",
+    "pickTitle": "Medicine",
+    "continue": "Continue",
+    "backPhotos": "Back to the photos",
+    "medicine": "Medicine",
+    "dosingTitle": "As you were told",
+    "dosingIntro": "Only your pharmacist or doctor decides the dose. The app never guesses it.",
+    "asTold": "What they said (optional)",
+    "asToldHint": "For example: one in the morning after breakfast.",
+    "looks": "What does it look like?",
+    "pendingNote": "This medicine will show as “Not checked yet” until a pharmacist at your hospital approves it. Reminders start right away.",
+    "pendingNoteIndependent": "You have no hospital on your account, so nobody can check this entry. Please follow what your pharmacist told you.",
+    "save": "Save and set reminders",
+    "saving": "Saving…",
+    "backPick": "Back",
+    "scanInstead": "Already on your list? Scan the pack to check it.",
+    "errors": {
+      "drugRequired": "Pick the medicine from the list first.",
+      "packRequired": "A photo of the pack is needed.",
+      "photoInvalid": "That photo could not be used. Take it again as a JPG or PNG.",
+      "doseRequired": "Type how much to take each time.",
+      "frequencyRequired": "Choose how often.",
+      "server": "We could not save. Check your network and try again."
+    }
+  },
+  "dispense": {
+    "title": "Dispense",
+    "intro": "Find the patient, pick the medicine from the formulary and type the dose. It is confirmed at once.",
+    "search": "Find a patient",
+    "searchPlaceholder": "Name or hospital number",
+    "searchButton": "Search",
+    "noPatients": "No patient matches. Patients appear once they sign up with the hospital registry.",
+    "pick": "Dispense",
+    "changePatient": "Change patient",
+    "sectionDrug": "Medicine (from the formulary)",
+    "findDrug": "Find the medicine",
+    "sectionDosing": "Dosing as prescribed",
     "instructionsRaw": "Sig (as written)",
     "instructionsRawHint": "Optional, kept for the record.",
+    "batchNo": "Batch number",
     "sectionLooks": "What the medicine looks like",
-    "save": "Add prescription",
+    "save": "Dispense and confirm",
     "saving": "Saving…",
     "saved": "Saved for {name}. They will hear:",
+    "another": "Dispense another",
+    "viewPatient": "View patient",
     "errors": {
-      "nameRequired": "Type the medicine name.",
+      "notYourPatient": "This patient is not in your hospital.",
+      "drugRequired": "Pick the medicine from the formulary.",
       "doseRequired": "Type the dose.",
       "frequencyRequired": "Choose how often.",
-      "notYourPatient": "This patient is not in your hospital.",
+      "server": "We could not save. Try again."
+    }
+  },
+  "verify": {
+    "title": "Entries to check",
+    "intro": "Medicines patients added themselves. Compare the photos with what they typed, then approve, edit or reject.",
+    "count": "{count, plural, =0 {Nothing waiting} one {# entry waiting} other {# entries waiting}}",
+    "emptyTitle": "Nothing to check",
+    "emptyBody": "When a patient adds a medicine from their phone it appears here.",
+    "pendingChip": "Not checked yet",
+    "photos": {
+      "pack": "Pack photo",
+      "packAlt": "Pack photographed by {name}",
+      "rx": "Prescription photo",
+      "rxAlt": "Prescription photographed by {name}",
+      "none": "No photo"
+    },
+    "aiTitle": "What the reader saw",
+    "aiNone": "The pack was not read (offline or the reader failed).",
+    "patientTitle": "What the patient entered",
+    "fields": {
+      "drug": "Medicine",
+      "dose": "Each time",
+      "frequency": "How often",
+      "times": "Times",
+      "food": "Food",
+      "duration": "For",
+      "ongoing": "Every day",
+      "quantity": "In the pack",
+      "asTold": "As told",
+      "expiry": "expires"
+    },
+    "approve": "Approve",
+    "edit": "Edit and approve",
+    "reject": "Reject",
+    "editTitle": "Correct the dosing, then approve",
+    "saveEdit": "Save and approve",
+    "cancel": "Cancel",
+    "reasonLabel": "Why is it rejected?",
+    "reasonHint": "The patient sees this reason. Keep it short and kind.",
+    "confirmReject": "Reject and tell the patient",
+    "working": "Saving…",
+    "done": {
+      "verified": "Approved {drug} for {name}. They have been told.",
+      "edited": "Corrected and approved {drug} for {name}. They have been told.",
+      "rejected": "Rejected {drug} for {name}. Their reminders are stopped and they have been told."
+    },
+    "errors": {
+      "reasonRequired": "Type the reason first.",
+      "notYours": "This entry is not from your hospital.",
+      "alreadyReviewed": "Someone has already checked this entry.",
       "server": "We could not save. Try again."
     }
   }
-}
+} as const;

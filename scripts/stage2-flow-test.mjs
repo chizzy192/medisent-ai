@@ -1,8 +1,9 @@
-// Stage 2 flow test: patient logs in, scans a demo label (file upload), confirms, saves, sees the
-// card with days left; then checks a seeded "not found" NAFDAC number and the pharmacist's view.
-// Language-agnostic: it drives the UI by ids and data-testid, not by visible text.
+// Stage 2 flow test (medication intake): Folake adds a medicine from a pack photo (reader
+// pre-fill, formulary pick, dose typed as told) → pending; the Scan tab matches the pack to her
+// record; the pharmacist approves it from the queue and dispenses another from the formulary.
+// It drives the UI by ids and data-testid, not by visible text, except for a few plain sentences.
 // Needs: a running server with Supabase keys, GEMINI_API_KEY and NEXT_PUBLIC_DEMO_MODE=true,
-// migration 0007 applied, and a demo label image. Run:
+// migrations through 0010 applied, seed.sql run, and a demo pack image (Amoxicillin 500 mg). Run:
 //   node scripts/stage2-flow-test.mjs http://localhost:3000 <absolute path to label.png>
 import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -67,61 +68,74 @@ async function login(phone) {
   await setValue("#identifier", phone); await click('button[name="intent"][value="start"]');
   await waitForSel("#code"); await setValue("#code", "123456"); await click('button[name="intent"][value="confirm"]');
 }
-
-await step("A1 patient (Folake, yo) logs in", async () => { await login("08000000304"); await waitForPath("/home"); await shot("A1-home-before"); });
-
-await step("A2 demo label uploaded; Found so far shows drug, strength and NAFDAC", async () => {
-  await goto("/scan"); await waitForSel('input[type="file"]');
+async function setFile(sel) {
   const { root } = await send("DOM.getDocument");
-  const { nodeId } = await send("DOM.querySelector", { nodeId: root.nodeId, selector: 'input[type="file"]' });
+  const { nodeId } = await send("DOM.querySelector", { nodeId: root.nodeId, selector: sel });
   await send("DOM.setFileInputFiles", { nodeId, files: [LABEL.replace(/\//g, "\\")] });
-  await evaluate(`document.querySelector('input[type="file"]').dispatchEvent(new Event("change", { bubbles: true }))`);
-  await waitForSel('[data-testid="scan-continue"]', 120000); await wait(1500); await shot("A2-found");
-  const t = await text(); if (!t.includes("Amoxicillin") || !t.includes("500 mg") || !t.includes("A4-1234")) throw new Error("fields missing: " + t.slice(0, 300));
+  await evaluate(`document.querySelector(${JSON.stringify(sel)}).dispatchEvent(new Event("change", { bubbles: true }))`);
+}
+const clickText = (txt) => evaluate(`(() => { const el = [...document.querySelectorAll("button,a")].find(b => b.innerText.trim() === ${JSON.stringify(txt)}); if (!el) return "missing"; el.click(); return "ok"; })()`);
+
+await step("A1 patient (Folake) logs in", async () => { await login("08000000304"); await waitForPath("/home"); await shot("A1-home-before"); });
+
+await step("A2 Add a medicine: pack photo read; printed fields with confidence, never a dose", async () => {
+  await goto("/add"); await waitForSel('[data-testid="pack-photo-file"]');
+  await setFile('[data-testid="pack-photo-file"]'); await wait(800);
+  await click('[data-testid="add-read"]');
+  await waitForSel('[data-testid="drug-search"], [data-testid="drug-picked"]', 120000); await wait(1200); await shot("A2-read");
+  const t = await text();
+  if (!/Amoxicillin/i.test(t)) throw new Error("name not read: " + t.slice(0, 300));
+  if (!t.includes("%")) throw new Error("no confidence shown");
+  if (/\b(1 capsule|three times|tds)\b/i.test(t)) throw new Error("a dose leaked into the reader output");
 });
 
-await step("A3 confirm screen prefilled with the scan; instruction block present", async () => {
-  await click('[data-testid="scan-continue"]'); await waitForSel("#drug_name"); await wait(1500); await shot("A3-confirm");
-  const v = await evaluate('document.querySelector("#drug_name").value'); if (!/amoxicillin/i.test(v)) throw new Error("drug name not prefilled: " + v);
-  const dose = await evaluate('document.querySelector("#dose").value'); if (!dose) throw new Error("dose not prefilled");
+await step("A3 pick from the formulary (suggestion from the photo) and type the dose as told", async () => {
+  const picked = await evaluate(`!!document.querySelector('[data-testid="drug-picked"]')`);
+  if (!picked) { await click('[data-testid="drug-option"]'); await waitForSel('[data-testid="drug-picked"]'); }
+  await click('[data-testid="add-continue"]'); await waitForSel('[data-testid="dose"]'); await shot("A3-dosing");
+  await setValue('[data-testid="dose"]', "1 capsule"); await setValue("#dosing-frequency", "3"); await setValue('[data-testid="quantity"]', "15"); await wait(400);
   const times = await evaluate('document.querySelectorAll("input[type=time]").length'); if (times !== 3) throw new Error("expected 3 reminder times, got " + times);
-  await setValue("#quantity", "15");
+  await waitFor("The app will say");
 });
 
-await step("A4 seeded not-found number shows the calm warning and the NAFDAC link, never 'fake'", async () => {
-  await setValue("#nafdac", "DEMO-X9-9999"); await waitFor("nafdac.gov.ng", 25000); await shot("A4-not-found");
-  const t = await text(); if (/fake/i.test(t)) throw new Error("the word 'fake' appeared");
+await step("A4 save lands on home: Not checked yet badge, reminders on the timeline", async () => {
+  await click('[data-testid="add-save"]'); await waitForPath("/home", 90000); await waitForSel('[data-testid="added-notice"]'); await waitFor("Amoxicillin"); await wait(800); await shot("A4-home-after");
+  const t = await text(); if (!t.includes("Not checked yet")) throw new Error("pending badge missing"); if (!/14:00/.test(t)) throw new Error("14:00 reminder missing: " + t.slice(0, 500));
 });
 
-await step("A5 save lands on home with the new card and reminders", async () => {
-  await click('[data-testid="confirm-save"]'); await waitForPath("/home", 60000); await waitFor("Amoxicillin"); await wait(1000); await shot("A5-home-after");
-  const t = await text(); if (!/14:00/.test(t)) throw new Error("14:00 reminder missing on the timeline: " + t.slice(0, 500));
+await step("A5 medicines page shows the entry as added by you, not checked yet", async () => {
+  await goto("/meds"); await waitFor("Amoxicillin"); await waitFor("Not checked yet"); await waitFor("added by you"); await shot("A5-meds");
 });
 
-await step("A6 medicines page shows the chip, mono number and NAFDAC link", async () => {
-  await goto("/meds"); await waitFor("Amoxicillin"); await waitFor("DEMO-X9-9999"); await waitFor("nafdac.gov.ng"); await shot("A6-meds");
+await step("A6 Scan tab 'Is this my drug?' matches the pack to the record and shows the dose FROM THE RECORD", async () => {
+  await goto("/scan"); await waitForSel('input[type="file"]'); await setFile('input[type="file"]');
+  await waitForSel('[data-testid="scan-result"]', 120000); await wait(1000); await shot("A6-scan-match");
+  const t = await text(); if (!t.includes("Your record says")) throw new Error("no match card: " + t.slice(0, 400)); if (!t.includes("1 capsule")) throw new Error("dose from the record missing");
+  if (/fake/i.test(t)) throw new Error("the word 'fake' appeared");
 });
 
-await step("A7 a due dose can be logged from the timeline", async () => {
-  await goto("/home"); await waitFor("Amoxicillin");
-  const r = await evaluate('(() => { const b = [...document.querySelectorAll("button.btn-primary")].find(b => b.querySelector("svg")); if (!b) return "none"; b.click(); return "ok"; })()');
-  if (r !== "ok") { results.push("SKIP A7 (no dose due at this hour)"); return; }
-  await wait(3000); await shot("A7-took-it");
+await step("B1 pharmacist: dashboard shows entries to check; queue shows Folake's entry with reader vs patient", async () => {
+  await login("08000000104"); await waitForPath("/dashboard"); await waitForSel('[data-testid="stat-pending"]'); await shot("B1-dashboard");
+  await goto("/verify"); await waitFor("Folake Adebayo"); await waitFor("What the reader saw"); await waitFor("What the patient entered"); await shot("B1-queue");
 });
 
-await step("A8 reminder screen renders for the new reminder", async () => {
-  const idv = await evaluate(`fetch("/api/scan").then(() => null)`);
-  void idv;
-  await goto("/meds"); await waitFor("Amoxicillin");
-  // The reminder id is not on the page; the server test covers /reminder/[id] through the DB check below.
-  results.push("INFO A8 reminder page checked by the DB probe in the runner");
+await step("B2 pharmacist approves the entry; it leaves the queue", async () => {
+  const ok = await evaluate(`(() => { const art = [...document.querySelectorAll('[data-testid="verify-entry"]')].find(a => a.innerText.includes("Folake Adebayo") && a.innerText.includes("Amoxicillin")); if (!art) return "none"; art.querySelector('[data-testid="verify-approve"] button').click(); return "ok"; })()`);
+  if (ok !== "ok") throw new Error("Folake's entry not found in the queue");
+  await waitFor("Approved Amoxicillin for Folake Adebayo", 30000); await shot("B2-approved");
 });
 
-await step("B1 pharmacist logs in; the patient page shows the new medicine and its check chip", async () => {
-  await login("08000000104"); await waitForPath("/dashboard"); await shot("B1-dashboard");
-  await goto("/patients"); await waitFor("Folake Adebayo");
-  await evaluate('[...document.querySelectorAll("a")].find(a => a.innerText.includes("Folake Adebayo")).click()');
-  await waitFor("Amoxicillin", 30000); await shot("B2-patient");
+await step("B3 dispense from the formulary for Folake", async () => {
+  await goto("/dispense?q=Folake"); await waitFor("Folake Adebayo"); await clickText("Dispense"); await waitForSel('[data-testid="drug-search"]');
+  await setValue('[data-testid="drug-search"]', "Omeprazole"); await wait(1200); await click('[data-testid="drug-option"]'); await waitForSel('[data-testid="drug-picked"]');
+  await setValue('[data-testid="dose"]', "1 capsule"); await setValue('[data-testid="quantity"]', "30"); await wait(300);
+  await evaluate('[...document.querySelectorAll("button[type=submit]")].find(b => b.innerText.includes("Dispense and confirm")).click()');
+  await waitFor("Saved for Folake Adebayo", 30000); await shot("B3-dispensed");
+});
+
+await step("C1 patient sees the approval notice and the dispensed medicine as checked", async () => {
+  await login("08000000304"); await waitForPath("/home"); await waitForSel('[data-testid="review-notice"]'); await waitFor("approved"); await shot("C1-home-reviewed");
+  await goto("/meds"); await waitFor("Omeprazole"); await waitFor("from your hospital"); await shot("C1-meds");
 });
 
 console.log("\n=== RESULTS ===\n" + results.join("\n"));

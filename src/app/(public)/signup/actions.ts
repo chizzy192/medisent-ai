@@ -1,8 +1,6 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { isLocale, LOCALE_COOKIE, type Locale } from "@/config/locales";
 import { createAdminClient } from "@/lib/db/admin";
 import { isServiceRoleConfigured, isValidNigerianPhone, normalizePhone, syntheticEmailForPhone } from "@/lib/db/env";
 import { homeForRole, NO_HOSPITAL, type LicenceBody, type Role, type SignupSession, type VerifyResult, licenceBodies, signupRoles } from "@/lib/db/types";
@@ -32,7 +30,6 @@ async function startSignup(_prev: SignupState, formData: FormData): Promise<Sign
 
   const hospitalId = field(formData, "hospital");
   const role = field(formData, "role") as Role;
-  const language = isLocale(field(formData, "language")) ? (field(formData, "language") as Locale) : "en";
   const consent = formData.get("consent") === "on";
 
   if (!hospitalId) fieldErrors.hospital = "hospitalRequired";
@@ -71,11 +68,11 @@ async function startSignup(_prev: SignupState, formData: FormData): Promise<Sign
     if (existing) return { step: "exists", role: "patient" };
     const session = await admin
       .from("signup_sessions")
-      .insert({ hospital_id: null, role: "patient", full_name: fullName, phone, language, consent_at: new Date().toISOString() })
+      .insert({ hospital_id: null, role: "patient", full_name: fullName, phone, consent_at: new Date().toISOString() })
       .select("id")
       .single();
     if (session.error || !session.data) return { step: "form", error: "server", values };
-    const otp = await issueOtp({ target: phone!, purpose: "signup", owner: { signupSessionId: session.data.id }, message: otpSms(language) });
+    const otp = await issueOtp({ target: phone!, purpose: "signup", owner: { signupSessionId: session.data.id }, message: otpSms });
     return { step: "otp", sessionId: session.data.id, masked: otp.maskedTarget, delivery: otp.delivery, role: "patient" };
   }
 
@@ -117,7 +114,6 @@ async function startSignup(_prev: SignupState, formData: FormData): Promise<Sign
       full_name: result.full_name,
       phone: target,
       email: result.email?.toLowerCase() ?? null,
-      language,
       staff_id: isStaff ? staffId : null,
       hospital_number: isStaff ? null : hospitalNumber,
       licence_body: result.licence_body ?? (isStaff && role !== "hospital_admin" ? licenceBody : null),
@@ -130,7 +126,7 @@ async function startSignup(_prev: SignupState, formData: FormData): Promise<Sign
     .single();
   if (session.error || !session.data) return { step: "form", error: "server", values };
 
-  const otp = await issueOtp({ target, purpose: "signup", owner: { signupSessionId: session.data.id }, message: otpSms(language) });
+  const otp = await issueOtp({ target, purpose: "signup", owner: { signupSessionId: session.data.id }, message: otpSms });
   return { step: "otp", sessionId: session.data.id, masked: otp.maskedTarget, delivery: otp.delivery, role };
 }
 
@@ -146,7 +142,7 @@ async function resendSignupOtp(prev: SignupState): Promise<SignupState> {
   if (prev.step !== "otp") return prev;
   const session = await loadSession(prev.sessionId);
   if (!session) return { step: "form", error: "sessionExpired" };
-  const otp = await issueOtp({ target: session.phone, purpose: "signup", owner: { signupSessionId: session.id }, message: otpSms(session.language) });
+  const otp = await issueOtp({ target: session.phone, purpose: "signup", owner: { signupSessionId: session.id }, message: otpSms });
   if (otp.cooldownSeconds) return { ...prev, error: undefined, resent: false, cooldownSeconds: otp.cooldownSeconds };
   return { ...prev, delivery: otp.delivery, error: undefined, triesLeft: undefined, cooldownSeconds: undefined, resent: true };
 }
@@ -177,7 +173,6 @@ async function confirmSignup(prev: SignupState, formData: FormData): Promise<Sig
       full_name: session.full_name,
       phone: session.phone,
       email,
-      language: session.language,
       staff_id: session.staff_id,
       hospital_number: session.hospital_number,
       licence_body: session.licence_body,
@@ -200,8 +195,6 @@ async function confirmSignup(prev: SignupState, formData: FormData): Promise<Sig
     detail: { role: session.role, hospital_id: session.hospital_id },
   });
 
-  const store = await cookies();
-  store.set(LOCALE_COOKIE, session.language, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
   await createSessionForEmail(email);
   redirect(homeForRole[session.role]);
 }

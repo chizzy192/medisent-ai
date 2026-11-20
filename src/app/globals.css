@@ -258,7 +258,7 @@
     background-color: var(--color-surface);
   }
 
-  /* Primary button: cobalt with white text, 48px minimum, wraps for long translations. */
+  /* Primary button: cobalt with white text, 48px minimum, wraps for long labels and large text. */
   .btn-primary,
   .btn-secondary,
   .btn-outline {

@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { EmptyState } from "@/components/EmptyState";
 import { ButtonLink } from "@/components/ui";
 
-/** Global error boundary: a plain sentence and a retry, in the app's language, never a white page. */
+/** Global error boundary: a plain English sentence and a retry, never a white page. */
 export default function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  const t = useTranslations("errorPage");
+  const t = tr("errorPage");
   useEffect(() => {
     console.error(error);
   }, [error]);

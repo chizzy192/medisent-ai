@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { RosterUpload } from "@/components/admin/RosterUpload";
 import { adminRoles, requireRole } from "@/lib/auth/dal";
 import { createAdminClient } from "@/lib/db/admin";
@@ -7,7 +7,7 @@ import { SectionLabel } from "@/components/ui";
 /** Hospital admin: upload the staff roster and the patient registry (CSV with preview). */
 export default async function RosterPage() {
   const { profile, hospital } = await requireRole(adminRoles);
-  const t = await getTranslations("roster");
+  const t = tr("roster");
   const admin = createAdminClient();
   const [staff, patients] = await Promise.all([
     admin.from("staff_roster").select("id", { count: "exact", head: true }).eq("hospital_id", profile.hospital_id!),

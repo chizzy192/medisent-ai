@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { DrugCheckChip, DrugCheckNote } from "@/components/DrugCheckChip";
 import { EmptyState } from "@/components/EmptyState";
 import { ScanIcon } from "@/components/icons";
@@ -9,6 +9,8 @@ import { Meter, ButtonLink, SectionLabel } from "@/components/ui";
 import { patientRoles, requireRole } from "@/lib/auth/dal";
 import { createClient } from "@/lib/db/server";
 import type { DrugCheckResult } from "@/lib/drugcheck";
+import type { PrescriptionSource, PrescriptionStatus } from "@/lib/db/types";
+import { StatusChip } from "@/components/StatusChip";
 import { daysLeft, lagosDate } from "@/lib/reminders";
 
 type Med = {
@@ -25,6 +27,9 @@ type Med = {
   check_result: DrugCheckResult | null;
   quantity_dispensed: number | null;
   created_at: string;
+  status: PrescriptionStatus;
+  source: PrescriptionSource;
+  rejection_reason: string | null;
 };
 type Reminder = { prescription_id: string; time_of_day: string };
 type Refill = { prescription_id: string; runs_out_on: string; quantity_dispensed: number; doses_per_day: number; units_per_dose: number };
@@ -32,10 +37,10 @@ type Refill = { prescription_id: string; runs_out_on: string; quantity_dispensed
 /** My medicines: every active prescription with its times, supply left and registration check. */
 export default async function MedsPage() {
   const { profile } = await requireRole(patientRoles);
-  const t = await getTranslations("meds");
+  const t = tr("meds");
   const supabase = await createClient();
   const [{ data: meds }, { data: rems }, { data: refills }] = await Promise.all([
-    supabase.from("prescriptions").select("id,drug_name,strength,dose,frequency_per_day,instructions_plain,pill_shape,pill_color,nafdac_no,manufacturer,check_result,quantity_dispensed,created_at").eq("active", true).order("created_at", { ascending: false }),
+    supabase.from("prescriptions").select("id,drug_name,strength,dose,frequency_per_day,instructions_plain,pill_shape,pill_color,nafdac_no,manufacturer,check_result,quantity_dispensed,created_at,status,source,rejection_reason").neq("status", "rejected").eq("active", true).order("created_at", { ascending: false }),
     supabase.from("reminders").select("prescription_id,time_of_day").eq("active", true).order("time_of_day"),
     supabase.from("refills").select("prescription_id,runs_out_on,quantity_dispensed,doses_per_day,units_per_dose").eq("refilled", false),
   ]);
@@ -53,14 +58,14 @@ export default async function MedsPage() {
           <SectionLabel>{t("label")}</SectionLabel>
           <h1 className="mt-1 text-2xl">{t("title")}</h1>
         </div>
-        <ButtonLink href="/scan" variant="outline">
+        <ButtonLink href="/add" variant="outline">
           <ScanIcon size={20} />
-          {t("scanAnother")}
+          {t("addAnother")}
         </ButtonLink>
       </div>
 
       {list.length === 0 ? (
-        <EmptyState label={t("label")} title={t("emptyTitle")} icon={<ScanIcon size={24} />} action={<ButtonLink href="/scan">{t("scanFirst")}</ButtonLink>}>
+        <EmptyState label={t("label")} title={t("emptyTitle")} icon={<ScanIcon size={24} />} action={<ButtonLink href="/add">{t("addFirst")}</ButtonLink>}>
           <p>{t("emptyBody")}</p>
         </EmptyState>
       ) : (
@@ -80,10 +85,15 @@ export default async function MedsPage() {
                   status={{ tone: left !== null && left <= 3 ? "warning" : "neutral", label: left === null ? t("perDay", { count: m.frequency_per_day }) : t("daysLeft", { count: Math.max(0, left) }) }}
                   footer={
                     <div className="space-y-3">
-                      {m.instructions_plain && <ListenButton text={m.instructions_plain} locale={profile.language} rate={rate} />}
+                      {m.instructions_plain && <ListenButton text={m.instructions_plain} rate={rate} />}
                       {refill && left !== null && totalDays && (
                         <Meter label={t("supply")} valueText={t("daysLeft", { count: Math.max(0, left) })} value={Math.max(0, left)} max={totalDays} tone={left <= 3 ? "warning" : "primary"} />
                       )}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <StatusChip tone={m.status === "pending" ? "neutral" : "success"}>{t(`status.${m.status}`)}</StatusChip>
+                        <span className="text-sm text-ink-2">{t(`source.${m.source}`)}</span>
+                      </div>
+                      {m.status === "pending" && <p className="text-sm text-ink-2">{t("pendingNote")}</p>}
                       <div className="flex flex-wrap items-center gap-2">
                         <DrugCheckChip result={m.check_result} />
                         {m.nafdac_no && <span className="font-mono text-sm text-ink-2">{m.nafdac_no}</span>}

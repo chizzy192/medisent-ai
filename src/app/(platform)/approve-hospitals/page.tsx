@@ -1,4 +1,4 @@
-import { getFormatter, getTranslations } from "next-intl/server";
+import { tr, formatDate } from "@/lib/strings";
 import { licenceLink } from "@/app/(platform)/actions";
 import { ReviewForm } from "@/components/admin/ReviewForm";
 import { EmptyState } from "@/components/EmptyState";
@@ -14,8 +14,7 @@ const tone: Record<HospitalStatus, ChipTone> = { pending: "neutral", approved: "
 /** Platform admin: review registered hospitals, open the licence, approve or reject. */
 export default async function ApproveHospitalsPage() {
   await requireRole(platformRoles);
-  const t = await getTranslations("approveHospitals");
-  const format = await getFormatter();
+  const t = tr("approveHospitals");
   const admin = createAdminClient();
   // Oldest registration first: the hospital waiting longest is at the top.
   const { data } = await admin.from("hospitals").select("*").order("created_at", { ascending: true });
@@ -25,7 +24,7 @@ export default async function ApproveHospitalsPage() {
   const links = Object.fromEntries(
     await Promise.all(pending.filter((h) => h.licence_url).map(async (h) => [h.id, await licenceLink(h.licence_url!)] as const)),
   );
-  const when = (iso: string) => format.dateTime(new Date(iso), { day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Lagos" });
+  const when = (iso: string) => formatDate(new Date(iso), { day: "numeric", month: "short", year: "numeric", timeZone: "Africa/Lagos" });
 
   const HospitalCard = ({ h, review }: { h: Hospital; review: boolean }) => (
     <Card as="li" className="space-y-4">

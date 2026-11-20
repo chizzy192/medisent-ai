@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 /**
  * Shared primitives (BUILD_PLAN section 3 v2). One primary button per card; secondary actions
- * are outlined cobalt. Buttons are 48px minimum, 10px radius, and wrap for long translations.
+ * are outlined cobalt. Buttons are 48px minimum, 10px radius, and wrap for long labels and large text.
  */
 type Variant = "primary" | "outline";
 const buttonClass = (variant: Variant, extra = "") =>
@@ -30,15 +30,17 @@ export function Card({
   as: Tag = "div",
   className = "",
   id,
+  testId,
   children,
 }: {
   as?: "div" | "article" | "section" | "li";
   className?: string;
   id?: string;
+  testId?: string;
   children: ReactNode;
 }) {
   return (
-    <Tag id={id} className={`rounded-card border border-border bg-surface p-4 ${className}`}>
+    <Tag id={id} data-testid={testId} className={`rounded-card border border-border bg-surface p-4 ${className}`}>
       {children}
     </Tag>
   );

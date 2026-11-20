@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { RegisterHospitalForm } from "@/components/auth/RegisterHospitalForm";
 import { FormPage } from "@/components/forms";
 import { HospitalHeader } from "@/components/HospitalHeader";
@@ -6,7 +6,7 @@ import { SetupNotice } from "@/components/SetupNotice";
 import { isServiceRoleConfigured } from "@/lib/db/env";
 
 export default async function RegisterHospitalPage() {
-  const t = await getTranslations("registerHospital");
+  const t = tr("registerHospital");
   return (
     <>
       <HospitalHeader />

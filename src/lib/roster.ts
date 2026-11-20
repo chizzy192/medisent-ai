@@ -1,4 +1,3 @@
-import { isLocale } from "@/config/locales";
 import { isValidNigerianPhone, normalizePhone } from "@/lib/db/env";
 import { licenceBodies, staffRoles, type LicenceBody, type StaffRole } from "@/lib/db/types";
 
@@ -10,7 +9,7 @@ import { licenceBodies, staffRoles, type LicenceBody, type StaffRole } from "@/l
 export type UploadKind = "staff" | "patients";
 export type RowIssue = { row: number; message: string };
 export type StaffRow = { staff_id: string; full_name: string; role: StaffRole; licence_body: LicenceBody | null; licence_no: string | null; phone: string | null; email: string | null };
-export type PatientRow = { hospital_number: string; full_name: string; phone: string; age: number | null; sex: "M" | "F" | "other" | null; language: string };
+export type PatientRow = { hospital_number: string; full_name: string; phone: string; age: number | null; sex: "M" | "F" | "other" | null };
 
 const clean = (s: string | undefined) => (s ?? "").normalize("NFC").replace(/\s+/g, " ").trim();
 
@@ -43,17 +42,15 @@ export function validateRows(kind: UploadKind, rows: Record<string, string>[]): 
       const age = clean(r.age) ? Number(clean(r.age)) : null;
       const sexRaw = clean(r.sex).toUpperCase() || null;
       const sex: PatientRow["sex"] = sexRaw === "M" ? "M" : sexRaw === "F" ? "F" : sexRaw === "OTHER" ? "other" : null;
-      const language = clean(r.language).toLowerCase() || "en";
       if (!hospitalNumber) issues.push({ row, message: "hospitalNumberMissing" });
       if (!clean(r.full_name)) issues.push({ row, message: "nameMissing" });
       if (!clean(r.phone)) issues.push({ row, message: "phoneMissing" });
       else if (!isValidNigerianPhone(phone)) issues.push({ row, message: "phoneInvalid" });
       if (age !== null && (!Number.isInteger(age) || age < 0 || age > 130)) issues.push({ row, message: "ageInvalid" });
       if (sexRaw && !sex) issues.push({ row, message: "sexInvalid" });
-      if (!isLocale(language)) issues.push({ row, message: "languageInvalid" });
       if (hospitalNumber && seen.has(hospitalNumber)) issues.push({ row, message: "duplicateId" });
       seen.add(hospitalNumber);
-      patients.push({ hospital_number: hospitalNumber, full_name: clean(r.full_name), phone: phone ?? "", age, sex, language });
+      patients.push({ hospital_number: hospitalNumber, full_name: clean(r.full_name), phone: phone ?? "", age, sex });
     }
   });
   return { issues, staff, patients };

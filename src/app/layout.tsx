@@ -1,15 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Noto_Sans } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
 import { cookies } from "next/headers";
-import { getLocale, getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { CONTRAST_COOKIE, isTextSize, TEXT_SIZE_COOKIE } from "@/lib/accessibility";
 import { brand } from "@/config/brand";
-import { htmlLang, isLocale, defaultLocale } from "@/config/locales";
 import "./globals.css";
 
 // Section 3 v2: IBM Plex Sans (UI) + IBM Plex Mono (times, doses, IDs, labels).
-// The "vietnamese" subset carries ẹ ọ ị ụ; unicode-range downloads only what is used.
+// The "vietnamese" subset carries ẹ ọ ị ụ for Nigerian names; unicode-range downloads only what is used.
 const plexSans = IBM_Plex_Sans({
   variable: "--font-plex-sans",
   subsets: ["latin", "latin-ext", "vietnamese"],
@@ -24,7 +22,7 @@ const plexMono = IBM_Plex_Mono({
   display: "swap",
 });
 
-// Fallback for stacked tone marks (e.g. ẹ̀) that Plex lacks.
+// Fallback for stacked tone marks in names (e.g. ẹ̀) that Plex lacks.
 const notoSans = Noto_Sans({
   variable: "--font-noto-sans",
   subsets: ["latin-ext", "vietnamese"],
@@ -34,7 +32,7 @@ const notoSans = Noto_Sans({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("meta");
+  const t = tr("meta");
   return {
     title: { default: brand.name, template: `%s · ${brand.name}` },
     description: t("description"),
@@ -55,21 +53,19 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const locale = await getLocale();
-  const lang = htmlLang[isLocale(locale) ? locale : defaultLocale];
   const store = await cookies();
   const textSize = store.get(TEXT_SIZE_COOKIE)?.value;
   const contrast = store.get(CONTRAST_COOKIE)?.value === "high" ? "high" : undefined;
 
   return (
     <html
-      lang={lang}
+      lang="en-NG"
       data-text-size={isTextSize(textSize) && textSize !== "normal" ? textSize : undefined}
       data-contrast={contrast}
       className={`${plexSans.variable} ${plexMono.variable} ${notoSans.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        {children}
       </body>
     </html>
   );

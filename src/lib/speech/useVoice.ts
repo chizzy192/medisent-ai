@@ -1,112 +1,82 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { isLocale, localeNames, type Locale } from "@/config/locales";
+import { useCallback, useEffect, useId, useState } from "react";
+import { tr } from "@/lib/strings";
 import { clientAudioKey, getCachedAudio, putCachedAudio } from "@/lib/offline/audio";
+import { playBlob, playUtterance, stopAll, usePlayerState, type VoiceSource } from "./player";
 
 /**
- * Plays a sentence in the patient's language: IndexedDB cache → /api/speak (Spitch / 9jaLingo)
- * → browser voice as the last resort (English and Pidgin only; the app never reads Igbo, Yoruba
- * or Hausa with a voice from another language). `rate` is the speech speed setting.
+ * Speaks an English sentence through the one shared player: IndexedDB cache → /api/speak
+ * (Spitch "kingsley") → the browser's English voice only when the server cannot be reached,
+ * labelled "Offline voice". `rate` is the patient's speech-speed setting (playback rate on top
+ * of Spitch's 0.9).
  */
-const voicePrefixes: Record<Locale, string[]> = { en: ["en"], ig: ["ig"], yo: ["yo"], ha: ["ha"], pcm: ["pcm", "en"] };
-
-export type VoiceSource = "cache" | "server" | "browser" | null;
+export type { VoiceSource };
 
 export function useVoice(rate = 1) {
-  const t = useTranslations("voice");
-  const raw = useLocale();
-  const uiLocale: Locale = isLocale(raw) ? raw : "en";
-  const [speaking, setSpeaking] = useState(false);
-  const [source, setSource] = useState<VoiceSource>(null);
+  const t = tr("voice");
+  const myKey = useId();
+  const player = usePlayerState();
   const [message, setMessage] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [lastSource, setLastSource] = useState<VoiceSource>(null);
+  const speaking = player.playingKey === myKey;
+  const source = speaking ? player.source : lastSource;
 
   const stop = useCallback(() => {
-    audioRef.current?.pause();
-    audioRef.current = null;
-    window.speechSynthesis?.cancel();
-    setSpeaking(false);
-  }, []);
+    if (player.playingKey === myKey) stopAll();
+  }, [myKey, player.playingKey]);
 
-  useEffect(() => stop, [stop]);
-
-  const playBlob = useCallback(
-    (blob: Blob) =>
-      new Promise<void>((resolve, reject) => {
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-        audio.playbackRate = rate;
-        audioRef.current = audio;
-        audio.onended = () => {
-          URL.revokeObjectURL(url);
-          setSpeaking(false);
-          resolve();
-        };
-        audio.onerror = () => {
-          URL.revokeObjectURL(url);
-          setSpeaking(false);
-          reject(new Error("playback"));
-        };
-        audio.play().then(() => setSpeaking(true)).catch(reject);
-      }),
-    [rate],
-  );
-
-  const browserVoice = useCallback(
-    (text: string, locale: Locale): boolean => {
-      const synth = window.speechSynthesis;
-      const voice = voicePrefixes[locale].map((p) => synth?.getVoices().find((v) => v.lang.toLowerCase().startsWith(p))).find(Boolean);
-      if (!synth || !voice) return false;
-      const u = new SpeechSynthesisUtterance(text);
-      u.voice = voice;
-      u.lang = voice.lang;
-      u.rate = 0.9 * rate;
-      u.onend = () => setSpeaking(false);
-      u.onerror = () => setSpeaking(false);
-      synth.cancel();
-      synth.speak(u);
-      setSpeaking(true);
-      setSource("browser");
-      return true;
-    },
-    [rate],
-  );
+  useEffect(() => () => stop(), [stop]);
 
   const speak = useCallback(
-    async (text: string, locale: Locale = uiLocale) => {
-      stop();
+    async (text: string) => {
+      stopAll();
       setMessage(null);
-      const key = await clientAudioKey(text, locale);
+      const key = await clientAudioKey(text);
       const hit = await getCachedAudio(key);
       if (hit) {
-        setSource("cache");
+        setLastSource("cache");
         try {
-          await playBlob(hit.blob);
+          await playBlob(myKey, hit.blob, "cache", rate);
           return;
         } catch {
           /* fall through to the server */
         }
       }
+      let reachable = true;
       try {
-        const res = await fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, language: locale }) });
+        const res = await fetch("/api/speak", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
         if (res.ok && (res.headers.get("content-type") ?? "").startsWith("audio/")) {
           const blob = await res.blob();
-          void putCachedAudio({ key, blob, mime: blob.type, createdAt: Date.now() });
-          setSource("server");
-          await playBlob(blob);
+          const provider = (res.headers.get("x-voice") as VoiceSource) ?? "spitch";
+          void putCachedAudio({ key, blob, mime: blob.type, createdAt: Date.now(), provider: provider ?? "spitch" });
+          setLastSource(provider);
+          await playBlob(myKey, blob, provider, rate);
           return;
         }
       } catch {
-        /* offline or server error: browser voice next */
+        reachable = false;
       }
-      if (!browserVoice(text, locale)) {
-        setSource(null);
-        setMessage(t("unavailable", { language: localeNames[locale] }));
+      // No clip from the server: the browser's English voice, only when offline or unreachable.
+      if (!reachable || !navigator.onLine) {
+        const synth = window.speechSynthesis;
+        const voice = synth?.getVoices().find((v) => v.lang.toLowerCase().startsWith("en"));
+        if (synth && voice) {
+          const u = new SpeechSynthesisUtterance(text);
+          u.voice = voice;
+          u.lang = voice.lang;
+          u.rate = 0.9 * rate;
+          if (playUtterance(myKey, u)) {
+            setLastSource("browser");
+            setMessage(t("offlineVoice"));
+            return;
+          }
+        }
       }
+      setLastSource(null);
+      setMessage(t("unavailable"));
     },
-    [browserVoice, playBlob, stop, t, uiLocale],
+    [myKey, rate, t],
   );
 
   return { speak, stop, speaking, source, message };

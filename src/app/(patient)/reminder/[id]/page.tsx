@@ -33,7 +33,6 @@ export default async function ReminderPage({ params, searchParams }: PageProps<"
         dose={p.dose ?? ""}
         instruction={p.instructions_plain ?? ""}
         pill={{ shape: p.pill_shape as PillShape, color: p.pill_color }}
-        locale={profile.language}
         rate={Number(profile.speech_rate) || 1}
         alreadyLogged={log?.status ?? null}
       />

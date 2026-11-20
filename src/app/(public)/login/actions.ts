@@ -1,8 +1,6 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
-import { LOCALE_COOKIE } from "@/config/locales";
 import { createAdminClient } from "@/lib/db/admin";
 import { isServiceRoleConfigured, isValidNigerianPhone, normalizePhone } from "@/lib/db/env";
 import { homeForRole, type Profile } from "@/lib/db/types";
@@ -55,7 +53,7 @@ async function startLogin(_prev: LoginState, formData: FormData): Promise<LoginS
   }
   if (!isValidNigerianPhone(profile.phone)) return { step: "form", error: "noPhoneOnFile", identifier };
 
-  const otp = await issueOtp({ target: profile.phone, purpose: "login", owner: { profileId: profile.id }, message: otpSms(profile.language) });
+  const otp = await issueOtp({ target: profile.phone, purpose: "login", owner: { profileId: profile.id }, message: otpSms });
   return { step: "otp", profileId: profile.id, masked: otp.maskedTarget, delivery: otp.delivery, next, cooldownSeconds: otp.cooldownSeconds };
 }
 
@@ -63,7 +61,7 @@ async function resendLoginOtp(prev: LoginState): Promise<LoginState> {
   if (prev.step !== "otp") return prev;
   const profile = await loadProfile(prev.profileId);
   if (!profile || !isValidNigerianPhone(profile.phone)) return { step: "form", error: "noPhoneOnFile" };
-  const otp = await issueOtp({ target: profile.phone, purpose: "login", owner: { profileId: profile.id }, message: otpSms(profile.language) });
+  const otp = await issueOtp({ target: profile.phone, purpose: "login", owner: { profileId: profile.id }, message: otpSms });
   if (otp.cooldownSeconds) return { ...prev, error: undefined, resent: false, cooldownSeconds: otp.cooldownSeconds };
   return { ...prev, delivery: otp.delivery, error: undefined, triesLeft: undefined, cooldownSeconds: undefined, resent: true };
 }
@@ -85,8 +83,6 @@ async function confirmLogin(prev: LoginState, formData: FormData): Promise<Login
 
   const admin = createAdminClient();
   await admin.from("audit_log").insert({ actor_id: profile.id, action: "login", target_table: "profiles", target_id: profile.id });
-  const store = await cookies();
-  store.set(LOCALE_COOKIE, profile.language, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
   await createSessionForEmail(profile.email);
   redirect(prev.next || homeForRole[profile.role]);
 }

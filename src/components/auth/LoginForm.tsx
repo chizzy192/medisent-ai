@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useRef } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { loginAction, type LoginState } from "@/app/(public)/login/actions";
 import { Field, FormMessage, Input, describedBy } from "@/components/forms";
 import { useFocusInvalid } from "@/components/useFocusInvalid";
@@ -13,7 +13,7 @@ import { ButtonLink } from "@/components/ui";
 
 /** Login: phone or email → OTP to the phone on file → the role's home. */
 export function LoginForm({ next, reason }: { next: string; reason?: string }) {
-  const t = useTranslations("login");
+  const t = tr("login");
   const [state, formAction] = useActionState(loginAction, { step: "form" } as LoginState);
   const formRef = useRef<HTMLFormElement>(null);
   const fieldError = state.step === "form" && (state.error === "identifierInvalid" || state.error === "identifierRequired") ? state.error : undefined;

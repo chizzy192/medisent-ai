@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import type { DrugCheckResult } from "@/lib/drugcheck";
 import { StatusChip, type ChipTone } from "./StatusChip";
 
@@ -6,7 +6,7 @@ const tone: Record<DrugCheckResult, ChipTone> = { registered: "success", not_fou
 
 /** Dot + word for a registration check result; the calm sentence goes beside it. */
 export function DrugCheckChip({ result }: { result: DrugCheckResult | null }) {
-  const t = useTranslations("drugCheck");
+  const t = tr("drugCheck");
   if (!result) return <StatusChip tone="neutral">{t("chips.none")}</StatusChip>;
   return <StatusChip tone={tone[result]}>{t(`chips.${result}`)}</StatusChip>;
 }
@@ -30,7 +30,7 @@ export function DrugCheckNote({
   typedName?: string;
   typedStrength?: string;
 }) {
-  const t = useTranslations("drugCheck");
+  const t = tr("drugCheck");
   if (!result) return null;
   let body: string;
   if (result === "registered") {

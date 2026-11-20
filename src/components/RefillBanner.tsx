@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { markRefilled } from "@/app/(patient)/home/actions";
 import { PillIcon, type PillShape } from "./PillIcon";
 import { StatusChip } from "./StatusChip";
@@ -14,7 +14,7 @@ export type RefillItem = { prescriptionId: string; name: string; strength: strin
  * the last pack size) so the count is right, then resets the days. Never red.
  */
 export function RefillBanner({ items }: { items: RefillItem[] }) {
-  const t = useTranslations("refill");
+  const t = tr("refill");
   const [pending, start] = useTransition();
   const [busy, setBusy] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);

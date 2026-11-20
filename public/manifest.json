@@ -1,7 +1,7 @@
 {
   "name": "Medisent AI",
   "short_name": "Medisent AI",
-  "description": "Your medicine, in your language.",
+  "description": "Your medicine, explained simply.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

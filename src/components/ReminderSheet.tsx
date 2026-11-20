@@ -2,9 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { logDose } from "@/app/(patient)/home/actions";
-import type { Locale } from "@/config/locales";
 import { CheckIcon, ClockIcon, MissedIcon } from "./icons";
 import { ListenButton } from "./ListenButton";
 import { PillIcon, type PillShape } from "./PillIcon";
@@ -24,7 +23,6 @@ export function ReminderSheet({
   dose,
   instruction,
   pill,
-  locale,
   rate,
   alreadyLogged,
 }: {
@@ -36,11 +34,10 @@ export function ReminderSheet({
   dose: string;
   instruction: string;
   pill: { shape: PillShape; color: string };
-  locale: Locale;
   rate: number;
   alreadyLogged: string | null;
 }) {
-  const t = useTranslations("reminder");
+  const t = tr("reminder");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [result, setResult] = useState<string | null>(alreadyLogged);
@@ -76,7 +73,7 @@ export function ReminderSheet({
       </div>
       <p className="mt-4 text-lg">{instruction}</p>
       <div className="mt-3">
-        <ListenButton text={instruction} locale={locale} rate={rate} size="lg" label={t("listen")} autoPlay />
+        <ListenButton text={instruction} rate={rate} size="lg" label={t("listen")} autoPlay />
       </div>
 
       {result ? (

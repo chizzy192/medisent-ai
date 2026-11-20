@@ -1,23 +1,21 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { tr } from "@/lib/strings";
 import { Logo } from "@/components/Logo";
 import { ReadAloudButton } from "@/components/ReadAloudButton";
 
 /**
- * Landing top bar (BUILD_PLAN Stage 0, section 1): logo, section links, language picker,
+ * Landing top bar (BUILD_PLAN Stage 0, section 1): logo, section links,
  * "Sign in" (outline) and "Try the demo" (primary). The read-aloud button is on every screen.
  * Sticky at the top. Below 1024px the section links move to a second row that wraps
  * (always visible, no JS, 48px targets) and "Sign in" joins that row.
  */
 export async function TopBar() {
-  const t = await getTranslations("landing");
-  const th = await getTranslations("header");
+  const t = tr("landing");
+  const th = tr("header");
   const links = [
     { href: "#how-it-works", label: t("navHowItWorks") },
     { href: "#for-hospitals", label: t("navForHospitals") },
     { href: "#safety", label: t("navSafety") },
-    { href: "#languages", label: t("navLanguages") },
   ];
 
   return (
@@ -52,7 +50,6 @@ export async function TopBar() {
           </ul>
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <LanguageSwitcher />
           {/* Phones (< 768px): no read-aloud button in the bar (owner's choice); the header bar stays short. */}
           <div className="hidden md:flex">
             <ReadAloudButton />

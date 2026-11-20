@@ -1,19 +1,38 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth/dal";
-import { CONFIDENCE_FLOOR, KEY_FIELDS, readLabel, shapeForForm, type ScanResult } from "@/lib/ai/scan";
+import { readPack, type PackRead } from "@/lib/ai/scan";
+import { createAdminClient } from "@/lib/db/admin";
+import type { PrescriptionStatus } from "@/lib/db/types";
 import { checkDrug, recordDrugCheck, type DrugCheck } from "@/lib/drugcheck";
-import { defaultTimes } from "@/lib/reminders";
+import { samePrescription, suggestFromPack, type FormularyDrug } from "@/lib/formulary";
+import { lagosDate } from "@/lib/reminders";
 
 /**
- * POST multipart { image } → { scan, check, suggestion } (BUILD_PLAN section 5).
- * The scanner JSON comes from Gemini; the NAFDAC number (if read) is checked against the
- * demo list straight away so the "Found so far" card can show Registered / Not found.
- * Nothing is saved here: the patient confirms on the next screen first.
+ * POST multipart { image } → { pack, check, formulary, matches, expired } (BUILD_PLAN section 5).
+ * The reader returns printed fields only (never a dose). The NAFDAC number is checked against
+ * the registration list, the formulary suggests the matching entry, and for a patient the pack
+ * is matched against their own prescriptions so the Scan tab can answer "Is this my drug?"
+ * with the dose FROM THE RECORD. Nothing is saved here.
  */
+export type MyMedMatch = {
+  id: string;
+  drug_name: string;
+  strength: string | null;
+  dose: string | null;
+  frequency_per_day: number;
+  instructions_plain: string | null;
+  status: PrescriptionStatus;
+  times: string[];
+};
+
 export type ScanResponse = {
-  scan: ScanResult;
+  pack: PackRead;
   check: DrugCheck | null;
-  suggestion: { pill_shape: ScanResult["pill_shape"]; times: string[] };
+  formulary: FormularyDrug[];
+  /** The patient's own prescriptions that this pack belongs to (verified or edited first). */
+  matches: MyMedMatch[];
+  /** The printed expiry date is before today (Lagos). */
+  expired: boolean;
   needsRetry: boolean;
 };
 
@@ -32,20 +51,33 @@ export async function POST(request: Request) {
   if (!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type)) return NextResponse.json({ error: "image_type" }, { status: 415 });
 
   try {
-    const scan = await readLabel(new Uint8Array(await file.arrayBuffer()), file.type === "image/heic" || file.type === "image/heif" ? "image/jpeg" : file.type);
-    const check = scan.nafdac_no ? await checkDrug({ nafdacNo: scan.nafdac_no, drugName: scan.drug_name, strength: scan.strength }) : null;
-    const missingKey = scan.missing_fields.some((f) => KEY_FIELDS.includes(f));
-    const needsRetry = scan.confidence < CONFIDENCE_FLOOR || !scan.drug_name || !scan.dose || missingKey;
-    // Every check is logged and a not-found / mismatch alerts the pharmacist even if the patient stops here.
-    if (check && (check.result === "not_found" || check.result === "mismatch")) {
-      await recordDrugCheck({ patientId: session.profile.id, hospitalId: session.profile.hospital_id, prescriptionId: null, scannedName: scan.drug_name, check });
+    const pack = await readPack(new Uint8Array(await file.arrayBuffer()), file.type === "image/heic" || file.type === "image/heif" ? "image/jpeg" : file.type);
+    const name = pack.drug_name.value;
+    const check = pack.nafdac_no.value ? await checkDrug({ nafdacNo: pack.nafdac_no.value, drugName: name ?? "", strength: pack.strength.value }) : null;
+    const formulary = await suggestFromPack({ name, strength: pack.strength.value, nafdac: pack.nafdac_no.value, barcode: pack.barcode.value });
+
+    let matches: MyMedMatch[] = [];
+    if (session.profile.role === "patient") {
+      const admin = createAdminClient();
+      const [{ data: meds }, { data: rems }] = await Promise.all([
+        admin.from("prescriptions").select("id,drug_id,drug_name,strength,dose,frequency_per_day,instructions_plain,status").eq("patient_id", session.profile.id).eq("active", true).neq("status", "rejected"),
+        admin.from("reminders").select("prescription_id,time_of_day").eq("patient_id", session.profile.id).eq("active", true).order("time_of_day"),
+      ]);
+      const times = new Map<string, string[]>();
+      for (const r of rems ?? []) times.set(r.prescription_id, [...(times.get(r.prescription_id) ?? []), String(r.time_of_day).slice(0, 5)]);
+      const packIds = new Set([check?.drugId, ...formulary.map((d) => d.id)].filter(Boolean) as string[]);
+      matches = (meds ?? [])
+        .filter((m) => samePrescription({ drugId: m.drug_id && packIds.has(m.drug_id) ? m.drug_id : null, name, strength: pack.strength.value }, m))
+        .sort((a, b) => Number(b.status !== "pending") - Number(a.status !== "pending"))
+        .map((m) => ({ id: m.id, drug_name: m.drug_name, strength: m.strength, dose: m.dose, frequency_per_day: m.frequency_per_day, instructions_plain: m.instructions_plain, status: m.status as PrescriptionStatus, times: times.get(m.id) ?? [] }));
+      // Every check is logged and a not-found / mismatch alerts the pharmacist even if the patient stops here.
+      if (check && (check.result === "not_found" || check.result === "mismatch")) {
+        await recordDrugCheck({ patientId: session.profile.id, hospitalId: session.profile.hospital_id, prescriptionId: matches[0]?.id ?? null, scannedName: name ?? "", check });
+      }
     }
-    const response: ScanResponse = {
-      scan,
-      check,
-      suggestion: { pill_shape: scan.pill_shape ?? shapeForForm(scan.form), times: defaultTimes(scan.frequency_per_day) },
-      needsRetry,
-    };
+
+    const expired = Boolean(pack.expiry_date.value && pack.expiry_date.value < lagosDate());
+    const response: ScanResponse = { pack, check, formulary, matches, expired, needsRetry: !name || pack.drug_name.confidence < 0.6 };
     return NextResponse.json(response);
   } catch (error) {
     console.error("[scan]", error);

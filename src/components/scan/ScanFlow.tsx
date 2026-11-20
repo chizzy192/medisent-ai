@@ -1,25 +1,27 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import type { ScanResponse } from "@/app/api/scan/route";
-import type { Locale } from "@/config/locales";
-import { CONFIDENCE_FLOOR, KEY_FIELDS } from "@/lib/ai/scan";
+import { DrugCheckChip, DrugCheckNote } from "@/components/DrugCheckChip";
 import { FormMessage } from "@/components/forms";
+import { ListenButton } from "@/components/ListenButton";
+import { PackReadCard } from "@/components/PackReadCard";
 import { StatusChip } from "@/components/StatusChip";
-import { SectionLabel } from "@/components/ui";
-import { ConfirmForm } from "./ConfirmForm";
+import { Card, SectionLabel } from "@/components/ui";
 
-type Phase = "idle" | "camera" | "reading" | "found" | "failed" | "confirm";
+type Phase = "idle" | "camera" | "reading" | "result" | "failed";
 
 /**
- * Scan flow (BUILD_PLAN Stage 2, signature element 4): live viewfinder with four cobalt
- * corner brackets, a sweeping line while reading and a status chip; below it the "Found so
- * far" card fills in Drug, Strength, NAFDAC as the reader answers. Low confidence or missing
- * fields show "Turn the pack" and offer a retake. File picker fallback when there is no camera.
+ * Scan tab = "Is this my drug?" (BUILD_PLAN section 5). The viewfinder (four cobalt corner
+ * brackets, sweep line while reading) reads the PRINTED fields of a pack, then matches them
+ * against the patient's own prescriptions. Match: the dose FROM THE RECORD, read aloud. No
+ * match: a calm warning and "ask your pharmacist". Expired or not on the NAFDAC list: warn.
+ * The screen never shows a dose that is not in the record.
  */
-export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
-  const t = useTranslations("scan");
+export function ScanFlow({ rate }: { rate: number }) {
+  const t = tr("scan");
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -28,7 +30,6 @@ export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<ScanResponse | null>(null);
-  const [shown, setShown] = useState(0);
   const [preview, setPreview] = useState<string | null>(null);
   const generation = useRef(0);
 
@@ -51,9 +52,8 @@ export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
       setCameraError(e instanceof DOMException && e.name === "NotAllowedError" ? "denied" : "unavailable");
       return;
     }
-    // Unmounted or retaken while the permission prompt was open: release this stream at once.
-    if (gen !== generation.current) return stream.getTracks().forEach((t) => t.stop());
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    if (gen !== generation.current) return stream.getTracks().forEach((x) => x.stop());
+    streamRef.current?.getTracks().forEach((x) => x.stop());
     streamRef.current = stream;
     setCameraError(null);
     if (videoRef.current) {
@@ -71,28 +71,18 @@ export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
     };
   }, [startCamera, stopCamera]);
 
-  // Progress ticks while the reader works (the API answers in one go); the first value is set
-  // where reading starts, so the effect only schedules timers.
   useEffect(() => {
     if (phase !== "reading") return;
     const id = setInterval(() => setProgress((p) => Math.min(92, p + Math.max(1, Math.round((92 - p) / 8)))), 400);
     return () => clearInterval(id);
   }, [phase]);
 
-  // "Found so far" fills field by field once the answer arrives.
-  useEffect(() => {
-    if (phase !== "found" || !result) return;
-    const ids = [1, 2, 3].map((n) => setTimeout(() => setShown(n), n * 350));
-    return () => ids.forEach(clearTimeout);
-  }, [phase, result]);
-
   async function send(blob: Blob) {
     setError(null);
     setProgress(8);
-    setShown(0);
     setPhase("reading");
     const form = new FormData();
-    form.append("image", blob, "label.jpg");
+    form.append("image", blob, "pack.jpg");
     try {
       const res = await fetch("/api/scan", { method: "POST", body: form, signal: AbortSignal.timeout(60_000) });
       if (!res.ok) {
@@ -101,10 +91,9 @@ export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
         setPhase("failed");
         return;
       }
-      const json = (await res.json()) as ScanResponse;
-      setResult(json);
+      setResult((await res.json()) as ScanResponse);
       setProgress(100);
-      setPhase("found");
+      setPhase("result");
     } catch {
       setError(navigator.onLine ? "readerFailed" : "offline");
       setPhase("failed");
@@ -146,23 +135,18 @@ export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
     void startCamera();
   }
 
-  if (phase === "confirm" && result) {
-    return <ConfirmForm scan={result} locale={locale} rate={rate} onBack={() => setPhase("found")} />;
-  }
-
   const reading = phase === "reading";
-  const found = phase === "found" && result;
-  const weak = found && (result.needsRetry || result.scan.missing_fields.some((f) => KEY_FIELDS.includes(f)));
-  const missing = found ? new Set(result.scan.missing_fields) : new Set<string>();
+  const match = result?.matches[0] ?? null;
+  const verdict: "match" | "pending" | "noMatch" | "unreadable" | null = !result ? null : result.needsRetry && !match ? "unreadable" : match ? (match.status === "pending" ? "pending" : "match") : "noMatch";
 
   return (
     <div className="space-y-4">
       <div>
-        <SectionLabel>{t("stepLabel", { step: 1, total: 2 })}</SectionLabel>
-        <h1 className="mt-1 text-2xl">{found ? t("foundTitle") : t("pointTitle")}</h1>
+        <SectionLabel>{t("label")}</SectionLabel>
+        <h1 className="mt-1 text-2xl">{result ? t("resultTitle") : t("pointTitle")}</h1>
+        {!result && <p className="mt-1 text-base text-ink-2">{t("intro")}</p>}
       </div>
 
-      {/* Viewfinder: dark, four cobalt corner brackets, sweep line while reading, status chip. */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-card bg-[#0B1220]">
         {preview ? (
           // eslint-disable-next-line @next/next/no-img-element -- captured frame
@@ -181,49 +165,66 @@ export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
             </StatusChip>
           )}
           {phase === "camera" && <StatusChip tone="neutral">{t("ready")}</StatusChip>}
-          {found && !weak && <StatusChip tone="success">{t("done", { pct: Math.round(result.scan.confidence * 100) })}</StatusChip>}
-          {found && weak && <StatusChip tone="warning">{t("weak", { pct: Math.round(result.scan.confidence * 100) })}</StatusChip>}
+          {verdict === "match" && <StatusChip tone="success">{t("verdict.match")}</StatusChip>}
+          {verdict === "pending" && <StatusChip tone="neutral">{t("verdict.pending")}</StatusChip>}
+          {verdict === "noMatch" && <StatusChip tone="warning">{t("verdict.noMatch")}</StatusChip>}
+          {verdict === "unreadable" && <StatusChip tone="warning">{t("verdict.unreadable")}</StatusChip>}
         </div>
       </div>
 
       {cameraError && !preview && <FormMessage tone="info">{t(`camera.${cameraError}`)}</FormMessage>}
       {error && <FormMessage tone="error">{t(`errors.${error}`)}</FormMessage>}
       <p role="status" className="sr-only">
-        {reading ? t("reading", { pct: progress }) : found ? (weak ? t("weak", { pct: Math.round(result.scan.confidence * 100) }) : t("done", { pct: Math.round(result.scan.confidence * 100) })) : ""}
+        {reading ? t("reading", { pct: progress }) : verdict ? t(`verdict.${verdict}`) : ""}
       </p>
 
-      {/* Found so far: fills in field by field. */}
-      {(reading || found) && (
-        <section aria-live="polite" className="rounded-card border border-border bg-surface p-4">
-          <SectionLabel>{t("foundSoFar")}</SectionLabel>
-          <dl className="mt-2 divide-y divide-surface-2">
-            {(
-              [
-                ["drug", result?.scan.drug_name, 1],
-                ["strength", result?.scan.strength, 2],
-                ["nafdac", result?.scan.nafdac_no, 3],
-              ] as const
-            ).map(([key, value, order]) => {
-              const visible = found && shown >= order;
-              const isMissing = visible && (!value || missing.has(key === "drug" ? "drug_name" : key === "nafdac" ? "nafdac_no" : "strength"));
-              return (
-                <div key={key} className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2">
-                  <dt className="text-base text-ink-2">{t(`fields.${key}`)}</dt>
-                  <dd className={`min-w-0 font-semibold [overflow-wrap:anywhere] transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"} ${key === "drug" ? "text-lg" : "font-mono text-lg"}`}>
-                    {isMissing ? <StatusChip tone="warning">{t("turnPack")}</StatusChip> : (value ?? "…")}
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
-          {found && result.check && shown >= 3 && (
-            <div className="mt-3">
-              <StatusChip tone={result.check.result === "registered" ? "success" : result.check.result === "unreadable" ? "neutral" : "warning"}>
-                {t(`check.${result.check.result}`)}
-              </StatusChip>
+      {result && (
+        <div className="space-y-4" data-testid="scan-result">
+          {result.expired && <FormMessage tone="error">{t("expired", { date: result.pack.expiry_date.value ?? "" })}</FormMessage>}
+
+          {match && (
+            <Card as="section" className={`space-y-3 ${verdict === "match" ? "border-2 border-success" : ""}`}>
+              <SectionLabel as="h2">{t("yourRecord")}</SectionLabel>
+              <p className="text-xl font-semibold [overflow-wrap:anywhere]">
+                {match.drug_name} <span className="font-mono text-lg font-medium text-ink-2">{match.strength}</span>
+              </p>
+              <p className="font-mono text-time font-medium text-ink">
+                {match.dose} <span className="text-base text-ink-2">· {match.times.join(" · ")}</span>
+              </p>
+              {match.instructions_plain && <p className="text-lg">{match.instructions_plain}</p>}
+              {match.instructions_plain && <ListenButton text={match.instructions_plain} rate={rate} size="lg" />}
+              {verdict === "pending" && <p className="text-base text-ink-2">{t("pendingNote")}</p>}
+            </Card>
+          )}
+
+          {verdict === "noMatch" && (
+            <Card as="section" className="space-y-3 border-2 border-warning-dot">
+              <SectionLabel as="h2">{t("noMatchTitle")}</SectionLabel>
+              <p className="text-base">{t("noMatchBody", { name: result.pack.drug_name.value ?? "" })}</p>
+              <p className="text-base text-ink-2">{t("askPharmacist")}</p>
+              <Link href="/add" className="btn-outline w-full sm:w-auto">
+                {t("addThis")}
+              </Link>
+            </Card>
+          )}
+
+          {verdict === "unreadable" && <FormMessage tone="info">{t("unreadableBody")}</FormMessage>}
+
+          {result.check && result.check.result !== "registered" && (
+            <Card as="section" className="space-y-2">
+              <DrugCheckChip result={result.check.result} />
+              <DrugCheckNote result={result.check.result} listedName={result.check.listedName} listedStrength={result.check.listedStrength} manufacturer={result.check.manufacturer} typedName={result.pack.drug_name.value ?? ""} typedStrength={result.pack.strength.value ?? ""} />
+            </Card>
+          )}
+          {result.check?.result === "registered" && (
+            <div className="flex flex-wrap items-center gap-2">
+              <DrugCheckChip result="registered" />
+              <span className="font-mono text-sm text-ink-2">{result.check.nafdacNo}</span>
             </div>
           )}
-        </section>
+
+          <PackReadCard pack={result.pack} />
+        </div>
       )}
 
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -232,22 +233,12 @@ export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
             {t("capture")}
           </button>
         )}
-        {found && (
-          <>
-            <button type="button" onClick={() => setPhase("confirm")} className="btn-primary flex-1" data-testid="scan-continue">
-              {weak ? t("continueAnyway") : t("continue")}
-            </button>
-            <button type="button" onClick={retake} className="btn-outline flex-1">
-              {t("retake")}
-            </button>
-          </>
-        )}
-        {phase === "failed" && (
-          <button type="button" onClick={retake} className="btn-primary flex-1" data-testid="scan-retake">
+        {(phase === "result" || phase === "failed") && (
+          <button type="button" onClick={retake} className={`flex-1 ${phase === "failed" ? "btn-primary" : "btn-outline"}`} data-testid="scan-retake">
             {t("retake")}
           </button>
         )}
-        {!reading && !found && (
+        {!reading && phase !== "result" && (
           <>
             <button type="button" onClick={() => fileRef.current?.click()} className={`flex-1 ${phase === "camera" || phase === "failed" ? "btn-outline" : "btn-primary"}`}>
               {t("choosePhoto")}
@@ -256,7 +247,14 @@ export function ScanFlow({ locale, rate }: { locale: Locale; rate: number }) {
           </>
         )}
       </div>
-      {found && weak && <p className="text-base text-ink-2">{t("weakHint", { pct: Math.round(CONFIDENCE_FLOOR * 100) })}</p>}
+      {!result && (
+        <p className="text-sm text-ink-2">
+          {t("addLead")}{" "}
+          <Link href="/add" className="underline">
+            {t("addLink")}
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { registerHospital, type RegisterState } from "@/app/(public)/register-hospital/actions";
 import { Field, FormMessage, Input, Select, Textarea, describedBy } from "@/components/forms";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -28,7 +28,7 @@ function sizeLabel(bytes: number) {
  * focus moves to the first invalid field.
  */
 export function RegisterHospitalForm() {
-  const t = useTranslations("registerHospital");
+  const t = tr("registerHospital");
   const [state, formAction] = useActionState(registerHospital, { step: "form" } as RegisterState);
   const values = state.step === "form" ? (state.values ?? {}) : {};
   const [colour, setColour] = useState(values.brandColor ?? "#1D4E89");

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { FormPage } from "@/components/forms";
 import { HospitalHeader } from "@/components/HospitalHeader";
@@ -13,7 +13,7 @@ export default async function SignupPage() {
   const session = await getSession();
   if (session && session.profile.verified_status === "verified") redirect(homeForRole[session.profile.role]);
 
-  const t = await getTranslations("signup");
+  const t = tr("signup");
   let hospitals: { id: string; name: string }[] = [];
   if (isServiceRoleConfigured()) {
     const { data } = await createAdminClient().from("hospitals").select("id,name").eq("status", "approved").order("name");

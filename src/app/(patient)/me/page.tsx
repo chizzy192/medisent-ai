@@ -1,7 +1,6 @@
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { signOut } from "@/lib/auth/actions";
 import { AccessibilityForm } from "@/components/AccessibilityForm";
-import { LanguageChoice } from "@/components/LanguageChoice";
 import { StatusChip } from "@/components/StatusChip";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Card, SectionLabel } from "@/components/ui";
@@ -9,15 +8,15 @@ import { getSession, requireRole } from "@/lib/auth/dal";
 import { isTextSize } from "@/lib/accessibility";
 
 /**
- * "Me" (section 3): the account, hospital, language, accessibility (text size, high contrast,
+ * "Me" (section 3): the account, hospital, accessibility (text size, high contrast,
  * speech speed) and sign-out. Later stages add Caregivers, Refills, Records and Privacy here.
  */
 export default async function MePage() {
   await requireRole(["patient", "doctor", "pharmacist", "nurse", "hospital_admin", "platform_admin"]);
   const session = (await getSession())!;
   const { profile, hospital } = session;
-  const t = await getTranslations("me");
-  const tAccess = await getTranslations("access");
+  const t = tr("me");
+  const tAccess = tr("access");
 
   const rows: { label: string; value: string | null }[] = [
     { label: t("role"), value: t(`roles.${profile.role}`) },
@@ -46,14 +45,6 @@ export default async function MePage() {
             </div>
           ))}
         </dl>
-      </Card>
-
-      <Card as="section">
-        <h2 className="text-xl">{t("language")}</h2>
-        <p className="mt-1 text-base text-ink-2">{t("languageBody")}</p>
-        <div className="mt-3">
-          <LanguageChoice label={t("language")} />
-        </div>
       </Card>
 
       <Card as="section" id="accessibility">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { saveAccessibility } from "@/app/(patient)/me/actions";
 import { SPEECH_RATES, TEXT_SIZES, type TextSize } from "@/lib/accessibility";
 import { ListenButton } from "./ListenButton";
@@ -12,7 +12,7 @@ import { SubmitButton } from "./SubmitButton";
  * Every choice is a large labelled radio; the sample sentence lets the person hear the speed.
  */
 export function AccessibilityForm({ textSize, highContrast, speechRate, sample }: { textSize: TextSize; highContrast: boolean; speechRate: number; sample: string }) {
-  const t = useTranslations("access");
+  const t = tr("access");
   const [rate, setRate] = useState(speechRate);
   const radio = (checked: boolean) => `flex min-h-12 cursor-pointer items-center gap-3 rounded-button border px-3 ${checked ? "border-primary bg-primary-tint" : "border-border bg-surface"}`;
 

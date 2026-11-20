@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { logDose } from "@/app/(patient)/home/actions";
-import type { Locale } from "@/config/locales";
 import { CheckIcon } from "./icons";
+import { StatusChip } from "./StatusChip";
 import { ListenButton } from "./ListenButton";
 import { MedicineCard, type DoseState } from "./MedicineCard";
 import type { PillShape } from "./PillIcon";
@@ -22,6 +22,8 @@ export type DoseItem = {
   pill: { shape: PillShape; color: string };
   state: DoseState;
   daysLeft: number | null;
+  /** Patient's own entry that no pharmacist has checked yet. */
+  pending: boolean;
 };
 
 const chipTone: Record<DoseState, ChipTone> = { taken: "success", now: "primary", later: "neutral", late: "warning", missed: "warning", snoozed: "warning" };
@@ -31,8 +33,8 @@ const chipTone: Record<DoseState, ChipTone> = { taken: "success", now: "primary"
  * "I took it" button; on tap it turns success with a check, then the card settles into its
  * taken state (250 ms; instant under reduced motion). Colour is never the only signal.
  */
-export function DoseCard({ item, locale, rate }: { item: DoseItem; locale: Locale; rate: number }) {
-  const t = useTranslations("home");
+export function DoseCard({ item, rate }: { item: DoseItem; rate: number }) {
+  const t = tr("home");
   const [state, setState] = useState<DoseState>(item.state);
   const [flash, setFlash] = useState(false);
   const [pending, start] = useTransition();
@@ -98,9 +100,10 @@ export function DoseCard({ item, locale, rate }: { item: DoseItem; locale: Local
               </p>
             )}
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <ListenButton text={item.instruction} locale={locale} rate={rate} />
+              <ListenButton text={item.instruction} rate={rate} />
               {supply && <span className="font-mono text-base text-warning">{supply}</span>}
             </div>
+            {item.pending && <StatusChip tone="neutral">{t("notChecked")}</StatusChip>}
           </div>
         }
       />

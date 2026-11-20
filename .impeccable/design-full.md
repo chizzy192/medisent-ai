@@ -42,13 +42,13 @@ ink `#000`, borders `#5E6E84`, primary `#1A3FB0`, set with `data-contrast="high"
 
 ## Typography
 
-- **IBM Plex Sans** (400 / 500 / 600) for all UI text, loaded with the Next.js Google Fonts loader (next/font) including the Vietnamese subset, which carries ẹ ọ ị ụ.
+- **IBM Plex Sans** (400 / 500 / 600) for all UI text, loaded with the Next.js Google Fonts loader (next/font) including the Vietnamese subset, which carries the ẹ ọ ị ụ found in Nigerian names.
 - **IBM Plex Mono** (500) for times (`08:00`), doses, counts, percentages, IDs (`AH-0002`, NAFDAC numbers) and small uppercase section labels.
-- Fallback: **Noto Sans**, for stacked tone marks (ẹ̀) and the ṣ / ṅ that Plex Mono lacks. All of ẹ ọ ṣ ị ụ ṅ must render.
+- Fallback: **Noto Sans**, for stacked tone marks (ẹ̀) and the ṣ / ṅ that Plex Mono lacks, so patient, staff and hospital names render. All of ẹ ọ ṣ ị ụ ṅ must render.
 - `tabular-nums` only on columns of numbers, never inside a single time.
 - Scale: page title 22–26px / 600; card title (medicine name) 19px / 600; body 18px (16px for secondary lines); time on a medicine card 22px mono; section label 12px mono uppercase, 0.04em tracking; never below 12px (bottom-nav labels 13px). Line-height 1.5 for body.
 - Medicine name, dose and time are the most readable text on patient screens.
-- Large-text mode scales everything 125% / 150% without breaking layouts. Text expands in other languages: no fixed-width buttons, allow wrapping, never clip.
+- Large-text mode scales everything 125% / 150% without breaking layouts. No fixed-width buttons, allow wrapping, never clip.
 
 ## Shape and spacing
 
@@ -63,7 +63,7 @@ Cobalt rounded square with a white plus, then "Medisent" in Plex Sans 600, then 
 
 ## Header rule
 
-White (surface). Logo left with the hospital name under it; language picker right as a compact mono code (`IG ▾`) over a native select; read-aloud button beside it (it wraps to its own row on phones). A 3px bar at the bottom in the hospital's `brand_color` (`#1D4E89` when the hospital has none); primary on public screens with no hospital yet.
+White (surface). Logo left with the hospital name under it; read-aloud button right. A 3px bar at the bottom in the hospital's `brand_color` (`#1D4E89` when the hospital has none); primary on public screens with no hospital yet.
 
 ## Buttons and status
 
@@ -75,7 +75,7 @@ White (surface). Logo left with the hospital name under it; language picker righ
 
 ## Bottom navigation
 
-Phones and tablets (< 1024px): fixed bottom bar, surface background, 1px border-colour top border, 64px + safe-area inset. Icon (24px outline) + always-visible translated label (13px min; on phones the label holds at 13px so words stay whole at 200% text, on wider screens it scales with the text). Active: primary icon and label, primary-tint pill, `aria-current="page"`; inactive ink-3. Every tab, Scan included, uses the same inactive/active treatment (owner decision 2026-11-19: no always-raised Scan square). Never hides on scroll. Desktop (≥ 1024px): staff and admins get a left sidebar (see the staff mockup); patients keep the bottom bar centred at max 480px.
+Phones and tablets (< 1024px): fixed bottom bar, surface background, 1px border-colour top border, 64px + safe-area inset. Icon (24px outline) + always-visible text label (13px min; on phones the label holds at 13px so words stay whole at 200% text, on wider screens it scales with the text). Active: primary icon and label, primary-tint pill, `aria-current="page"`; inactive ink-3. Every tab, Scan included, uses the same inactive/active treatment (owner decision 2026-11-19: no always-raised Scan square). Never hides on scroll. Desktop (≥ 1024px): staff and admins get a left sidebar (see the staff mockup); patients keep the bottom bar centred at max 480px.
 
 - Badges: danger count only for open red-flag alerts; primary count for waiting questions; warning dot on Home when a dose is overdue; each badge has sr-only words.
 - Does not hide on scroll; hides only while the on-screen keyboard is open (visual viewport, scale-aware so pinch-zoom keeps it).
@@ -84,7 +84,7 @@ Phones and tablets (< 1024px): fixed bottom bar, surface background, 1px border-
 
 ## Signature elements (section 3)
 
-1. **Today ring (Home):** progress ring of doses taken today, mono count (`1/3 TAKEN`), beside the greeting in the patient's language and the next dose. Fills from 0 on first load (600 ms ease-out).
+1. **Today ring (Home):** progress ring of doses taken today, mono count (`1/3 TAKEN`), beside the greeting and the next dose. Fills from 0 on first load (600 ms ease-out).
 2. **Day timeline (Home):** today's doses as a vertical timeline; nodes success = taken, primary with a soft halo = now, border-grey = later, warning = late. The now card has a 2px primary border and the big "✓ I took it" button.
 3. **Pill icons** in the medicine's real colour and shape (round, capsule, oval, inhaler, liquid, injection), chosen on the confirm screen or suggested by the scanner; stored as `pill_shape` / `pill_color`. Name + mono strength on one line, time and dose below.
 4. **Live scan viewfinder:** dark frame, four rounded primary corner brackets, a sweeping scan line, live status chip ("Reading label… 82%"); the "Found so far" card fills Drug, Strength, NAFDAC field by field; missing fields show a warning chip ("Turn the pack").
@@ -105,7 +105,7 @@ Button (primary, outline: `.btn-primary`, `.btn-outline`), Card, SectionLabel (`
 
 ## Landing page (`/`)
 
-Drawn to `docs/mockups/medisent-landing.png`, nine sections (BUILD_PLAN Stage 0): top bar with section links, hero on the dot grid with the mono kicker chip and a 64px headline whose "your language" is primary, the live preview console (`src/components/landing/PreviewConsole.tsx`: language tabs swap the spoken sentence; audio files per language under the public audio/landing folder (not yet generated) with a browser-voice fallback), four numbered steps on a line, the three-views spec table (three cards below 768px), the drawn feature phone (`FeaturePhone.tsx`; its body and green LCD colours are an illustration, like pill colours, not tokens), four safety cards, the dark CTA band (`.theme-dark` remaps the tokens to the dark values inside it) and the footer with the language codes in mono. The brand name appears in the top bar and footer only.
+Drawn to `docs/mockups/medisent-landing.png`, nine sections (BUILD_PLAN Stage 0): top bar with section links, hero on the dot grid with the mono kicker chip and a 64px headline whose "explained simply" is primary, the live preview console (`src/components/landing/PreviewConsole.tsx`: one English sentence with a play button and waveform; the clip is public/audio/landing/en.mp3 (not yet generated) with a browser-voice fallback), four numbered steps on a line, the three-views spec table (three cards below 768px), the drawn feature phone (`FeaturePhone.tsx`; its body and green LCD colours are an illustration, like pill colours, not tokens), four safety cards, the dark CTA band (`.theme-dark` remaps the tokens to the dark values inside it) and the footer with a one-line mono note. The brand name appears in the top bar and footer only.
 
 ## Known contrast gaps (owner decisions)
 
@@ -115,11 +115,19 @@ Drawn to `docs/mockups/medisent-landing.png`, nine sections (BUILD_PLAN Stage 0)
 ## Stage 2 components
 
 - **Scan viewfinder** (`src/components/scan/ScanFlow.tsx`): dark `#0B1220` frame, four cobalt corner brackets, a 2px cobalt line sweeping every 1.8 s while reading (`.animate-scan-sweep`, off under reduced motion), a status chip at the bottom ("Reading label… 82%"), then the "Found so far" card whose Drug / Strength / NAFDAC rows fade in one by one; missing fields show the warning chip "Turn the pack".
-- **Confirm screen** (`ConfirmForm.tsx`): every field editable in cards; reminder times as native time inputs in mono; the plain-language sentence in a primary-tint block with Listen; **PillPicker** (six shapes drawn as the real icon, eight colours plus a free picker); quantity; NAFDAC number with the live check chip and calm note; never the word "fake".
+- **Confirm screen** (`ConfirmForm.tsx`): every field editable in cards; reminder times as native time inputs in mono; the plain-English sentence in a primary-tint block with Listen; **PillPicker** (six shapes drawn as the real icon, eight colours plus a free picker); quantity; NAFDAC number with the live check chip and calm note; never the word "fake".
 - **Day timeline** (`DayTimeline` + `DoseCard`): node colours success / primary halo / border-grey / warning; the now card has a 2px primary border and the "I took it" primary button, which turns success with a check for 250 ms before the card settles.
 - **Reminder sheet** (`ReminderSheet.tsx`): 36px mono time, the medicine name and dose as the largest text, Listen in large size, three 56px choices Taken / Snooze / Missed (icon + word).
 - **Refill banner** (`RefillBanner.tsx`): warning tint and border, one row per medicine with the pill icon, a mono "X days left" chip and "I got a refill" (outline).
 - **Accessibility** (Me): text size normal / large / largest sets `data-text-size` on `<html>` (125% / 150% root font; spacing stays in px), high contrast sets `data-contrast="high"`, speech speed is the playback rate.
+
+## Speech (owner rules, 2026-11-19)
+
+- One shared audio player (`src/lib/speech/player.ts`): starting any clip stops every other clip and the browser's speechSynthesis; only the reminder screen autoplays, one clip.
+- English only (owner decision, 2026-11-19). One voice in `src/config/voices.ts`: Spitch system voice "kingsley", English, speed 0.9. No translation step anywhere.
+- Text reaches the voice as written: UI strings from `src/content/strings.ts`, instructions from `buildInstruction()`.
+- Browser voice: the device's English voice only when the server cannot be reached, labelled "Offline voice" (warning chip).
+- Development shows a mono source badge (cache / spitch / browser) next to every play button; the server logs status, provider, voice and timing for every /api/speak call.
 
 ## Hard rules
 
@@ -128,7 +136,7 @@ Drawn to `docs/mockups/medisent-landing.png`, nine sections (BUILD_PLAN Stage 0)
 - Never colour alone: dot or icon + word.
 - No gradients, no glassmorphism, no purple, no emoji in UI, no shadows on cards.
 - Every screen has a read-aloud button. Owner exception (2026-11-19): the public landing page hides it below 768px so the sticky top bar stays short; app screens keep it at every size.
-- Text must not be clipped when translated.
+- Text must not be clipped at any text size.
 
 ## Anti-goals
 

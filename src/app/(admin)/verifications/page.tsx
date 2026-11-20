@@ -1,4 +1,4 @@
-import { getFormatter, getTranslations } from "next-intl/server";
+import { tr, formatDate } from "@/lib/strings";
 import { setMemberStatus, unblockAttempt } from "@/app/(admin)/actions";
 import { StatusChip, type ChipTone } from "@/components/StatusChip";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -13,8 +13,7 @@ const tone: Record<VerifiedStatus, ChipTone> = { verified: "success", pending: "
 /** Hospital admin: who has joined, who is blocked after three failed matches, and unblocking. */
 export default async function VerificationsPage() {
   const { profile, hospital } = await requireRole(adminRoles);
-  const t = await getTranslations("verifications");
-  const format = await getFormatter();
+  const t = tr("verifications");
   const admin = createAdminClient();
   const hospitalId = profile.hospital_id!;
 
@@ -24,7 +23,7 @@ export default async function VerificationsPage() {
   ]);
   const blockedRows = (blocked ?? []) as VerificationAttempt[];
   const people = (members ?? []) as Profile[];
-  const when = (iso: string) => format.dateTime(new Date(iso), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lagos" });
+  const when = (iso: string) => formatDate(new Date(iso), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lagos" });
 
   return (
     <main id="main" className="mx-auto w-full max-w-4xl flex-1 space-y-8 px-4 py-6 sm:px-6 sm:py-8">

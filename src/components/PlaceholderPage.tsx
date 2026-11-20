@@ -1,18 +1,18 @@
-import { getTranslations } from "next-intl/server";
-import type en from "../../messages/en.json";
+import { strings } from "@/content/strings";
+import { tr } from "@/lib/strings";
 import { EmptyState } from "./EmptyState";
 import { HospitalHeader } from "./HospitalHeader";
 import { ButtonLink } from "./ui";
 
-type PageKey = keyof (typeof en)["pages"];
+type PageKey = keyof typeof strings.pages;
 
 /**
  * Stand-in for screens built in later stages: a finished-looking empty state inside the
- * real shell. All text comes from messages/. `shell="public"` adds the public header (app
+ * real shell. All text comes from src/content/strings.ts. `shell="public"` adds the public header (app
  * groups get the header and navigation from their layout).
  */
 export async function PlaceholderPage({ titleKey, shell }: { titleKey: PageKey; shell?: "public" }) {
-  const t = await getTranslations();
+  const t = tr();
   return (
     <>
       {shell === "public" && <HospitalHeader />}

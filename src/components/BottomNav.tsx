@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { navTabs, type NavCounts, type NavIconName, type NavRole, type NavTab } from "@/config/nav";
 import {
   AskIcon,
@@ -51,7 +51,7 @@ function useKeyboardOpen() {
 }
 
 function Badge({ tab, counts }: { tab: NavTab; counts: NavCounts }) {
-  const t = useTranslations("nav");
+  const t = tr("nav");
   if (!tab.badge) return null;
   const count = counts[tab.badge] ?? 0;
   if (count <= 0) return null;
@@ -82,13 +82,13 @@ function Badge({ tab, counts }: { tab: NavTab; counts: NavCounts }) {
  * centred at 480px.
  */
 export function BottomNav({ role, counts = {} }: { role: NavRole; counts?: NavCounts }) {
-  const t = useTranslations("nav");
+  const t = tr("nav");
   const pathname = usePathname();
   const keyboardOpen = useKeyboardOpen();
   const tabs = navTabs[role];
   const navRef = useRef<HTMLElement>(null);
 
-  // The bar grows with large text and long translations; the page padding follows its real height
+  // The bar grows with large text and long labels; the page padding follows its real height
   // through --bottom-nav-h (AppShell reads it).
   useEffect(() => {
     const nav = navRef.current;
@@ -142,7 +142,7 @@ export function BottomNav({ role, counts = {} }: { role: NavRole; counts?: NavCo
 
 /** Desktop (>= 1024px) left sidebar for staff and admins, same tabs as the bottom bar. */
 export function Sidebar({ role, counts = {} }: { role: Exclude<NavRole, "patient">; counts?: NavCounts }) {
-  const t = useTranslations("nav");
+  const t = tr("nav");
   const pathname = usePathname();
   return (
     <nav aria-label={t("main")} className="sticky top-0 hidden max-h-screen w-64 shrink-0 self-start overflow-y-auto border-r border-border bg-surface p-3 lg:block">

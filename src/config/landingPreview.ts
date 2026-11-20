@@ -1,19 +1,11 @@
-import type { Locale } from "./locales";
-
 /**
- * Landing "live preview" console (BUILD_PLAN Stage 0, section 3): one prescription spoken
- * in five languages. The spoken sentence is content in that language, not UI text, so it
- * lives here rather than in messages/. Native speakers must check every sentence.
- * Audio: pre-generated files at public/audio/landing/<code>.mp3 (Spitch / 9jaLingo). Until
- * they exist the console falls back to the browser voice, or says the voice is missing.
+ * Landing "live preview" console (BUILD_PLAN Stage 0, section 3): one prescription, scanned,
+ * read out loud in plain English, and set as a reminder. The spoken sentence is demo content,
+ * not UI text, so it lives here rather than in src/content.
+ * Audio: a pre-generated clip at public/audio/landing/en.mp3 (Spitch "kingsley"). Until it
+ * exists the console falls back to the browser's English voice, or says no voice is available.
  */
-export const previewSentence: Record<Locale, string> = {
-  en: "Take one tablet every morning.",
-  ig: "Ṅụọ otu mkpụrụ ọgwụ n'ụtụtụ ọ bụla.",
-  yo: "Lo kóró oògùn kan ní àárọ̀ ọjọ́ kọ̀ọ̀kan.",
-  ha: "Sha ƙwaya ɗaya kowace safiya.",
-  pcm: "Take one tablet every morning time.",
-};
+export const previewSentence = "Take one tablet every morning.";
 
 /** The scanned label as printed (mono), and the scan result. Fictional demo data. */
 export const previewLabel = {
@@ -26,4 +18,4 @@ export const previewLabel = {
   refillDays: 27,
 };
 
-export const previewAudioSrc = (code: Locale) => `/audio/landing/${code}.mp3`;
+export const previewAudioSrc = "/audio/landing/en.mp3";

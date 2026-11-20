@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { brand } from "@/config/brand";
-import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
 import { ReadAloudButton } from "./ReadAloudButton";
 
@@ -12,12 +11,12 @@ export type HeaderHospital = {
 };
 
 /**
- * Section 3 v2 header: white, logo left with the hospital name under it, language picker
- * right (`IG ▾`), 3px bar at the bottom in the hospital's brand_color (#1D4E89 when it has
+ * Section 3 v2 header: white, logo left with the hospital name under it, read-aloud button
+ * right, 3px bar at the bottom in the hospital's brand_color (#1D4E89 when it has
  * none). With no hospital yet (public screens) the bar is primary (BUILD_PLAN Stage 0).
  */
 export async function HospitalHeader({ hospital }: { hospital?: HeaderHospital | null }) {
-  const t = await getTranslations("header");
+  const t = tr("header");
   const barColor = hospital ? hospital.brandColor || brand.defaultBrandColor : "var(--color-primary)";
 
   return (
@@ -37,11 +36,8 @@ export async function HospitalHeader({ hospital }: { hospital?: HeaderHospital |
             </p>
           )}
         </div>
-        <div className="flex items-center gap-2 max-sm:contents">
-          <LanguageSwitcher />
-          <div className="max-sm:flex max-sm:basis-full max-sm:justify-end">
-            <ReadAloudButton />
-          </div>
+        <div className="flex items-center gap-2">
+          <ReadAloudButton />
         </div>
       </div>
     </header>

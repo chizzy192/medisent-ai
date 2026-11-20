@@ -56,7 +56,8 @@ const click = (sel) => evaluate(`(() => { const el = document.querySelector(${JS
 const clickText = (txt) => evaluate(`(() => { const el = [...document.querySelectorAll("button,a")].find(b => b.innerText.trim() === ${JSON.stringify(txt)}); if (!el) return "missing"; el.click(); return "ok"; })()`);
 const clearSession = async () => { await send("Network.clearBrowserCookies"); };
 const results = [];
-const step = async (name, fn) => { try { await fn(); results.push(`PASS ${name}`); console.log("PASS", name); } catch (e) { results.push(`FAIL ${name}: ${e.message}`); console.log("FAIL", name, e.message); } };
+const only = process.env.ONLY; // ONLY=E1 runs just the steps whose name starts with E1
+const step = async (name, fn) => { if (only && !name.startsWith(only)) return; try { await fn(); results.push(`PASS ${name}`); console.log("PASS", name); } catch (e) { results.push(`FAIL ${name}: ${e.message}`); console.log("FAIL", name, e.message); } };
 
 const HOSP = "a0000000-0000-4000-8000-000000000001";
 async function fillStaff(fullName, staffId, licenceNo) {
@@ -105,8 +106,8 @@ await step("D1 patient login with phone, code, lands on home with hospital name"
   await clearSession(); await goto("/login"); await waitFor("Sign in");
   await setValue("#identifier", "08000000302"); await click('button[name="intent"][value="start"]');
   await waitFor("Demo only"); await setValue("#code", "123456"); await click('button[name="intent"][value="confirm"]');
-  await waitForPath("/home"); await waitFor("Adaeze Specialist Hospital (Demo)"); await waitFor("Lisinopril"); await shot("D1-home"); const tt = await text(); if (!tt.includes("Nnọọ")) throw new Error("expected Igbo greeting for an Igbo-speaking patient");
-  const t = await text(); if (!t.includes("Nyochaa") || !t.includes("Ọgbakọ")) throw new Error("patient bottom bar (Igbo) missing");
+  await waitForPath("/home"); await waitFor("Adaeze Specialist Hospital (Demo)"); await waitFor("Lisinopril"); await shot("D1-home"); const tt = await text(); if (!tt.includes("Welcome")) throw new Error("expected the English greeting on home");
+  const t = await text(); if (!t.includes("Scan") || !t.includes("Forum")) throw new Error("patient bottom bar missing");
 });
 await step("D2 patient cannot open the staff dashboard", async () => {
   await goto("/dashboard"); await wait(1500); if ((await url()) !== "/home") throw new Error("expected redirect to /home, got " + (await url()));
@@ -118,7 +119,7 @@ await step("E1 hospital admin sees the blocked ID on verifications and unblocks 
   await waitFor("Demo only"); await setValue("#code", "123456"); await click('button[name="intent"][value="confirm"]');
   await waitForPath("/hospital"); await waitFor("Adaeze Specialist Hospital (Demo)"); await shot("E1-hospital");
   await goto("/verifications"); await waitFor("AH-PH-999"); await shot("E2-verifications");
-  await clickText("Wepụ mgbochi"); const t0 = Date.now(); while (Date.now() - t0 < 15000) { if (!(await text()).includes("AH-PH-999")) break; await wait(500); } if ((await text()).includes("AH-PH-999")) throw new Error("still blocked after unblock"); await shot("E3-unblocked");
+  await clickText("Unblock"); const t0 = Date.now(); while (Date.now() - t0 < 15000) { if (!(await text()).includes("AH-PH-999")) break; await wait(500); } if ((await text()).includes("AH-PH-999")) throw new Error("still blocked after unblock"); await shot("E3-unblocked");
 });
 await step("F1 platform admin login lands on approve hospitals", async () => {
   await clearSession(); await goto("/login"); await waitFor("Sign in");

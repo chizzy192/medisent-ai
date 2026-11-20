@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useRef, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { localeNames, locales } from "@/config/locales";
+import { tr } from "@/lib/strings";
 import { licenceBodies, NO_HOSPITAL, signupRoles, type Role } from "@/lib/db/types";
 import { signupAction, type SignupState } from "@/app/(public)/signup/actions";
 import { CheckboxField, Field, FormMessage, Input, Select, describedBy } from "@/components/forms";
@@ -20,8 +19,7 @@ type HospitalOption = { id: string; name: string };
  * the chosen role; one server action validates everything again and drives every step.
  */
 export function SignupForm({ hospitals }: { hospitals: HospitalOption[] }) {
-  const t = useTranslations("signup");
-  const locale = useLocale();
+  const t = tr("signup");
   const [state, formAction] = useActionState(signupAction, { step: "form" } as SignupState);
   const values = state.step === "form" ? (state.values ?? {}) : {};
   const [hospital, setHospital] = useState(values.hospital ?? "");
@@ -158,16 +156,6 @@ export function SignupForm({ hospitals }: { hospitals: HospitalOption[] }) {
           <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="0803 000 0000" defaultValue={values.phone} invalid={Boolean(err("phone"))} aria-describedby={describedBy("phone", { hint: true, error: Boolean(err("phone")) })} className="font-mono" />
         </Field>
       )}
-
-      <Field label={t("language")} htmlFor="language" hint={t("languageHint")}>
-        <Select id="language" name="language" defaultValue={values.language ?? locale} aria-describedby={describedBy("language", { hint: true })}>
-          {locales.map((code) => (
-            <option key={code} value={code} lang={code}>
-              {localeNames[code]}
-            </option>
-          ))}
-        </Select>
-      </Field>
 
       <CheckboxField id="consent" name="consent" label={t("consent")} error={err("consent")} defaultChecked={values.consent === "on"} />
 

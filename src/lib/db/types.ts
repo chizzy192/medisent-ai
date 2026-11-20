@@ -2,13 +2,16 @@
  * Row types for the tables Stage 1 touches (mirrors supabase/migrations/0001_schema.sql).
  * Hand-written until the Supabase CLI can generate them (no CLI on this machine yet).
  */
-import type { Locale } from "@/config/locales";
-
 export type Role = "platform_admin" | "hospital_admin" | "doctor" | "pharmacist" | "nurse" | "patient";
 export type StaffRole = Exclude<Role, "platform_admin" | "patient">;
 export type HospitalStatus = "pending" | "approved" | "rejected";
 export type VerifiedStatus = "pending" | "verified" | "rejected" | "blocked";
 export type LicenceBody = "MDCN" | "PCN" | "NMCN";
+export type WithFood = "before" | "after" | "with" | "any";
+export const withFoodValues: WithFood[] = ["before", "after", "with", "any"];
+/** Where a prescription came from and whether a pharmacist has checked it (0010_intake.sql). */
+export type PrescriptionSource = "hospital" | "self";
+export type PrescriptionStatus = "pending" | "verified" | "edited" | "rejected";
 
 export const staffRoles: StaffRole[] = ["hospital_admin", "doctor", "pharmacist", "nurse"];
 export const signupRoles: Exclude<Role, "platform_admin">[] = ["patient", "doctor", "pharmacist", "nurse", "hospital_admin"];
@@ -42,7 +45,6 @@ export type Profile = {
   full_name: string;
   phone: string | null;
   email: string | null;
-  language: Locale;
   licence_no: string | null;
   licence_body: LicenceBody | null;
   staff_id: string | null;
@@ -76,7 +78,6 @@ export type PatientRegistryRow = {
   phone: string;
   age: number | null;
   sex: "M" | "F" | "other" | null;
-  language: Locale;
 };
 
 export type VerificationAttempt = {
@@ -96,7 +97,6 @@ export type SignupSession = {
   full_name: string;
   phone: string;
   email: string | null;
-  language: Locale;
   staff_id: string | null;
   hospital_number: string | null;
   licence_body: LicenceBody | null;
@@ -127,7 +127,6 @@ export type VerifyResult =
       phone: string | null;
       email?: string | null;
       full_name: string;
-      language?: Locale;
       licence_body?: LicenceBody | null;
       licence_no?: string | null;
       roster_id?: string;
@@ -152,4 +151,4 @@ export const NO_HOSPITAL = "none";
 
 /** Required CSV columns for the hospital admin uploads. */
 export const staffColumns = ["staff_id", "full_name", "role", "licence_body", "licence_no", "phone", "email"] as const;
-export const patientColumns = ["hospital_number", "full_name", "phone", "age", "sex", "language"] as const;
+export const patientColumns = ["hospital_number", "full_name", "phone", "age", "sex"] as const;

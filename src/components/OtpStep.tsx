@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { DEMO_OTP, demoMode } from "@/lib/db/env";
 import { Field, FormMessage, Input, describedBy } from "./forms";
 import { StatusChip } from "./StatusChip";
@@ -28,7 +28,7 @@ export function OtpStep({
   resent?: boolean;
   formAction: (formData: FormData) => void;
 }) {
-  const t = useTranslations("otp");
+  const t = tr("otp");
   const exhausted = error === "too_many" || error === "expired" || error === "missing";
   const invalid = error === "codeWrong" || error === "codeFormat";
 

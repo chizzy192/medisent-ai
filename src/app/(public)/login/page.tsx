@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { FormPage } from "@/components/forms";
 import { HospitalHeader } from "@/components/HospitalHeader";
@@ -15,7 +15,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
   const session = await getSession();
   if (session && session.profile.verified_status === "verified") redirect(homeForRole[session.profile.role]);
 
-  const t = await getTranslations("login");
+  const t = tr("login");
   return (
     <>
       <HospitalHeader />

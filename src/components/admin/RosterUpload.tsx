@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { parseCsv } from "@/lib/csv";
 import { patientColumns, staffColumns } from "@/lib/db/types";
 import { uploadCsv, type UploadState } from "@/app/(admin)/actions";
@@ -18,7 +18,7 @@ const PREVIEW_ROWS = 8;
  * and the column check, then saves. The server parses and validates the file again.
  */
 export function RosterUpload({ kind }: { kind: UploadKind }) {
-  const t = useTranslations("roster");
+  const t = tr("roster");
   const [state, formAction] = useActionState(uploadCsv, { step: "idle" } as UploadState);
   const [preview, setPreview] = useState<{ headers: string[]; rows: Record<string, string>[]; total: number; missing: string[]; issues: RowIssue[]; encoding?: string } | null>(null);
   const required = kind === "staff" ? staffColumns : patientColumns;

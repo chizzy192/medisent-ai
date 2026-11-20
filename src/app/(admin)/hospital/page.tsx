@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { Card, SectionLabel } from "@/components/ui";
 import { StatusChip } from "@/components/StatusChip";
 import { adminRoles, requireRole } from "@/lib/auth/dal";
@@ -8,7 +8,7 @@ import { createAdminClient } from "@/lib/db/admin";
 /** Hospital admin dashboard: counts, open blocks, and the way to the roster and verifications. */
 export default async function HospitalPage() {
   const { profile, hospital } = await requireRole(adminRoles);
-  const t = await getTranslations("hospitalDashboard");
+  const t = tr("hospitalDashboard");
   const admin = createAdminClient();
   const hospitalId = profile.hospital_id!;
   const [roster, registry, staff, patients, blocked, alerts] = await Promise.all([

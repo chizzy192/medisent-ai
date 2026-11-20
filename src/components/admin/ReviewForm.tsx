@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { reviewHospital, type ReviewState } from "@/app/(platform)/actions";
 import { FormMessage, Textarea, describedBy } from "@/components/forms";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -11,7 +11,7 @@ import { SubmitButton } from "@/components/SubmitButton";
  * hospital); a reviewed hospital can be reopened, which undoes a mis-tap.
  */
 export function ReviewForm({ hospitalId, mode, note }: { hospitalId: string; mode: "review" | "reviewed"; note: string | null }) {
-  const t = useTranslations("approveHospitals");
+  const t = tr("approveHospitals");
   const [state, formAction] = useActionState(reviewHospital, undefined as ReviewState);
   const noteId = `note-${hospitalId}`;
 

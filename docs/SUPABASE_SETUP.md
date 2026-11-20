@@ -24,9 +24,12 @@ SQL editor → New query. Paste and run each file in this order, one at a time:
 4. `supabase/migrations/0004_storage.sql`
 5. `supabase/migrations/0005_otp.sql`
 6. `supabase/migrations/0006_grants.sql` (table privileges for the API roles; without it every request answers "permission denied")
-7. `supabase/seed.sql` (safe to run again later; it regenerates the 30-day dose logs from today)
+7. `supabase/migrations/0007_stage2.sql`
+8. `supabase/migrations/0008_translations.sql` (kept for history; 0009 removes what it adds)
+9. `supabase/migrations/0009_english_only.sql` (drops every language column and the language enum; clears cached audio)
+10. `supabase/seed.sql` (safe to run again later; it regenerates the 30-day dose logs from today)
 
-Already ran 0001–0004 before 0005 and 0006 existed? Just run 0005, 0006 and the seed now.
+Already ran 0001–0008? Just run 0009 and the seed again now (the seed no longer sets a language).
 
 Check it worked: Table editor → `hospitals` shows two Demo hospitals, and the app's sign-in page no longer shows the blue "Supabase is not set up yet" box after `npm run dev` is restarted.
 

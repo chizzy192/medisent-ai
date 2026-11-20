@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { tr } from "@/lib/strings";
 import { FormMessage } from "./forms";
 
 /**
@@ -6,7 +6,7 @@ import { FormMessage } from "./forms";
  * owner adds them). Never shown in production builds with keys present.
  */
 export async function SetupNotice() {
-  const t = await getTranslations("setup");
+  const t = tr("setup");
   return (
     <div className="mt-4">
       <FormMessage tone="info">

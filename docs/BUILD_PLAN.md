@@ -32,10 +32,10 @@ After each stage, stop and wait for me. I review and commit everything myself.
 
 ## 1. What Medisent AI is
 
-A voice-first, offline-ready medication companion for Nigerian hospitals.
+A voice-first, offline-ready medication companion for Nigerian hospitals. **English only** (change of plan, 2026-11-19): every screen, voice note, SMS, call and USSD menu is in plain, simple English; there is no translation and no language picker.
 
 - Hospitals register; staff (doctors, pharmacists, nurses) and patients join a hospital and are verified against the hospital's staff roster or patient registry.
-- Patients scan a drug label or prescription and hear the instructions in Igbo, Yoruba, Hausa, Pidgin or English.
+- Patients scan a drug label or prescription and hear the instructions read out in plain English.
 - AI builds reminders, answers medication questions by voice, runs daily check-ins, catches red flags, checks interactions, and scores adherence risk.
 - Verified professionals post on a forum about medication, diet and mental health.
 - Records move between hospitals with patient consent.
@@ -47,21 +47,11 @@ A voice-first, offline-ready medication companion for Nigerian hospitals.
 - One-tap guided demo mode for judges.
 
 Name: **Medisent AI**  
-Tagline: **Ọgwụ. Oògùn. Magani. Your medicine, in your language.**
+Tagline: **Your medicine, explained simply.**
 
-### App name and languages
-- The app name lives in ONE config file, `src/config/brand.ts`, so it can change in one line (the final name may follow the domain).
-- The brand name **Medisent AI** stays the same in every language (brand names are not translated). The tagline and all other text are translated:
-
-| Locale | Code | Tagline line shown under the name |
-| --- | --- | --- |
-| English | `en` | Your medicine, in your language. |
-| Igbo | `ig` | Ọgwụ gị, n'asụsụ gị. |
-| Yoruba | `yo` | Oògùn rẹ, ní èdè rẹ. |
-| Hausa | `ha` | Maganinka, a harshenka. |
-| Nigerian Pidgin | `pcm` | Your medicine, for your own language. |
-
-Native speakers must check every non-English word and tone mark before the demo.
+### App name and language
+- The app name lives in ONE config file, `src/config/brand.ts`, so it can change in one line (the final name may follow the domain). The tagline lives there too.
+- English only. All UI text lives in `src/content/strings.ts`; patient-facing sentences are plain English at a grade-6 reading level (short words, short sentences, no jargon).
 
 ---
 
@@ -76,14 +66,13 @@ Native speakers must check every non-English word and tone mark before the demo.
 | Auth | Supabase Auth: phone OTP (patients), email + OTP (staff) |
 | Storage | Supabase Storage: label photos, cached audio, logos, licence uploads |
 | Vision + assistant | Gemini (current Flash model), JSON output |
-| Speech ig / yo / ha / en | Spitch (TTS + STT) |
-| Speech Pidgin | 9jaLingo (TTS) |
+| Speech | Spitch (TTS + STT), one English voice "kingsley" at speed 0.9; browser English voice as the offline fallback |
 | SMS / voice / USSD | Africa's Talking |
 | Drug names | Seeded list based on the NAFDAC Greenbook |
 | Interactions | Curated table of common pairs + AI; pharmacist confirms |
 | Risk score | Weighted score in TypeScript (weights in section 5) |
 | Clinic finder | Seeded clinics + Leaflet / OpenStreetMap |
-| UI translation | next-intl, one JSON file per locale in `messages/` (en, ig, yo, ha, pcm) |
+| UI text | English only; every string in `src/content/strings.ts`, read through `tr()` in `src/lib/strings.ts` |
 | Hosting | Vercel + Supabase cloud; custom domain added later (section 9) |
 
 ### Repo layout
@@ -105,16 +94,16 @@ src/
       sms/         Africa's Talking inbound + outbound
       transfer/    records transfer between hospitals
   config/
-    brand.ts       app name per locale, tagline, domain
+    brand.ts       app name, tagline, domain
   lib/
-    ai/            prompts, safety filters, red-flag lists per language
+    ai/            prompts, safety filters, red-flag word list
     db/            supabase clients, generated types
     offline/       dexie schema, sync queue
     fhir/          record -> FHIR JSON mapper
 supabase/
   migrations/      schema + RLS policies
   seed.sql         demo data (section 7)
-messages/          en.json, ig.json, yo.json, ha.json, pcm.json
+src/content/       strings.ts (every UI string, English)
 public/            manifest.json, icons
 docs/              this file
 ```
@@ -129,7 +118,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 GEMINI_API_KEY=
 SPITCH_API_KEY=
-NAIJALINGO_API_KEY=
 AFRICASTALKING_USERNAME=
 AFRICASTALKING_API_KEY=
 AFRICASTALKING_SENDER_ID=
@@ -174,7 +162,7 @@ Logo: cobalt rounded square with a white plus, then "Medisent" in Plex Sans 600,
 
 Status chips: dot + word, always (● Taken, ● 20 min late, ● Upcoming, ● High 78). Colour is never the only signal.
 
-Header: white, logo left, language picker right (`IG ▾`), hospital name under the logo, 3px hospital-colour bar at the bottom.
+Header: white, logo left, read-aloud button right, hospital name under the logo, 3px hospital-colour bar at the bottom.
 
 Rules:
 - One primary (cobalt) button per card; secondary actions are outlined cobalt.
@@ -185,18 +173,17 @@ Rules:
 - High-contrast mode: ink `#000`, borders `#5E6E84`, primary `#1A3FB0`.
 - No gradients, no glassmorphism, no purple, no emoji in UI, no centred-hero-plus-three-cards layout.
 
-### Translation (whole app)
-- Every piece of UI text comes from `messages/<locale>.json` through next-intl. No hard-coded strings in components.
-- Locale is chosen at signup and changeable from the header language switcher; stored in `profiles.language` and a cookie.
-- `en.json` is the source. Generate first drafts of `ig`, `yo`, `ha`, `pcm` with a script `scripts/translate-messages.ts` that calls Gemini, then mark every machine-drafted file with `"_status": "machine-draft"` until a native speaker reviews it.
-- Dynamic content (prescription instructions, assistant answers, forum posts) is translated at runtime by the AI routes and labelled "machine-translated" where shown.
-- Dates, times and numbers formatted with `Intl` for the locale.
-- Text expands in other languages: no fixed-width buttons; allow wrapping.
+### Text (whole app, English only)
+- Every piece of UI text comes from `src/content/strings.ts` through `tr()`. No hard-coded strings in components.
+- No language picker, no language step at signup, no language setting in Me, no "Read in …" text anywhere. Old locale-prefixed URLs (/ig/..., /yo/...) redirect to the same page without the prefix.
+- Patient-facing sentences (instructions, assistant answers, check-ins, SMS, calls, USSD) are plain English a 12-year-old can read.
+- Dates, times and numbers formatted with `Intl` for en-NG, Africa/Lagos.
+- No fixed-width buttons; allow wrapping at large text sizes.
 
 Also: three text sizes; adjustable speech speed.
 
 ### Signature UI elements (what makes it interesting)
-1. **Today ring (Home):** a progress ring showing doses taken today (`1/3 TAKEN` in mono), next to the greeting in the patient's language ("Ndewo, Emeka") and the next dose. The card has a faint dot-grid background (`radial-gradient` 1px dots, 14px spacing, `#D3DBE6`) — the only decorative texture in the app, used on hero cards only.
+1. **Today ring (Home):** a progress ring showing doses taken today (`1/3 TAKEN` in mono), next to the greeting ("Welcome, Emeka") and the next dose. The card has a faint dot-grid background (`radial-gradient` 1px dots, 14px spacing, `#D3DBE6`) — the only decorative texture in the app, used on hero cards only.
 2. **Day timeline (Home):** today's doses as a vertical timeline. Node colours: success = taken, primary with a soft halo = now, border-grey = later, warning = late. The "now" card has a 2px primary border and the big "✓ I took it" button.
 3. **Pill icons in the medicine's real colour and shape:** each medicine gets a small icon (round tablet, capsule, inhaler, liquid, injection) in the colour the patient sees in real life. Chosen on the confirm-scan screen ("What does your tablet look like?") or suggested by the scanner. Stored as `prescriptions.pill_shape` and `prescriptions.pill_color`. Helps elderly and low-literacy patients match the screen to the pack. Medicine name + strength (strength in mono, ink-2) stay on one line; time and dose on the line below.
 4. **Live scan viewfinder:** dark viewfinder with four rounded primary corner brackets, a sweeping scan line, and a live status chip ("Reading label… 82%"). Below it, a "Found so far" card fills in field by field (Drug, Strength, NAFDAC) as the scanner reads them; missing fields show a warning chip ("Turn the pack").
@@ -214,12 +201,12 @@ Motion (all respect `prefers-reduced-motion`: replace with instant changes):
 - On phones and tablets (< 1024px) every signed-in screen has a **bottom navigation bar**, like a native mobile app. On desktop (≥ 1024px) staff and admins get a left sidebar instead; patients keep the bottom bar centred at max 480px wide.
 - **Patient tabs (5):** Home · Scan · Ask · Forum · Me
     - Scan is the centre tab, shown as a raised cobalt rounded square with a scan icon (the main action).
-    - "Me" holds My progress, Caregivers, Refills, Records, Language, Accessibility, Privacy.
+    - "Me" holds My progress, Caregivers, Refills, Records, Accessibility, Privacy.
 - **Pharmacist / doctor / nurse tabs (5):** Dashboard · Patients · Alerts · Forum · Me
 - **Hospital admin tabs (4):** Dashboard · Staff · Patients · Me (transfers and verifications inside Dashboard)
 - Spec:
     - Fixed to the bottom, white (surface) background, 1px border-colour top border, height 64px plus `env(safe-area-inset-bottom)` for phones with gesture bars.
-    - Every tab = icon (24px, outline) + text label (13px minimum, always visible, translated). Never icon-only.
+    - Every tab = icon (24px, outline) + text label (13px minimum, always visible). Never icon-only.
     - Active tab: primary icon and label, primary-tint pill behind the icon, `aria-current="page"`. Inactive: ink-3.
     - Each tab is at least 48×48px touch area.
     - Badges: danger count only for open red-flag alerts; primary count for waiting questions; warning dot on Home when a dose is overdue.
@@ -238,24 +225,24 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 | --- | --- |
 | hospitals | id, name, slug, logo_url, brand_color, address, city, state, cac_no, licence_url, status (pending / approved / rejected) |
 | staff_roster | id, hospital_id, staff_id, full_name, role, phone, email, licence_body, licence_no |
-| patient_registry | id, hospital_id, hospital_number, full_name, phone, age, sex, language |
-| profiles | id (= auth user), device_type (smartphone / basic), preferred_channel (app / sms / voice), role (platform_admin / hospital_admin / doctor / pharmacist / nurse / patient), hospital_id (nullable for independent patients), full_name, phone, language (ig / yo / ha / pcm / en), licence_no, licence_body (MDCN / PCN / NMCN), verified_status (pending / verified / rejected / blocked), failed_attempts |
-| prescriptions | id, patient_id, hospital_id, quantity_dispensed, drug_id, pill_shape (round / capsule / oval / inhaler / liquid / injection), pill_color (hex), drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, source (scan / staff), image_url, confirmed_by_patient, created_by, active |
+| patient_registry | id, hospital_id, hospital_number, full_name, phone, age, sex |
+| profiles | id (= auth user), device_type (smartphone / basic), preferred_channel (app / sms / voice), role (platform_admin / hospital_admin / doctor / pharmacist / nurse / patient), hospital_id (nullable for independent patients), full_name, phone, licence_no, licence_body (MDCN / PCN / NMCN), verified_status (pending / verified / rejected / blocked), failed_attempts |
+| prescriptions | id, patient_id, hospital_id, drug_id (→ drugs, the formulary), drug_name, strength, form, dose, frequency_per_day, duration_days, with_food, instructions, instructions_plain, pill_shape (round / capsule / oval / inhaler / liquid / injection), pill_color (hex), quantity_dispensed, **source (hospital / self)**, **status (pending / verified / edited / rejected)**, verified_by, verified_at, rejection_reason, pack_photo_path, rx_photo_path (Storage bucket `med-photos`, path `<patient_id>/…`), ai_prefill (jsonb: what the reader saw, with a confidence per field), expiry_date, batch_no, patient_notified_at, created_by, active |
 | reminders | id, prescription_id, patient_id, time_of_day, days, channel (app / sms / voice), active |
 | dose_logs | id, reminder_id, patient_id, scheduled_at, status (taken / missed / snoozed / late), logged_at, synced |
 | conditions | id, patient_id, hospital_id, name, noted_by, started_on |
 | allergies | id, patient_id, substance, reaction |
-| checkins | id, patient_id, transcript, language, mood, side_effects (jsonb), red_flag (bool), created_at |
+| checkins | id, patient_id, transcript, mood, side_effects (jsonb), red_flag (bool), created_at |
 | alerts | id, patient_id, hospital_id, type (red_flag / side_effect / missed_doses / high_risk / interaction / question), detail, status (open / handled), handled_by |
-| assistant_messages | id, patient_id, question, answer, language, escalated (bool), cited_post_id |
-| forum_posts | id, author_id, hospital_id, category (medication / diet / mental_health), title, body, audio_url, drug_tags (text[]), language, status (published / hidden), is_demo |
+| assistant_messages | id, patient_id, question, answer, escalated (bool), cited_post_id |
+| forum_posts | id, author_id, hospital_id, category (medication / diet / mental_health), title, body, audio_url, drug_tags (text[]), status (published / hidden), is_demo |
 | transfers | id, patient_id, from_hospital_id, to_hospital_id, scope (jsonb), consent_at, status (requested / accepted / completed / declined), summary |
 | audit_log | id, actor_id, action, target_table, target_id, created_at |
 | ussd_sessions | id, session_id, phone, patient_id, menu_path, created_at |
-| voice_calls | id, patient_id, reminder_id, call_id, language, status (queued / answered / no_answer / failed), dtmf (pressed key), recording_url, created_at |
+| voice_calls | id, patient_id, reminder_id, call_id, status (queued / answered / no_answer / failed), dtmf (pressed key), recording_url, created_at |
 | clinics | id, name, address, lat, lng, phone, hours, is_demo |
-| drugs | id, name, generic_name, strength, form, manufacturer, nafdac_no, nafdac_listed (bool), is_demo |
-| caregivers | id, patient_id, full_name, relationship, phone, language, channel (sms / whatsapp / app), notify_after_missed (int, default 1), consent_at, active |
+| drugs (formulary) | id, name, generic_name, strength, form, manufacturer, nafdac_no, barcode (nullable), nafdac_listed (bool), is_demo. The ONLY source of a medicine's name / strength / form: pharmacists and patients pick from it, never type it. |
+| caregivers | id, patient_id, full_name, relationship, phone, channel (sms / whatsapp / app), notify_after_missed (int, default 1), consent_at, active |
 | caregiver_alerts | id, caregiver_id, patient_id, dose_log_id, sent_at, channel, status (sent / failed) |
 | refills | id, prescription_id, patient_id, quantity_dispensed, doses_per_day, units_per_dose, dispensed_on, runs_out_on (computed), alert_days_before (default 3), alerted_at, refilled (bool) |
 | drug_checks | id, patient_id, scanned_name, nafdac_no, result (registered / not_found / mismatch / unreadable), checked_at |
@@ -284,42 +271,49 @@ Core components: BottomNav, HospitalHeader, MedicineCard (drug, dose, next time,
 
 | Job | Route | Input → output |
 | --- | --- | --- |
-| Label / prescription reader | `/api/scan` | photo → prescription JSON + confidence |
-| Instruction builder + speech | `/api/speak` | prescription + language → plain sentence → audio |
+| Pack reader | `/api/scan` | pack photo → PRINTED fields only (name, strength, form, NAFDAC no., manufacturer, batch, expiry, barcode), a confidence per field, **dosage always null**; plus the formulary suggestion and the match against the patient's own verified prescriptions |
+| Instruction builder + speech | `/api/speak` | prescription → plain English sentence → audio |
 | Voice assistant | `/api/assistant` | question + patient context → answer + audio, or escalation |
 | Check-in parser | `/api/checkin` | transcript → mood, side effects, red flag |
 | Interaction checker | inside `/api/scan` | new drug + current meds + allergies → pharmacist alert |
 | Adherence risk score | after each dose log | dose logs + check-ins → 0–100 + band |
 | Transfer summary / weekly insight | `/api/transfer`, cron | records → one-page summary / insight card |
 
-### Scanner JSON schema (Gemini structured output)
+### Medication intake rule (change of approach, 2026-11-20)
+**The AI never determines a dose.** Dosage comes only from (a) a pharmacist's or doctor's entry when dispensing, or (b) a patient's own entry that a pharmacist verifies. Three paths:
+1. **Pharmacist dispensing** (`/dispense`, pharmacists and doctors): find patient → pick drug from the formulary → dose, frequency, duration, instructions → saved with `source = 'hospital'`, `status = 'verified'`, `verified_by` = the dispenser.
+2. **Patient self-add** (`/add`): photo of the pack (required) + photo of the prescription or note (optional) → the reader pre-fills name / strength / NAFDAC / expiry / batch with a confidence per field → the patient confirms by picking from the formulary → types dose / frequency / duration as told → saved with `source = 'self'`, `status = 'pending'`. Grey "Not checked yet" badge everywhere it shows; reminders run but carry the badge.
+3. **Verification queue** (`/verify`, pharmacists and doctors): pending entries with the photos, the reader's fields and the patient's entry side by side → **Approve** / **Edit** (corrects the dosing, rebuilds the sentence and reminders, status `edited`) / **Reject** (reason required; reminders stop). The patient is told (SMS + a notice on Home). Every action is written to `audit_log`.
+
+**Scan tab = "Is this my drug?"** Scanning a pack reads name / strength / barcode / expiry only, then matches against the patient's prescriptions. Results: **match** (show the dose FROM THE RECORD and read it aloud; "not checked yet" when pending) · **no match** (warn + "ask your pharmacist" + "Add this medicine") · **expired** · **not found on the NAFDAC list**. The screen never shows a dose that is not in the record.
+
+### Pack reader JSON schema (Gemini structured output)
 ```json
 {
-  "drug_name": "Amoxicillin",
-  "strength": "500 mg",
-  "form": "capsule",
-  "dose": "1 capsule",
-  "frequency_per_day": 3,
-  "duration_days": 5,
-  "with_food": "after",
-  "instructions_raw": "1 cap tds x 5/7 p.c.",
-  "warnings_on_label": ["Complete the full course"],
-  "confidence": 0.86,
-  "missing_fields": []
+  "drug_name":    { "value": "Amoxicillin",   "confidence": 0.96 },
+  "strength":     { "value": "500 mg",        "confidence": 0.93 },
+  "form":         { "value": "capsule",       "confidence": 0.90 },
+  "nafdac_no":    { "value": "A4-1234",       "confidence": 0.88 },
+  "manufacturer": { "value": "Demo Pharma",   "confidence": 0.85 },
+  "batch_no":     { "value": "B2026-07",      "confidence": 0.80 },
+  "expiry_date":  { "value": "2027-12-31",    "confidence": 0.82 },
+  "barcode":      { "value": "6150000000156", "confidence": 0.70 },
+  "dosage": null,
+  "confidence": 0.90
 }
 ```
-Confidence < 0.75 or any missing field → ask for another photo ("Turn the pack so I can see the dose"). Patient must confirm before saving.
+The prompt tells the model to extract printed fields only, to ignore any dosing text, and to return null with a low confidence for anything it cannot see. Name confidence < 0.6 → ask for another photo. Nothing from the reader is saved as a dose.
 
 ### Assistant system prompt rules
 1. Answer only from the patient's prescriptions, label text, allergies and approved forum posts passed in context.
 2. Never diagnose, prescribe, or change/stop a dose: "I can't advise that — please ask your pharmacist."
-3. Reply in the patient's language, short sentences a 10-year-old understands.
+3. Reply in plain, simple English at a grade-6 reading level: short sentences a 10-year-old understands.
 4. Cite the forum post or label line used.
 5. If unsure, say so and escalate to the pharmacist (create an alert).
 6. Send no names or phone numbers to the model.
 
 ### Red-flag layer (runs BEFORE the model)
-- Keyword lists per language in `src/lib/ai/redflags.ts`: chest pain, can't breathe, fainting, seizure, swelling of face or throat, heavy bleeding, suicidal thoughts. English + Pidgin first; leave clearly marked TODO slots for Igbo, Yoruba, Hausa terms (to be checked by native speakers).
+- English keyword list in `src/lib/ai/redflags.ts`: chest pain, can't breathe, fainting, seizure, swelling of face or throat, heavy bleeding, suicidal thoughts (include common informal spellings).
 - Match → skip the model, show red-flag screen, create alert.
 - Model also returns `red_flag: true/false` as a second check.
 - Self-harm / suicide words → crisis helpline screen (numbers in a config file marked "verify before demo") + urgent staff alert.
@@ -349,25 +343,24 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - Create the repo layout in section 2 (placeholder pages / route files).
 - Tailwind theme: every token in section 3 + dark mode; fonts via `next/font/google`.
 - `.env.example` (section 2); `.env.local` in `.gitignore`.
-- Install `@supabase/supabase-js @supabase/ssr dexie serwist @serwist/next next-intl`.
-- `src/config/brand.ts` with the app name "Medisent AI" and the tagline per locale (section 1).
-- next-intl set up with locales en, ig, yo, ha, pcm; `messages/en.json` holding every landing-page string; the other four files drafted by `scripts/translate-messages.ts`.
-- Language switcher in the header; brand name stays "Medisent AI", tagline and text change with the language.
+- Install `@supabase/supabase-js @supabase/ssr dexie serwist @serwist/next`.
+- `src/config/brand.ts` with the app name "Medisent AI" and the tagline (section 1).
+- `src/content/strings.ts` holding every landing-page string (English only).
 - Landing page `/` — follow `docs/mockups/medisent-landing.png` (replaces the plain version). Sections, top to bottom:
-    1. **Top bar:** logo, links (How it works · For hospitals · Safety · Languages), language picker, "Sign in" (outline), "Try the demo" (primary).
-    2. **Hero on dot-grid background:** mono kicker chip ("Medication companion · 5 Nigerian languages"); headline "Your medicine, explained in *your language*, on time, every time." (64px, 600, "your language" in primary); one-line lead; buttons "Try the demo →" and "Register your hospital".
-    3. **Live preview console** (the interesting part): a wide card with language tabs EN · IG · YO · HA · PCM. Three cells: (1) scanned label in mono with "Registered" and "Confidence" chips; (2) the instruction spoken in the selected language with a play button and waveform, English gloss under it; (3) a today ring + reminder time + refill chip. Switching tabs swaps the spoken sentence and plays its audio (pre-generated files in `public/audio/landing/`). Works without JS (shows English).
+    1. **Top bar:** logo, links (How it works · For hospitals · Safety), "Sign in" (outline), "Try the demo" (primary).
+    2. **Hero on dot-grid background:** mono kicker chip ("Medication companion · Built for Nigerian hospitals"); headline "Your medicine, explained *simply*, on time, every time." (64px, 600, "simply" in primary); one-line lead; buttons "Try the demo →" and "Register your hospital".
+    3. **Live preview console** (the interesting part): a wide card with three cells: (1) scanned label in mono with "Registered" and "Confidence" chips; (2) the instruction read out in plain English with a play button and waveform; (3) a today ring + reminder time + refill chip. The play button plays a pre-generated clip (`public/audio/landing/en.mp3`). Works without JS (shows the sentence).
     4. **How it works:** 4 numbered steps on a connecting line — 01 Scan · 02 Hear · 03 Remember · 04 Get help.
     5. **One platform, three views:** a spec-sheet table (rows Sees / Does / Verified by; columns Patients / Pharmacists & doctors / Hospitals), verification methods in mono.
     6. **Works on any phone:** text panel + a drawn basic feature phone (keypad, green LCD) showing the SMS reminder "Reply 1 if taken". Must look like a basic phone, not a smartphone.
     7. **Safe by design:** 4 cards — Never diagnoses · Red flags first · NDPA 2023 · Verified voices.
     8. **Final CTA band** (dark ink background): "See it work in under a minute." + "Try the demo →" + "Register your hospital", with "Demo mode · fictional data" label.
-    9. **Footer:** logo, "Built for AIESEC Hackathon 2026", language list in mono.
+    9. **Footer:** logo and a one-line mono note.
     - Mobile: sections stack; console cells stack vertically; steps become a vertical timeline; spec table becomes three cards.
     - The brand name appears in the top bar only (not repeated as a page heading).
     - Dev-only letter-check line ("ẹ ọ ṣ ị ụ ṅ") in a small footer row, hidden in production.
 - **Impeccable (Stage 0):** after I install Impeccable (section 10, step 1), write `DESIGN.md` from section 3 and `PRODUCT.md` from section 1 using the templates in section 10.3, then run `/impeccable init` to confirm and complete PRODUCT.md. Build the landing page with `/impeccable shape landing page` first, then build it, then `/impeccable critique landing page` and `/impeccable audit landing page`; fix all P0 and P1 findings.
-- **Done when:** `npm run dev` and `npm run build` pass; landing page shows the right fonts and colours; switching to Igbo keeps "Medisent AI" in the header and shows the Igbo tagline and landing text.
+- **Done when:** `npm run dev` and `npm run build` pass; landing page shows the right fonts and colours.
 
 ### Stage 1 — Hospitals, accounts, verification
 - Supabase migrations for every table in section 4, plus RLS policies and the verification function.
@@ -383,25 +376,27 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - **Impeccable (Stage 1):** `/impeccable shape signup and verification flow` before coding. After building: `/impeccable harden signup` (errors, OTP failure, rejected and blocked states, long names, i18n overflow), `/impeccable clarify signup` (labels, error messages, rejected-screen copy), `/impeccable critique hospital registration`, `/impeccable audit admin roster upload`, `/impeccable shape bottom navigation`, `/impeccable adapt bottom navigation` (360px, 200% text, gesture-bar phones), `/impeccable audit bottom navigation` (labels, touch size, aria-current). Fix P0 and P1.
 - **Done when:** each role sees its own bottom bar on a phone-sized screen; pharmacist Chidinma Okafor verifies with staff ID AH-PH-001; a fake staff ID is rejected; both land on the right screens.
 
-### Stage 2 — Scan, speak, remind
+### Stage 2 — Intake, scan, speak, remind
+- **Medication intake** (section 5 rule): formulary (`drugs`, ~40 seeded Nigerian medicines), pharmacist **Dispense** screen, patient **Add a medicine** (photos → reader pre-fill → formulary pick → dose as told → pending), pharmacist **Verification queue** (Approve / Edit / Reject with reason, audit log, patient told), Storage bucket `med-photos` with RLS (patient + their hospital's pharmacists and doctors). Migration `0010_intake.sql`.
 - Camera capture (getUserMedia) with file-picker fallback.
-- `/api/scan` with Gemini + schema above; low-confidence retry; NAFDAC name match; unknown-drug flag.
-- Confirm screen before saving, including "What does your medicine look like?" (shape + colour picker, scanner suggests a default).
-- Signature elements 1–4 from section 3: Today ring, day timeline, pill icons, live scan viewfinder with "Found so far".
-- Plain-language instruction builder ("Take 1 tablet 3 times a day after food, for 5 days").
-- `/api/speak`: Spitch (ig, yo, ha, en), 9jaLingo (pcm); cache audio in Storage + IndexedDB; English Web Speech fallback if keys are missing.
+- `/api/scan` with Gemini + the pack-reader schema above (printed fields only, confidence per field, never a dose); formulary suggestion; match against the patient's own prescriptions.
+- **Scan tab = "Is this my drug?"**: match → the dose from the record, read aloud; no match / expired / not on the NAFDAC list → calm warning and "ask your pharmacist".
+- "What does your medicine look like?" (shape + colour picker) on both intake forms.
+- Signature elements 1–4 from section 3: Today ring, day timeline, pill icons, live scan viewfinder.
+- Plain-English instruction builder ("Take 1 tablet 3 times a day, after food, for 5 days").
+- `/api/speak`: Spitch English voice "kingsley" at speed 0.9; cache audio in Storage + IndexedDB; the browser's English voice (labelled "Offline voice") only when the server cannot be reached.
 - Reminder generator (3× daily → 08:00, 14:00, 20:00; editable).
 - Reminder screen: plays the voice note; Taken / Snooze / Missed → `dose_logs`.
-- Staff can add a prescription for a patient.
-- **Refills:** when a prescription is saved, store quantity dispensed (from the scan or asked: "How many tablets did you get?"), compute `runs_out_on`, show "X days left" on the MedicineCard; a daily job alerts the patient (app + SMS) and their pharmacist 3 days before; "I got a refill" button resets the count.
+- Staff dispense for a patient from the formulary (`/dispense`, also linked from the patient page).
+- **Refills:** when a prescription is saved, store quantity dispensed (typed by the pharmacist or the patient: "How many in the pack?"), compute `runs_out_on`, show "X days left" on the MedicineCard; a daily job alerts the patient (app + SMS) and their pharmacist 3 days before; "I got a refill" button resets the count.
 - **Drug registration check:**
-    - Scanner also extracts `nafdac_no` (format like `A4-1234`) and manufacturer if visible; patient can also type the number.
+    - The pack reader extracts `nafdac_no` (format like `A4-1234`) and manufacturer if printed; the formulary row carries the number for dispensed medicines.
     - Look up in the `drugs` table. Results: **Registered** (green: name, strength and manufacturer match) · **Not found** (warning: "We couldn't find this NAFDAC number in our list. Show this pack to your pharmacist before taking it.") · **Mismatch** (warning: number belongs to a different drug) · **Unreadable** (ask for another photo or typing).
     - Never say a drug is "fake". Wording is always "not found in our list — check with your pharmacist". Log every check in `drug_checks`; "not found" and "mismatch" create a pharmacist alert.
     - Add a link "Report to NAFDAC" pointing to NAFDAC's official site (no data sent automatically).
 - Accessibility settings: three text sizes, high contrast, speech speed.
 - **Impeccable (Stage 2):** `/impeccable shape scan and reminder flow` first. After building: `/impeccable critique scan flow`, `/impeccable harden scan` (camera denied, blurry photo, low confidence, unknown drug, no network), `/impeccable typeset medicine card` (dose and time must be the most readable text on screen), `/impeccable adapt reminder screen` (small Android screens, large text size setting), `/impeccable audit patient home`, `/impeccable clarify drug check result` (warning must be calm, not scary), `/impeccable critique refill banner`. Fix P0 and P1.
-- **Done when:** scanning a real drug pack gives a confirmed prescription, spoken in Igbo, with reminders scheduled; the card shows "days left"; a seeded "not found" NAFDAC number shows the check-with-pharmacist warning and creates an alert.
+- **Done when:** a pharmacist dispenses from the formulary and the patient hears it in plain English with reminders; a patient adds a medicine from its pack, it shows "Not checked yet", and the pharmacist approves / edits / rejects it from the queue; scanning the pack answers "Is this my drug?" with the dose from the record; the card shows "days left"; a seeded "not found" NAFDAC number shows the check-with-pharmacist warning and creates an alert.
 
 ### Stage 3 — Assistant, check-ins, red flags, risk
 - `/api/listen` (Spitch STT).
@@ -413,24 +408,24 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - Interaction check on each new prescription vs current meds + allergies → pharmacist alert.
 - Risk score recalculated after every dose log; high → alert.
 - **Caregiver mode:**
-    - Patient settings → "Add a caregiver": name, relationship, phone, language, channel (SMS / WhatsApp later / app), alert after 1 or 2 missed doses. Patient must tick consent.
+    - Patient settings → "Add a caregiver": name, relationship, phone, channel (SMS / WhatsApp later / app), alert after 1 or 2 missed doses. Patient must tick consent.
     - Caregiver gets a one-time SMS asking them to reply YES to accept; only then are alerts sent.
-    - When a dose is marked missed (or not confirmed 60 min after the reminder), and the threshold is reached, send the caregiver an SMS in their language: "Medisent AI: Mama Nkechi has not taken her 8:00 am Lisinopril. Please check on her." Log in `caregiver_alerts`.
+    - When a dose is marked missed (or not confirmed 60 min after the reminder), and the threshold is reached, send the caregiver an SMS in plain English: "Medisent AI: Mama Nkechi has not taken her 8:00 am Lisinopril. Please check on her." Log in `caregiver_alerts`.
     - Red-flag alerts also notify the caregiver immediately.
     - Patient can pause or remove a caregiver at any time.
 - **Impeccable (Stage 3):** `/impeccable shape voice assistant and red-flag screen` first. After building: `/impeccable critique voice assistant` (mic state, listening, thinking, answer, escalation must each be obvious), `/impeccable harden voice assistant` (mic denied, no speech detected, API failure, very long answer), `/impeccable clarify red-flag screen` (short, calm, direct wording), `/impeccable audit red-flag screen` (contrast of white on alert red, call button size). Do NOT run bolder, overdrive or delight on the red-flag screen. `/impeccable shape caregiver setup`, then `/impeccable clarify caregiver setup` (consent wording) and `/impeccable harden caregiver setup` (invalid phone, caregiver never replies, SMS failure).
-- **Done when:** Nkechi Okeke's missed dose sends her caregiver an SMS; a spoken question gets a spoken answer in the same language; "chest pain" triggers the red-flag flow; dashboard data shows risk scores for all 10 patients.
+- **Done when:** Nkechi Okeke's missed dose sends her caregiver an SMS; a spoken question gets a spoken answer in plain English; "chest pain" triggers the red-flag flow; dashboard data shows risk scores for all 10 patients.
 
 ### Stage 4 — Forum and record transfers
 - Forum feed: Medication, Diet, Mental health; posts tagged with the patient's drugs first.
 - Post editor for verified staff (text, optional voice note, drug tags); verified badge with licence body.
-- "Listen in my language": translate + TTS, labelled "machine-translated", link to original.
+- "Listen": every post can be read out loud (TTS, same English voice).
 - Anonymous questions to professionals; crisis keywords → helpline screen.
 - Report button + admin hide.
 - Transfer flow: verify at new hospital → "Transfer my records" → choose scope → new hospital accepts → records COPIED (never deleted).
 - AI transfer summary for the new doctor; FHIR JSON export (Patient, MedicationRequest, Condition, AllergyIntolerance); audit log.
 - **Impeccable (Stage 4):** `/impeccable shape forum feed and post editor` and `/impeccable shape records transfer flow` first. After building: `/impeccable critique forum feed`, `/impeccable layout forum post card`, `/impeccable harden post editor` (empty post, long titles, failed audio upload), `/impeccable clarify transfer consent screen` (patient must understand exactly what is shared), `/impeccable audit transfer flow`.
-- **Done when:** a pharmacist's post plays in Yoruba; Emeka Nwosu moves from Adaeze to Ikenga with meds and reminders intact.
+- **Done when:** a pharmacist's post plays out loud; Emeka Nwosu moves from Adaeze to Ikenga with meds and reminders intact.
 
 ### Stage 5 — Offline, SMS, dashboards
 - Serwist service worker: app shell, routes, audio.
@@ -440,19 +435,18 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - Africa's Talking: SMS reminders; replies 1 = taken, 2 = missed; inbound webhook updates `dose_logs`; voice-call reminder playing cached audio.
 - **No-data mode (basic phones, no internet, no reading needed):**
     - **Staff-assisted signup:** pharmacist/nurse registers a patient from the dashboard with "Basic phone" ticked (`device_type = basic`); the pharmacist scans the label at the counter. Patient gets SMS: "Medisent AI: You're registered with [Hospital]. Reply YES to start reminders."
-    - **SMS reminders** in the patient's language: "08:00 Take Lisinopril 10mg (1 tablet). Reply 1 if taken, 2 if not." Replies update `dose_logs`.
-    - **Voice-call reminders** (`/api/voice`, Africa's Talking Voice): plays the cached Spitch/9jaLingo audio of the instruction, then "Press 1 if taken, 2 if not, 9 to leave a question." DTMF result logged in `voice_calls` and `dose_logs`. Default channel for patients who can't read.
+    - **SMS reminders** in plain English: "08:00 Take Lisinopril 10mg (1 tablet). Reply 1 if taken, 2 if not." Replies update `dose_logs`.
+    - **Voice-call reminders** (`/api/voice`, Africa's Talking Voice): plays the cached Spitch audio of the instruction (English), then "Press 1 if taken, 2 if not, 9 to leave a question." DTMF result logged in `voice_calls` and `dose_logs`. Default channel for patients who can't read.
     - **Escalation:** no reply after 60 min → second reminder → caregiver alert.
-    - **USSD menu** (`/api/ussd`, sandbox code e.g. `*384*123#`), screens ≤ 160 characters, in the patient's language:
+    - **USSD menu** (`/api/ussd`, sandbox code e.g. `*384*123#`), screens ≤ 160 characters, in plain English:
       ```
       Medisent AI – [Hospital]
       1. My medicines today
       2. I took my medicine
       3. I have a side effect
       4. EMERGENCY – I need help
-      5. Change language
       ```
-      1 lists today's doses with times; 2 lists due doses to confirm; 3 offers Dizzy / Rash / Stomach pain / Other → logged as side effect + alert; 4 creates a red-flag alert (pharmacist + caregiver) and shows the hospital phone number; 5 switches language.
+      1 lists today's doses with times; 2 lists due doses to confirm; 3 offers Dizzy / Rash / Stomach pain / Other → logged as side effect + alert; 4 creates a red-flag alert (pharmacist + caregiver) and shows the hospital phone number.
     - **SMS questions:** any other text is treated as a question → assistant with the same safety rules → SMS reply (≤ 2 SMS) or escalation to pharmacist.
     - **Voice questions:** "Press 9" records a question → Spitch STT → pharmacist alert with transcript.
     - **Costs:** hospital pays SMS and calls; USSD may charge users unless zero-rated — note in admin settings; sandbox is free.
@@ -476,9 +470,9 @@ Finish each stage's **Done when** test before the next. After each stage: list f
     - A permanent "Demo mode — fictional data" ribbon on every screen.
     - Demo actions that would send real SMS go to the configured test phone only.
     - `/demo/reset` restores the seeded state after each judge.
-- Every screen's strings in all five message files; run the translate script for new keys; list keys still marked machine-draft.
+- Every screen's strings in `src/content/strings.ts`; no hard-coded text left in components.
 - `/demo/reset` (platform admin only) wipes and reloads seed data.
-- Empty, loading and error states in all five languages.
+- Empty, loading and error states on every screen.
 - Contrast check against section 3; fix any pair under 4.5:1.
 - Test on a small Android screen size and throttled 3G.
 - List anything still broken.
@@ -523,18 +517,18 @@ ikenga,IM-NU-001,Grace Udeh,nurse,NMCN,DEMO-NMCN-3002,+2348000000204,grace@ikeng
 
 ### Patient registry (Emeka Nwosu is in both, for the transfer demo)
 ```csv
-hospital,hospital_number,full_name,age,sex,language,phone,adherence_profile
-adaeze,AH-0001,Emeka Nwosu,67,M,ig,+2348000000301,medium
-adaeze,AH-0002,Nkechi Okeke,72,F,ig,+2348000000302,high_risk
-adaeze,AH-0003,Musa Abdullahi,45,M,ha,+2348000000303,good
-adaeze,AH-0004,Folake Adebayo,34,F,yo,+2348000000304,good
-adaeze,AH-0005,Chukwudi Agu,52,M,pcm,+2348000000305,high_risk
-adaeze,AH-0006,Aisha Lawal,29,F,ha,+2348000000306,medium
-adaeze,AH-0007,Ifeoma Chukwu,24,F,en,+2348000000307,medium
-adaeze,AH-0008,Yusuf Ibrahim,60,M,ha,+2348000000308,good
-adaeze,AH-0009,Bisi Ogunleye,40,F,yo,+2348000000309,good
-ikenga,IM-0001,Emeka Nwosu,67,M,ig,+2348000000301,medium
-ikenga,IM-0002,Obioma Nnadi,55,M,ig,+2348000000310,good
+hospital,hospital_number,full_name,age,sex,phone,adherence_profile
+adaeze,AH-0001,Emeka Nwosu,67,M,+2348000000301,medium
+adaeze,AH-0002,Nkechi Okeke,72,F,+2348000000302,high_risk
+adaeze,AH-0003,Musa Abdullahi,45,M,+2348000000303,good
+adaeze,AH-0004,Folake Adebayo,34,F,+2348000000304,good
+adaeze,AH-0005,Chukwudi Agu,52,M,+2348000000305,high_risk
+adaeze,AH-0006,Aisha Lawal,29,F,+2348000000306,medium
+adaeze,AH-0007,Ifeoma Chukwu,24,F,+2348000000307,medium
+adaeze,AH-0008,Yusuf Ibrahim,60,M,+2348000000308,good
+adaeze,AH-0009,Bisi Ogunleye,40,F,+2348000000309,good
+ikenga,IM-0001,Emeka Nwosu,67,M,+2348000000301,medium
+ikenga,IM-0002,Obioma Nnadi,55,M,+2348000000310,good
 ```
 
 ### Conditions, allergies, prescriptions
@@ -542,9 +536,9 @@ ikenga,IM-0002,Obioma Nnadi,55,M,ig,+2348000000310,good
 | --- | --- | --- | --- | --- |
 | Emeka Nwosu | Hypertension, type 2 diabetes | None | Amlodipine 5 mg once daily; metformin 500 mg twice daily after food | Transfer Adaeze → Ikenga |
 | Nkechi Okeke | Hypertension | None | Lisinopril 10 mg once daily | Scanning ibuprofen triggers interaction alert |
-| Musa Abdullahi | Malaria | None | Artemether-lumefantrine 80/480 mg twice daily for 3 days | Hausa voice |
-| Folake Adebayo | Peptic ulcer | None | Omeprazole 20 mg once daily before breakfast | Yoruba question "Can I take this after food?" |
-| Chukwudi Agu | Hypertension | None | Losartan 50 mg once daily | Pidgin check-in "I dey feel dizzy", then "chest pain" |
+| Musa Abdullahi | Malaria | None | Artemether-lumefantrine 80/480 mg twice daily for 3 days | Fixed-course voice note |
+| Folake Adebayo | Peptic ulcer | None | Omeprazole 20 mg once daily before breakfast | Spoken question "Can I take this after food?" |
+| Chukwudi Agu | Hypertension | None | Losartan 50 mg once daily | Check-in "I have been feeling dizzy", then "chest pain" |
 | Aisha Lawal | Asthma | None | Budesonide inhaler twice daily; salbutamol inhaler when needed | Missed-dose pattern |
 | Ifeoma Chukwu | Depression | None | Sertraline 50 mg once daily | Low-mood check-ins; mental health posts |
 | Yusuf Ibrahim | Type 2 diabetes | None | Metformin 1000 mg twice daily; glibenclamide 5 mg once daily before breakfast | Diabetes diet posts |
@@ -569,8 +563,10 @@ All caregiver phones = `DEMO_TEST_PHONE` during the demo.
 - Emeka Nwosu metformin: 60 tablets, dispensed 25 days ago → 5 days left.
 - Everyone else: enough for 10+ days.
 
-### Drug registration list (`drugs`, all `is_demo = true`)
-- Seed one row per prescribed drug with a fictional demo NAFDAC number (e.g. `DEMO-A4-0001` …) and manufacturer.
+### Formulary / drug registration list (`drugs`, all `is_demo = true`)
+- Seed ~40 common Nigerian medicines (Amlodipine, Metformin, Lisinopril, Artemether-lumefantrine, Amoxicillin, Ciprofloxacin, Paracetamol, Azithromycin, Nifedipine, Atorvastatin, insulin, ORS, …) with a fictional demo NAFDAC number (`DEMO-A4-0001` …), manufacturer and a demo EAN barcode.
+- Seed three pending patient entries (Folake: Amoxicillin; Chukwudi: Paracetamol; Emeka: Atorvastatin) with `ai_prefill` so the verification queue has something to show. Seeded rows have no photos.
+- Seed the roster row `AH-PH-003` "Amara Test-Pharmacist" (never an account): `scripts/stage1-flow-test.mjs` signs her up.
 - Add one fictional "not found" test number `DEMO-X9-9999` printed on a demo pack image, for the warning demo.
 - Real NAFDAC data is not used in the demo; label the list "Demo registration list".
 
@@ -601,12 +597,14 @@ Both demo hospitals plus 3 invented "Demo clinic" entries in Nsukka and Enugu wi
 
 1. Hospital A approved; pharmacist verifies with real staff ID; fake ID rejected.
 2. Patient login: "Welcome to Adaeze Specialist Hospital (Demo)", meds and conditions.
-3. Scan a real drug pack → hear instructions in Igbo → reminders appear → card shows "days left"; registration check shows Registered.
-3b. Type `DEMO-X9-9999` → "not found in our list — check with your pharmacist" warning → pharmacist alert.
-4. Ask by voice in Yoruba: "Can I take this after food?" → spoken answer with linked forum post.
-5. "I dey feel dizzy" logs side effect; "chest pain" opens red-flag alert with nearest clinic.
+3. Pharmacist opens Dispense → Folake → Amoxicillin 500 mg from the formulary → 1 capsule, 3 times a day, 5 days → saved and confirmed; Folake hears it in plain English and the reminders appear.
+3a. Folake adds a medicine herself: pack photo → the reader shows name / strength / NAFDAC with confidence (never a dose) → she picks it from the list and types the dose as told → Home shows the card with "Not checked yet".
+3b. Pharmacist opens "Entries to check": photos, what the reader saw and what Folake typed side by side → Approve (or Edit the dose, or Reject with a reason) → Folake's Home shows "Your pharmacist checked"; the audit log has the action.
+3c. Scan tab, "Is this my drug?": Folake scans the Amoxicillin pack → match → the dose from the record is read aloud; scanning a pack not on her list → "Not on your list, ask your pharmacist"; an expired pack → warning; `DEMO-X9-9999` → "not found in our list — check with your pharmacist" → pharmacist alert.
+4. Ask by voice: "Can I take this after food?" → spoken answer with linked forum post.
+5. "I have been feeling dizzy" logs side effect; "chest pain" opens red-flag alert with nearest clinic.
 6. Airplane mode: reminder fires, "Taken" logs, syncs on reconnect.
-7. Basic phone: SMS reminder → reply 1; voice-call reminder in Igbo → press 1; USSD `*384*123#` → option 4 EMERGENCY → pharmacist alert.
+7. Basic phone: SMS reminder → reply 1; voice-call reminder → press 1; USSD `*384*123#` → option 4 EMERGENCY → pharmacist alert.
 7b. Nkechi misses a dose → her caregiver's (test) phone gets an SMS; refill alert shows "2 days left".
 8. Pharmacist dashboard (with 30-day adherence charts): risk scores, missed doses, dizziness report, red-flag alert, interaction warning.
 9. Emeka transfers to Hospital B; meds, reminders and AI summary arrive.
@@ -650,17 +648,17 @@ It gives the agent a shared design vocabulary of 24 commands, a reviewer (critiq
 - Type scale: body 18px minimum; medicine name and dose are the largest text on patient screens; line-height 1.5 for body.
 - Spacing: 4px base, 8 / 12 / 16 / 24 / 32 steps; cards 14–16px padding, 12px radius; buttons 10px radius, 48px minimum height.
 - Components list from section 3.
-- Hard rules: primary buttons with white text; red only for red-flag alerts; never colour alone (icon + word); no gradients, no glassmorphism, no purple; every screen has a read-aloud button; text must not be clipped when translated.
+- Hard rules: primary buttons with white text; red only for red-flag alerts; never colour alone (icon + word); no gradients, no glassmorphism, no purple; every screen has a read-aloud button; text must not be clipped at large text sizes.
 - Anti-goals: generic SaaS landing (centered hero + three feature cards), purple-pink gradients, tiny grey text, icon-only buttons on patient screens.
 
 **PRODUCT.md** — write a draft from section 1, then run `/impeccable init` to check and complete it. Must contain:
 - Product: Medisent AI — voice-first, offline-ready medication companion for Nigerian hospitals.
-- Users: (1) patients, many elderly or low-literacy, speaking Igbo, Yoruba, Hausa, Pidgin or English, on cheap Android phones with weak network; (2) pharmacists and doctors checking adherence and alerts; (3) hospital admins managing staff and patients.
-- Jobs: take the right medicine at the right time; understand instructions in my language; get help fast in an emergency; (staff) see who is at risk and act.
+- Users: (1) patients, many elderly or low-literacy, on cheap Android phones with weak network; (2) pharmacists and doctors checking adherence and alerts; (3) hospital admins managing staff and patients.
+- Jobs: take the right medicine at the right time; understand instructions by hearing them in plain English; get help fast in an emergency; (staff) see who is at risk and act.
 - Brand personality: trustworthy, warm, calm, plain-spoken, Nigerian.
 - Context of use: noisy clinics, bright sunlight, one hand, interrupted network.
 - Platform: responsive web app / PWA, mobile-first for patients, desktop-first for staff dashboards.
-- Success: a 70-year-old Igbo speaker can confirm a dose in under 10 seconds.
+- Success: a 70-year-old patient can confirm a dose in under 10 seconds.
 
 ### 10.4 Command guide for this project
 

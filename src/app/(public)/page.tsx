@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { tr, formatDate } from "@/lib/strings";
 import { FeaturePhone } from "@/components/landing/FeaturePhone";
 import { PreviewConsole } from "@/components/landing/PreviewConsole";
 import { TopBar } from "@/components/landing/TopBar";
@@ -8,9 +8,8 @@ import { AlertIcon, ArrowRightIcon, LockIcon, ShieldIcon, VerifiedListIcon } fro
 import { Logo } from "@/components/Logo";
 import { StatusChip } from "@/components/StatusChip";
 import { previewLabel } from "@/config/landingPreview";
-import { defaultLocale, isLocale, localeCodes, locales } from "@/config/locales";
 
-/** A wall-clock time in Lagos, formatted for the visitor's locale as 24-hour (`08:00`). */
+/** A wall-clock time in Lagos, formatted as 24-hour (`08:00`). */
 function lagosTime(hour: number) {
   return new Date(Date.UTC(2026, 0, 15, hour - 1, 0));
 }
@@ -20,11 +19,8 @@ function lagosTime(hour: number) {
  * The brand name appears in the top bar only. The top bar carries the read-aloud button.
  */
 export default async function LandingPage() {
-  const t = await getTranslations("landing");
-  const format = await getFormatter();
-  const rawLocale = await getLocale();
-  const locale = isLocale(rawLocale) ? rawLocale : defaultLocale;
-  const reminderTime = format.dateTime(lagosTime(previewLabel.reminderHour), {
+  const t = tr("landing");
+  const reminderTime = formatDate(lagosTime(previewLabel.reminderHour), {
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23",
@@ -88,8 +84,7 @@ export default async function LandingPage() {
               </Link>
             </div>
             <div className="mt-10 lg:mt-12">
-              {/* English visitors see the Igbo sentence with its gloss first, as in the comp. */}
-              <PreviewConsole initial={locale === "en" ? "ig" : locale} time={reminderTime} />
+              <PreviewConsole time={reminderTime} />
             </div>
           </div>
         </section>
@@ -275,10 +270,7 @@ export default async function LandingPage() {
           <p className="flex items-center">
             <Logo />
           </p>
-          <p className="font-mono text-sm text-ink-2">
-            <span className="sr-only">{t("footerLanguages")}: </span>
-            {locales.map((code) => localeCodes[code]).join(" · ")}
-          </p>
+          <p className="font-mono text-sm text-ink-2">{t("footerNote")}</p>
         </div>
         {process.env.NODE_ENV !== "production" && <DevLetterCheck label={t("letterCheck")} />}
       </footer>
@@ -299,14 +291,14 @@ function SectionHead({ id, title, intro }: { id: string; title: string; intro: R
 }
 
 /**
- * Development-only glyph check (BUILD_PLAN Stage 0). Outside <main> so read-aloud skips it.
+ * Development-only glyph check for the letters in Nigerian names (BUILD_PLAN Stage 0). Outside <main> so read-aloud skips it.
  * TODO (Stage 6): remove, see docs/stage-6-tasks.md.
  */
 function DevLetterCheck({ label }: { label: string }) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-4 sm:px-6">
       <p className="text-sm text-ink-3">
-        {label}: <span lang="yo">ẹ ọ ṣ ị ụ ṅ</span> · <span lang="yo" className="font-mono">ẹ ọ ṣ ị ụ ṅ</span>
+        {label}: <span>ẹ ọ ṣ ị ụ ṅ</span> · <span className="font-mono">ẹ ọ ṣ ị ụ ṅ</span>
       </p>
     </div>
   );

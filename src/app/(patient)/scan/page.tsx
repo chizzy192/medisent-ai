@@ -6,7 +6,7 @@ export default async function ScanPage() {
   const { profile } = await requireRole(patientRoles);
   return (
     <main id="main" className="mx-auto w-full max-w-xl flex-1 px-4 py-5 sm:px-6">
-      <ScanFlow locale={profile.language} rate={Number(profile.speech_rate) || 1} />
+      <ScanFlow rate={Number(profile.speech_rate) || 1} />
     </main>
   );
 }

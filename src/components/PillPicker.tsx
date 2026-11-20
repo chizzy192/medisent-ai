@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { tr } from "@/lib/strings";
 import { CheckIcon } from "./icons";
 import { PillIcon, type PillShape } from "./PillIcon";
 
@@ -21,7 +21,7 @@ export const PILL_COLOURS: { hex: string; key: string }[] = [
 ];
 
 export function PillPicker({ shape, color, onShape, onColor }: { shape: PillShape; color: string; onShape: (s: PillShape) => void; onColor: (c: string) => void }) {
-  const t = useTranslations("pill");
+  const t = tr("pill");
   return (
     <div className="space-y-4">
       <fieldset>
