@@ -117,8 +117,8 @@ async function notify(phone: string | null | undefined, text: string, id: string
   must("patient_notified_at", await createAdminClient().from("prescriptions").update({ patient_notified_at: new Date().toISOString() }).eq("id", id));
 }
 
+/** /verify itself is NOT revalidated: the card must stay to show its done message; the entry is gone on the next visit. */
 function revalidate(patientId: string) {
-  revalidatePath("/verify");
   revalidatePath("/dashboard");
   revalidatePath(`/patients/${patientId}`);
   revalidatePath("/home");

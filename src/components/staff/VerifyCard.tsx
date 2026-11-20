@@ -59,10 +59,12 @@ export function VerifyCard({ entry }: { entry: QueueEntry }) {
     quantity: entry.quantity_dispensed ? String(entry.quantity_dispensed) : "",
   });
 
-  if (state?.done) {
+  const done = state?.done;
+
+  if (done) {
     return (
-      <FormMessage tone={state.done === "rejected" ? "info" : "success"}>
-        <p className="font-semibold">{t(`done.${state.done}`, { name: entry.patient_name, drug: entry.drug_name })}</p>
+      <FormMessage tone={done === "rejected" ? "info" : "success"}>
+        <p className="font-semibold">{t(`done.${done}`, { name: entry.patient_name, drug: entry.drug_name })}</p>
       </FormMessage>
     );
   }

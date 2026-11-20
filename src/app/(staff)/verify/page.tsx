@@ -1,6 +1,6 @@
 import { tr } from "@/lib/strings";
-import { EmptyState } from "@/components/EmptyState";
-import { VerifyCard, type QueueEntry } from "@/components/staff/VerifyCard";
+import type { QueueEntry } from "@/components/staff/VerifyCard";
+import { VerifyQueue } from "@/components/staff/VerifyQueue";
 import { SectionLabel } from "@/components/ui";
 import type { PackRead } from "@/lib/ai/scan";
 import { requireRole } from "@/lib/auth/dal";
@@ -83,19 +83,7 @@ export default async function VerifyPage() {
         <p className="mt-1 text-base text-ink-2">{t("intro")}</p>
         <p className="mt-1 font-mono text-sm text-ink-2">{t("count", { count: entries.length })}</p>
       </div>
-      {entries.length === 0 ? (
-        <EmptyState label={t("title")} title={t("emptyTitle")}>
-          <p>{t("emptyBody")}</p>
-        </EmptyState>
-      ) : (
-        <ul className="space-y-4">
-          {entries.map((e) => (
-            <li key={e.id}>
-              <VerifyCard entry={e} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <VerifyQueue entries={entries} />
     </main>
   );
 }
