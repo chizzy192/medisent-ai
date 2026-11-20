@@ -28,6 +28,9 @@ export default async function DashboardPage() {
       return [];
     }),
   ]);
+  const { data: riskRows } = await supabase.from("risk_scores").select("patient_id,score,band,updated_at").order("score", { ascending: false });
+  const { data: riskPeople } = riskRows?.length ? await supabase.from("profiles").select("id,full_name,hospital_number").in("id", riskRows.map((r) => r.patient_id)) : { data: [] as { id: string; full_name: string; hospital_number: string | null }[] };
+  const riskName = new Map((riskPeople ?? []).map((p) => [p.id, p]));
   const ended = allCourses.filter((c) => c.finished);
   const completedPct = ended.length ? Math.round((ended.filter((c) => c.completed).length / ended.length) * 100) : null;
   const atRisk = allCourses.filter((c) => c.atRisk);
@@ -75,6 +78,28 @@ export default async function DashboardPage() {
           </Card>
         ))}
       </ul>
+
+      <Card as="section" className="space-y-3" testId="risk-scores">
+        <h2 className="text-xl">{t("riskTitle")}</h2>
+        <p className="text-base text-ink-2">{t("riskBody")}</p>
+        {(riskRows ?? []).length === 0 ? (
+          <p className="text-base text-ink-2">{t("riskNone")}</p>
+        ) : (
+          <ul className="divide-y divide-surface-2">
+            {(riskRows ?? []).map((r) => (
+              <li key={r.patient_id} className="flex flex-wrap items-center justify-between gap-2 py-2" data-testid="risk-row">
+                <Link href={`/patients/${r.patient_id}`} className="min-w-0 font-semibold text-primary underline">
+                  {riskName.get(r.patient_id)?.full_name ?? "—"}
+                </Link>
+                <span className="font-mono text-sm text-ink-2">{riskName.get(r.patient_id)?.hospital_number ?? ""}</span>
+                <StatusChip tone={r.band === "high" ? "danger" : r.band === "medium" ? "warning" : "success"}>
+                  {t(`riskBand.${r.band}`)} <span className="font-mono">{r.score}</span>
+                </StatusChip>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
 
       <Card as="section" className="space-y-3" testId="courses-at-risk">
         <h2 className="text-xl">{t("coursesAtRiskTitle")}</h2>

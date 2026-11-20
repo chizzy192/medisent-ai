@@ -4,6 +4,8 @@ import { isServiceRoleConfigured } from "@/lib/db/secrets";
 import { daysLeft, lagosDate } from "@/lib/reminders";
 import { sendSms } from "@/lib/sms";
 import { checkCourseRisk, loadCourses } from "@/lib/course";
+import { sweepUnconfirmedDoses } from "@/lib/caregivers";
+import { recalcRisk } from "@/lib/risk";
 
 /**
  * Daily refill job (BUILD_PLAN Stage 2): for every active refill running out within
@@ -54,5 +56,16 @@ export async function GET(request: Request) {
   // Finish-your-course: every active course with 2+ missed doses gets one alert and one SMS.
   let coursesAtRisk = 0;
   for (const c of await loadCourses(admin, {})) if (c.atRisk && (await checkCourseRisk(c.prescriptionId))) coursesAtRisk++;
-  return NextResponse.json({ ok: true, checked: refills?.length ?? 0, alerted, coursesAtRisk, today });
+  // Caregivers: today's doses not confirmed 60 minutes after the reminder.
+  const caregiverSms = await sweepUnconfirmedDoses().catch((e) => {
+    console.error("[caregiver sweep]", e);
+    return 0;
+  });
+  // Risk score for every patient (also recalculated live after each dose log and check-in).
+  const { data: patients } = await admin.from("profiles").select("id,hospital_id").eq("role", "patient").eq("verified_status", "verified");
+  let risks = 0;
+  for (const p of patients ?? []) {
+    await recalcRisk(p.id, p.hospital_id).then(() => risks++).catch((e) => console.error("[risk]", e));
+  }
+  return NextResponse.json({ ok: true, checked: refills?.length ?? 0, alerted, coursesAtRisk, caregiverSms, risks, today });
 }

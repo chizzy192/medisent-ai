@@ -1,6 +1,9 @@
-import { tr } from "@/lib/strings";
+import { tr, formatDate } from "@/lib/strings";
 import { signOut } from "@/lib/auth/actions";
 import { AccessibilityForm } from "@/components/AccessibilityForm";
+import { CaregiverSection, type CaregiverItem } from "@/components/CaregiverSection";
+import { createClient } from "@/lib/db/server";
+import { demoMode } from "@/lib/db/env";
 import { StatusChip } from "@/components/StatusChip";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Card, SectionLabel } from "@/components/ui";
@@ -17,6 +20,17 @@ export default async function MePage() {
   const { profile, hospital } = session;
   const t = tr("me");
   const tAccess = tr("access");
+  let caregivers: CaregiverItem[] = [];
+  if (profile.role === "patient") {
+    const supabase = await createClient();
+    const [{ data: cgs }, { data: last }] = await Promise.all([
+      supabase.from("caregivers").select("id,full_name,relationship,phone,notify_after_missed,status").eq("active", true).order("full_name"),
+      supabase.from("caregiver_alerts").select("caregiver_id,sent_at").order("sent_at", { ascending: false }).limit(50),
+    ]);
+    const lastBy = new Map<string, string>();
+    for (const a of last ?? []) if (!lastBy.has(a.caregiver_id)) lastBy.set(a.caregiver_id, formatDate(new Date(a.sent_at), { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lagos" }));
+    caregivers = ((cgs ?? []) as Omit<CaregiverItem, "lastAlert">[]).map((c) => ({ ...c, lastAlert: lastBy.get(c.id) ?? null }));
+  }
 
   const rows: { label: string; value: string | null }[] = [
     { label: t("role"), value: t(`roles.${profile.role}`) },
@@ -47,6 +61,15 @@ export default async function MePage() {
         </dl>
       </Card>
 
+      {profile.role === "patient" && (
+        <Card as="section" id="caregivers">
+          <h2 className="text-xl">{t("caregiversTitle")}</h2>
+          <div className="mt-3">
+            <CaregiverSection items={caregivers} demo={demoMode} />
+          </div>
+        </Card>
+      )}
+
       <Card as="section" id="accessibility">
         <h2 className="text-xl">{tAccess("title")}</h2>
         <p className="mt-1 text-base text-ink-2">{tAccess("intro")}</p>
@@ -58,11 +81,6 @@ export default async function MePage() {
             sample={tAccess("sample")}
           />
         </div>
-      </Card>
-
-      <Card as="section">
-        <h2 className="text-xl">{t("comingTitle")}</h2>
-        <p className="mt-1 text-base text-ink-2">{t("comingBody")}</p>
       </Card>
 
       <form action={signOut}>

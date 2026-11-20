@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { patientRoles, requireRole } from "@/lib/auth/dal";
 import { createAdminClient } from "@/lib/db/admin";
+import { caregiverMissedDose } from "@/lib/caregivers";
 import { checkCourseRisk } from "@/lib/course";
+import { recalcRisk } from "@/lib/risk";
 import { lagosDate, LATE_AFTER_MS, SNOOZE_MS } from "@/lib/reminders";
 
 /**
@@ -22,7 +24,7 @@ export async function logDose(reminderId: string, scheduledAtIso: string, action
 
   const now = new Date();
   const status = action === "taken" ? (now.getTime() - scheduledAt.getTime() > LATE_AFTER_MS ? "late" : "taken") : action;
-  const { error } = await admin.from("dose_logs").upsert(
+  const { data: logRow, error } = await admin.from("dose_logs").upsert(
     {
       reminder_id: reminderId,
       patient_id: profile.id,
@@ -33,9 +35,13 @@ export async function logDose(reminderId: string, scheduledAtIso: string, action
       synced: true,
     },
     { onConflict: "reminder_id,scheduled_at" },
-  );
+  ).select("id").single();
   if (error) return { ok: false };
-  if (status === "missed") await checkCourseRisk(reminder.prescription_id).catch((e) => console.error("[course]", e));
+  if (status === "missed") {
+    await checkCourseRisk(reminder.prescription_id).catch((e) => console.error("[course]", e));
+    await caregiverMissedDose({ patientId: profile.id, reminderId, scheduledAt, doseLogId: logRow?.id ?? null }).catch((e) => console.error("[caregiver]", e));
+  }
+  await recalcRisk(profile.id, profile.hospital_id).catch((e) => console.error("[risk]", e));
   revalidatePath("/home");
   return { ok: true, status };
 }

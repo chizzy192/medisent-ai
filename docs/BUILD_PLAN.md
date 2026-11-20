@@ -412,22 +412,22 @@ Finish each stage's **Done when** test before the next. After each stage: list f
 - **Done when:** a pharmacist dispenses from the formulary and the patient hears it in plain English with reminders; a patient adds a medicine from its pack, it shows "Not checked yet", and the pharmacist approves / edits / rejects it from the queue; scanning the pack answers "Is this my drug?" with the dose from the record; the card shows "days left"; a seeded "not found" NAFDAC number shows the check-with-pharmacist warning and creates an alert.
 
 ### Stage 3 — Assistant, check-ins, red flags, risk
-- `/api/listen` (Spitch STT).
-- `/api/assistant` with the rules in section 5; reply as text + audio; saved to `assistant_messages`.
-- Red-flag layer before the model; escalation alerts.
-- Daily check-in voice flow; parser extracts mood, side effects, red flag.
+- **Built 2026-11-20 (English only).** `/api/listen` (Spitch STT, English) behind `VoiceInput` (mic, halo, live waveform, transcript, "Try asking" chips).
+- `/api/assistant` with the rules in section 5 (`src/lib/ai/answer-rules.ts`: system prompt + an answer guard that replaces any dosing change or diagnosis with the safe sentence; unit tests in `scripts/stage3-rules.test.mjs`); context = verified prescriptions (pending ones labelled), allergies, conditions, course progress, forum posts; reply as text + Spitch audio through the shared player; saved to `assistant_messages`; "Call my pharmacist" always on screen.
+- Red-flag layer before the model (`src/lib/ai/redflags.ts`, keyword rules, never AI): emergency words → `/redflag` (AlertBanner, big call button, nearest seeded clinics on a Leaflet map, staff alert, caregiver SMS); self-harm words → `/redflag?kind=crisis` (helplines from `src/config/helplines.ts`, verify before demo) + urgent staff alert.
+- Daily check-in `/checkin`: three questions by tap, voice or text; parser (rules first, model second) extracts mood, side effects, red flag; a side effect raises a `side_effect` staff alert.
 - Signature element 5: live voice waveform, transcript, "Try asking" chips, recording halo.
 - Red-flag screen: AlertBanner, call button, nearest seeded clinics on a Leaflet map; staff alert.
 - Interaction check on each new prescription vs current meds + allergies → pharmacist alert.
-- Risk score recalculated after every dose log; high → alert.
-- **Caregiver mode:**
+- Risk score (`src/lib/risk.ts`, formula in section 5 plus +15 course at risk, +10 per open red flag) recalculated after every dose log, check-in and red flag, and daily by the cron; high → one `high_risk` alert per day. Dashboard lists every patient's score; the Alerts tab lists and handles alerts.
+- **Caregiver mode (built):** Me → Caregivers (consent tick, invitation SMS, YES reply through `/api/sms`, demo "Simulate YES" button), missed-dose texts after 1 or 2 missed doses (live on "I missed it" and the cron's 60-minute sweep), red flags notify at once, pause / resume / remove; every text in `caregiver_alerts` (one per dose slot). Migration `0012_stage3.sql`.
     - Patient settings → "Add a caregiver": name, relationship, phone, channel (SMS / WhatsApp later / app), alert after 1 or 2 missed doses. Patient must tick consent.
     - Caregiver gets a one-time SMS asking them to reply YES to accept; only then are alerts sent.
     - When a dose is marked missed (or not confirmed 60 min after the reminder), and the threshold is reached, send the caregiver an SMS in plain English: "Medisent AI: Mama Nkechi has not taken her 8:00 am Lisinopril. Please check on her." Log in `caregiver_alerts`.
     - Red-flag alerts also notify the caregiver immediately.
     - Patient can pause or remove a caregiver at any time.
 - **Impeccable (Stage 3):** `/impeccable shape voice assistant and red-flag screen` first. After building: `/impeccable critique voice assistant` (mic state, listening, thinking, answer, escalation must each be obvious), `/impeccable harden voice assistant` (mic denied, no speech detected, API failure, very long answer), `/impeccable clarify red-flag screen` (short, calm, direct wording), `/impeccable audit red-flag screen` (contrast of white on alert red, call button size). Do NOT run bolder, overdrive or delight on the red-flag screen. `/impeccable shape caregiver setup`, then `/impeccable clarify caregiver setup` (consent wording) and `/impeccable harden caregiver setup` (invalid phone, caregiver never replies, SMS failure).
-- **Done when:** Nkechi Okeke's missed dose sends her caregiver an SMS; a spoken question gets a spoken answer in plain English; "chest pain" triggers the red-flag flow; dashboard data shows risk scores for all 10 patients.
+- **Done when:** Nkechi Okeke's missed dose sends her caregiver an SMS; a spoken question gets a spoken answer in plain English; "chest pain" triggers the red-flag flow; dashboard data shows risk scores for all 10 patients. Test: `scripts/stage3-test.mjs`.
 
 ### Stage 4 — Forum and record transfers
 - Forum feed: Medication, Diet, Mental health; posts tagged with the patient's drugs first.
@@ -617,8 +617,8 @@ Both demo hospitals plus 3 invented "Demo clinic" entries in Nsukka and Enugu wi
 3d. Interaction: pharmacist dispenses ibuprofen to Yusuf (warfarin + aspirin) → red "Don't take these together" card → save is refused until "I have reviewed this interaction" is ticked → audit_log row; Yusuf's page and the dashboard show the interaction alert.
 3e. Course (8 finished courses seeded, 6 completed → 75%): Aisha's Home shows "Day 3 of 5 · 6 doses left · Don't stop early" read aloud; Musa's card is amber "At risk, 2 doses missed"; the dashboard lists Musa under "Courses at risk" and shows "Courses completed %"; Musa taps "I stopped taking this early" → doctor alert.
 3c. Scan tab, "Is this my drug?": Folake scans the Amoxicillin pack → match → the dose from the record is read aloud; scanning a pack not on her list → "Not on your list, ask your pharmacist"; an expired pack → warning; `DEMO-X9-9999` → "not found in our list — check with your pharmacist" → pharmacist alert.
-4. Ask by voice: "Can I take this after food?" → spoken answer with linked forum post.
-5. "I have been feeling dizzy" logs side effect; "chest pain" opens red-flag alert with nearest clinic.
+4. Ask by voice: "Can I take this after food?" → spoken answer from the record; "I missed my dose, what now?" → only the recorded instruction + "ask your pharmacist".
+5. Check-in: "I have been feeling dizzy" logs a side effect and alerts the pharmacist; asking about "chest pain" opens the red-flag screen with the call button and nearest clinics; the dashboard Alerts tab shows the red flag.
 6. Airplane mode: reminder fires, "Taken" logs, syncs on reconnect.
 7. Basic phone: SMS reminder → reply 1; voice-call reminder → press 1; USSD `*384*123#` → option 4 EMERGENCY → pharmacist alert.
 7b. Nkechi misses a dose → her caregiver's (test) phone gets an SMS; refill alert shows "2 days left".

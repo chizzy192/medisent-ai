@@ -29,6 +29,13 @@ update reminders set active = true where prescription_id::text like 'f0000000-%'
 delete from refills where prescription_id::text like 'f0000000-%';
 delete from alerts;
 
+-- ---------- Stage 3 rows: questions, check-ins, caregiver texts, inbound SMS, scores ----------
+delete from assistant_messages;
+delete from caregiver_alerts;
+delete from caregivers;
+delete from inbound_sms;
+delete from risk_scores;
+
 -- ---------- accounts, sign-ups and hospitals created at rehearsals ----------
 delete from otp_codes;
 delete from signup_sessions;

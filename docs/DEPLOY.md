@@ -5,7 +5,7 @@ this document contains a secret value; copy values from the Supabase and provide
 
 ## 1. Before you start
 
-- Supabase project with migrations `0001` – `0011` applied in order (SQL editor, one file at a
+- Supabase project with migrations `0001` – `0012` applied in order (SQL editor, one file at a
   time) and `supabase/seed.sql` run once (`docs/SUPABASE_SETUP.md`).
 - Supabase → Authentication → Providers → Email enabled, **Confirm email off** (the app verifies
   people with its own OTP).
@@ -30,7 +30,7 @@ Names only; the values come from the provider dashboards.
 | `GEMINI_API_KEY` | **server only** | yes (pack reader) | Google AI Studio key. |
 | `GEMINI_MODEL` | **server only** | no | Override of the model list in `src/lib/ai/scan.ts`. |
 | `SPITCH_API_KEY` | **server only** | yes (voice) | Without it the browser's English voice reads instead, labelled "Offline voice". |
-| `AFRICASTALKING_USERNAME` | **server only** | no | `sandbox` for the sandbox. Without the three Africa's Talking values SMS is logged, not sent. |
+| `AFRICASTALKING_USERNAME` | **server only** | no | `sandbox` for the sandbox. Without the three Africa's Talking values SMS is logged, not sent (caregiver texts then show as "failed: not_configured" in `caregiver_alerts`). Inbound SMS webhook (caregiver YES replies): point Africa's Talking → SMS → Callback URL at `https://<your-app>.vercel.app/api/sms`. |
 | `AFRICASTALKING_API_KEY` | **server only** | no | |
 | `AFRICASTALKING_SENDER_ID` | **server only** | no | |
 | `CRON_SECRET` | **server only** | yes | Any long random string. Vercel sends it as `Authorization: Bearer …` to the cron route; the route refuses other callers. |

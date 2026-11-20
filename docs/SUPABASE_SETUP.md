@@ -29,7 +29,8 @@ SQL editor → New query. Paste and run each file in this order, one at a time:
 9. `supabase/migrations/0009_english_only.sql` (drops every language column and the language enum; clears cached audio)
 10. `supabase/migrations/0010_intake.sql` (formulary intake: source/status, photos bucket `med-photos`)
 11. `supabase/migrations/0011_interactions_courses.sql` (interaction rules, course tracking, new alert types)
-12. `supabase/seed.sql` (safe to run again later; it regenerates the 30-day dose logs from today)
+12. `supabase/migrations/0012_stage3.sql` (assistant, check-ins, caregiver status, inbound SMS)
+13. `supabase/seed.sql` (safe to run again later; it regenerates the 30-day dose logs from today)
 
 Already ran some of them? Run the missing ones in order, then the seed again. To restore demo state later, see docs/DEPLOY.md section 6 (reset.sql + seed.sql, or the platform admin's "Reset demo data" button).
 

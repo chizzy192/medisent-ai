@@ -384,12 +384,12 @@ from seed_people where role = 'patient'
 on conflict (patient_id) do update set score = excluded.score, band = excluded.band, updated_at = now();
 
 -- ---------- caregivers (phones are replaced by DEMO_TEST_PHONE when the app sends in demo mode) ----------
-insert into caregivers (patient_id, full_name, relationship, phone, channel, notify_after_missed, consent_at)
+insert into caregivers (patient_id, full_name, relationship, phone, channel, notify_after_missed, consent_at, status, accepted_at)
 select * from (values
-  ('c0000000-0000-4000-8000-000000000302'::uuid, 'Adaeze Okeke', 'Daughter', '+2348000000902', 'sms'::caregiver_channel_t, 1, now()),
-  ('c0000000-0000-4000-8000-000000000301'::uuid, 'Chinedu Nwosu', 'Son', '+2348000000901', 'sms'::caregiver_channel_t, 2, now()),
-  ('c0000000-0000-4000-8000-000000000305'::uuid, 'Ngozi Agu', 'Wife', '+2348000000905', 'sms'::caregiver_channel_t, 1, now())
-) as v(patient_id, full_name, relationship, phone, channel, notify_after_missed, consent_at)
+  ('c0000000-0000-4000-8000-000000000302'::uuid, 'Adaeze Okeke', 'Daughter', '+2348000000902', 'sms'::caregiver_channel_t, 1, now(), 'accepted', now()),
+  ('c0000000-0000-4000-8000-000000000301'::uuid, 'Chinedu Nwosu', 'Son', '+2348000000901', 'sms'::caregiver_channel_t, 2, now(), 'accepted', now()),
+  ('c0000000-0000-4000-8000-000000000305'::uuid, 'Ngozi Agu', 'Wife', '+2348000000905', 'sms'::caregiver_channel_t, 1, now(), 'accepted', now())
+) as v(patient_id, full_name, relationship, phone, channel, notify_after_missed, consent_at, status, accepted_at)
 where not exists (select 1 from caregivers c where c.patient_id = v.patient_id and c.full_name = v.full_name);
 
 -- ---------- refills ----------

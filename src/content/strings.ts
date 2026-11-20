@@ -185,7 +185,8 @@ export const strings = {
     "reminder": "Reminder",
     "add": "Add a medicine",
     "dispense": "Dispense",
-    "verify": "Entries to check"
+    "verify": "Entries to check",
+    "redflag": "Help now"
   },
   "setup": {
     "title": "Supabase is not set up yet",
@@ -562,7 +563,15 @@ export const strings = {
     "coursesCompleted": "Courses completed (finished with at most 1 missed dose)",
     "coursesAtRiskTitle": "Courses at risk",
     "coursesAtRiskNone": "No patient has missed two or more doses of a course.",
-    "courseRisk": "Day {day} of {total} · {missed} missed"
+    "courseRisk": "Day {day} of {total} · {missed} missed",
+    "riskTitle": "Adherence risk",
+    "riskBody": "Recalculated after every dose log and check-in. High risk raises an alert.",
+    "riskNone": "No scores yet.",
+    "riskBand": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
   },
   "me": {
     "label": "Me",
@@ -590,7 +599,8 @@ export const strings = {
       "pending": "Pending",
       "rejected": "Rejected",
       "blocked": "Blocked"
-    }
+    },
+    "caregiversTitle": "Caregivers"
   },
   "errorPage": {
     "label": "Error",
@@ -1034,5 +1044,175 @@ export const strings = {
     "working": "Resetting…",
     "done": "Done in {seconds} seconds. Demo data is back to the seed.",
     "failed": "The reset did not finish. Nothing was changed if the error happened before the first step."
+  },
+  "mic": {
+    "start": "Speak your question",
+    "stop": "Stop recording",
+    "hint": "Tap the microphone and speak, or type below.",
+    "listening": "Listening… {seconds}s",
+    "transcribing": "Hearing you…",
+    "errors": {
+      "denied": "The microphone is switched off for this app. You can type instead.",
+      "unsupported": "This browser cannot record. You can type instead.",
+      "noSpeech": "We did not hear anything. Tap the microphone and speak clearly, or type instead.",
+      "failed": "We could not understand the recording. Try again, or type instead.",
+      "notConfigured": "Voice input is not set up on this server. You can type instead.",
+      "offline": "You are offline. Voice needs the internet; you can type instead.",
+      "tooLong": "That was 30 seconds, so we stopped. Keep it short."
+    }
+  },
+  "assistant": {
+    "label": "Ask",
+    "title": "Ask about your medicines",
+    "intro": "Answers come from your own record, in plain English. For anything else, ask your pharmacist.",
+    "historyLabel": "Your questions and answers",
+    "empty": "Ask anything about the medicines on your list. Speak or type.",
+    "tryAsking": "Try asking",
+    "chips": {
+      "food": "Can I take this with food?",
+      "missed": "I missed my dose, what now?",
+      "sideEffects": "What are the side effects?"
+    },
+    "thinking": "Reading your record…",
+    "unsureChip": "Pharmacist told",
+    "typeLabel": "Your question",
+    "placeholder": "For example: can I take my tablets after food?",
+    "send": "Ask",
+    "callPharmacist": "Call my pharmacist",
+    "noPhone": "{hospital} has no phone on file. Ask at the pharmacy desk.",
+    "noHospital": "No hospital on your account. Ask your pharmacist in person.",
+    "disclaimer": "The app never starts, stops or changes a dose, and never says what an illness is. Your pharmacist does that.",
+    "errors": {
+      "failed": "We could not get an answer just now. Try again, or call your pharmacist.",
+      "offline": "You are offline. Questions need the internet. Your medicines and reminders still work."
+    }
+  },
+  "redflag": {
+    "label": "Alert · {time}",
+    "emergency": {
+      "title": "This needs help now",
+      "body": "Stop what you are doing. Call for help, or go to the nearest clinic. Do not take more medicine until someone has seen you.",
+      "callHospital": "Call {hospital}",
+      "call112": "Call 112 (emergency)",
+      "also112": "If nobody answers, call 112."
+    },
+    "crisis": {
+      "title": "You are not alone",
+      "body": "It sounds like you are in a very hard place. Please talk to someone now. These people are trained to listen and will not judge you.",
+      "call": "Call {name}",
+      "helplines": "People to call now",
+      "verify": "Numbers to be verified before the demo (src/config/helplines.ts)."
+    },
+    "staffTold": "Your hospital has been told.",
+    "nearest": "Nearest clinics",
+    "mapLabel": "Map of nearby clinics",
+    "youAreHere": "You are here",
+    "useMyLocation": "Use my location",
+    "locationOff": "Location is off; the map shows the clinics near your hospital.",
+    "call": "Call",
+    "backHome": "Back to today"
+  },
+  "checkin": {
+    "stepLabel": "Daily check-in · {step} of 3",
+    "questions": {
+      "feeling": "How do you feel today?",
+      "sideEffects": "Any side effects from your medicines?",
+      "problems": "Any problems taking your medicines?"
+    },
+    "hearQuestion": "Hear the question",
+    "options": {
+      "good": "Good",
+      "okay": "Okay",
+      "low": "Not good",
+      "none": "No side effects",
+      "dizziness": "Dizziness",
+      "nausea": "Nausea",
+      "headache": "Headache",
+      "rash": "Rash",
+      "stomachPain": "Stomach pain",
+      "noProblem": "No problems",
+      "forgot": "I forget sometimes",
+      "ranOut": "I ran out",
+      "hardToSwallow": "Hard to swallow",
+      "cost": "Cost"
+    },
+    "orType": "Or say it in your own words",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish check-in",
+    "saving": "Saving…",
+    "alreadyToday": "You already checked in today. You can do it again if something changed.",
+    "doneLabel": "Check-in saved",
+    "doneTitle": "Thank you. See you tomorrow.",
+    "thanksSpoken": "Thank you. Your check-in is saved. See you tomorrow.",
+    "moods": {
+      "good": "Feeling good",
+      "okay": "Feeling okay",
+      "low": "Not feeling good"
+    },
+    "alerted": "Your pharmacist has been told about the side effect.",
+    "noAlert": "Nothing needs your pharmacist today.",
+    "backHome": "Back to today",
+    "errors": {
+      "failed": "We could not save the check-in. Try again.",
+      "offline": "You are offline. Try again when you are back online."
+    }
+  },
+  "caregivers": {
+    "intro": "A caregiver gets a text when you miss a dose or need urgent help. They must reply YES first.",
+    "name": "Caregiver's name",
+    "relationship": "Relationship",
+    "relationshipHint": "Daughter, son, wife, friend…",
+    "phone": "Their phone number",
+    "phoneHint": "A Nigerian number, for example 0803 000 0000",
+    "notifyAfter": "Text them after",
+    "after": "{count, plural, one {# missed dose} other {# missed doses}}",
+    "consent": "I agree that Medisent AI may text this person about my missed doses and emergencies. I can stop this at any time.",
+    "add": "Add and send the invitation",
+    "addButton": "Add a caregiver",
+    "cancel": "Cancel",
+    "saving": "Sending…",
+    "invited": "Invitation sent. Alerts start once they reply YES.",
+    "status": {
+      "pending": "Waiting for YES",
+      "accepted": "Active",
+      "paused": "Paused"
+    },
+    "resend": "Send the invitation again",
+    "simulateYes": "Simulate YES reply (demo)",
+    "pause": "Pause",
+    "resume": "Resume",
+    "remove": "Remove",
+    "lastAlert": "Last text: {when}",
+    "errors": {
+      "nameRequired": "Type the caregiver's name.",
+      "phoneInvalid": "That is not a Nigerian phone number.",
+      "ownPhone": "That is your own number. Use the caregiver's.",
+      "consentRequired": "Tick the box to allow texts to this person.",
+      "server": "We could not save. Try again."
+    },
+    "invitedNotSent": "Saved, but the invitation text could not be sent (SMS is not set up on this server). Tell them to reply YES when they get it, or use the demo button."
+  },
+  "alerts": {
+    "title": "Alerts",
+    "count": "{count, plural, =0 {Nothing open} one {# open} other {# open}}",
+    "emptyTitle": "No open alerts",
+    "emptyBody": "Red flags, side effects, interactions, missed doses and questions appear here.",
+    "handledTitle": "Recently handled",
+    "markHandled": "Mark handled",
+    "handling": "Saving…",
+    "types": {
+      "red_flag": "Red flag",
+      "side_effect": "Side effect",
+      "missed_doses": "Missed doses",
+      "high_risk": "High risk",
+      "interaction": "Interaction",
+      "question": "Question",
+      "drug_not_found": "NAFDAC not found",
+      "refill": "Refill",
+      "course_at_risk": "Course at risk",
+      "course_stopped": "Course stopped",
+      "verification_blocked": "Sign-up blocked"
+    }
   }
 } as const;
